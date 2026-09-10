@@ -1,0 +1,19 @@
+{
+  "termo_numero": "Termo de Adesão oficial registrado no Transferegov",
+  "cnpj_proponente": "88.000.914/0001-01",
+  "municipio": "Viamão",
+  "uf": "RS",
+  "orgao_concedente": "MINISTÉRIO DA CULTURA (Fundo Nacional de Cultura)",
+  "codigo_orgao_siafi": "42000",
+  "objeto": "Implementação das Ações da Política Nacional Aldir Blanc de Fomento à Cultura - PNAB (Lei nº 14.399/2022)",
+  "valor_global": 0,
+  "data_extrato": "09/09/2026",
+  "banco_custodia": "Conta Fiduciária Vinculada ao Fundo Municipal de Cultura (Transferegov.br)",
+  "conta_vinculada": "Fundo Municipal de Cultura de Viamão",
+  "fonte_link": "https://portal.transferegov.sistema.gov.br/",
+  "base_legal": "Lei Federal nº 14.399/2022, Decreto Federal nº 11.740/2023 e Portarias MinC nº 80/2023 e nº 84/2023",
+  "fonte_auditada": "Plataforma Transferegov.br / Ministério da Cultura (MinC)",
+  "status_etapa": "Fase de Elaboração e Publicação de Editais",
+  "sincronizacao_pendente": false,
+  "data_extracao": "2026-09-10T10:50:00.000Z"
+}
