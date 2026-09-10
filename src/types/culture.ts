@@ -67,7 +67,7 @@ export interface LeiIncentivo {
 export interface CulturalLinkRef {
   titulo: string;
   url: string;
-  tipo: 'instagram' | 'facebook' | 'youtube' | 'spotify' | 'whatsapp' | 'website' | 'noticia' | 'documento' | 'outro';
+  tipo: 'instagram' | 'facebook' | 'youtube' | 'spotify' | 'whatsapp'  | 'noticia' | 'documento' | 'outro';
   descricao?: string;
 }
 
@@ -83,10 +83,10 @@ export interface PontoCultural {
     | 'Artes Cênicas & Audiovisual'
     | 'Matriz Afro-Brasileira & Memória'
     | 'Coletivo Comunitário';
-  endereco: string;
+  endereco?: string;
   bairro?: string; // Mantido apenas para compatibilidade opcional; não exibido na interface
-  lat: number;
-  lon: number;
+  lat?: number;
+  lon?: number;
   descricao: string;
   resumo_geral_cultura?: string;
   o_que_costumam_fazer?: string;
@@ -115,7 +115,6 @@ export interface PontoCultural {
     atividades_principais?: string[];
     publico_alvo?: string;
     horario_funcionamento?: string;
-    certificacoes?: string[];
     projetos_em_andamento?: string[];
     como_participar?: string;
     termo_mrosc?: string;
@@ -129,7 +128,7 @@ export interface SharedCommunityLink {
   pontoNome: string;
   titulo: string;
   url: string;
-  tipo: 'instagram' | 'facebook' | 'youtube' | 'spotify' | 'whatsapp' | 'website' | 'noticia' | 'documento' | 'outro';
+  tipo: 'instagram' | 'facebook' | 'youtube' | 'spotify' | 'whatsapp'  | 'noticia' | 'documento' | 'outro';
   enviadoPor: string;
   data: string;
   descricao?: string;

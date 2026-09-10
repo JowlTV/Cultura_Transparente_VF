@@ -160,10 +160,6 @@ export const FacSection: React.FC<FacSectionProps> = ({ editais, onNavigateToTab
               Diretrizes estritas da SEDAC-RS para submissão e admissibilidade de projetos culturais
             </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200 self-start md:self-auto">
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-            Atenção às Vedações
-          </span>
         </div>
 
         {/* 3 Cartões de Requisitos Estritos */}
@@ -463,38 +459,6 @@ export const FacSection: React.FC<FacSectionProps> = ({ editais, onNavigateToTab
 
       {/* 6. CATÁLOGO OFICIAL DE MECANISMOS E EDITAIS DA SEDAC-RS (ANTI-ALUCINAÇÃO & TRANSPARÊNCIA) */}
       <div className="space-y-4">
-        {/* Banner de Integridade Pública e Protocolo Anti-Alucinação */}
-        <div className="bg-gradient-to-r from-blue-900/90 to-slate-900 rounded-3xl p-5 sm:p-6 border border-blue-700/50 text-white shadow-md space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Protocolo de Integridade Pública & Anti-Alucinação de Editais</span>
-            </div>
-            <span className="text-[11px] text-slate-300 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/15 w-fit">
-              Fonte: SEDAC-RS / Pró-cultura RS
-            </span>
-          </div>
-
-          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-            Como o Sistema Pró-cultura RS opera em ambiente próprio sem API REST pública automatizada, este painel mapeia exclusivamente os <strong>mecanismos regulamentares oficiais (FAC e LIC-RS)</strong>. Para chamamentos com espelhamento externo não automatizado, o sistema sinaliza com status <strong>"Sincronização pendente com o Pró-cultura RS"</strong>, sendo vedada a geração ou estimativa de números, tetos fictícios ou prazos hipotéticos.
-          </p>
-
-          <div className="pt-1 flex flex-wrap items-center gap-2">
-            <a
-              href="https://www.procultura.rs.gov.br/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1e40af] hover:bg-blue-600 text-white text-xs font-bold rounded-xl transition-all shadow-xs border border-blue-400/30"
-            >
-              <span>Consultar Painel de Editais no Pró-cultura RS</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-            <span className="text-[11px] text-slate-400">
-              Acesse a plataforma oficial para baixar minutas, anexos e formulários homologados.
-            </span>
-          </div>
-        </div>
-
         {/* Barra de Filtros e Busca */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>

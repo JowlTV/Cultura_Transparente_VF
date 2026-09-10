@@ -63,12 +63,10 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
       let matchesCategoria = true;
       if (filtroCategoria === 'editais') {
         matchesCategoria = n.categoria_filtro === 'editais' || Boolean(n.prazo) || n.etiqueta.toLowerCase().includes('edital');
-      } else if (filtroCategoria === 'governo-federal') {
-        matchesCategoria = n.origem === 'Federal (MinC)' || n.categoria_filtro === 'governo-federal';
-      } else if (filtroCategoria === 'sedac-rs') {
-        matchesCategoria = n.origem === 'Estadual (SEDAC-RS)' || n.categoria_filtro === 'sedac-rs';
       } else if (filtroCategoria === 'viamao') {
-        matchesCategoria = n.origem === 'Municipal (Viamão)' || n.categoria_filtro === 'viamao';
+        matchesCategoria = n.jurisdicao === 'Municipal (Viamão)' || n.categoria_filtro === 'viamao';
+      } else if (filtroCategoria === 'eventos') {
+        matchesCategoria = n.etiqueta.includes('Evento') || n.etiqueta.includes('Tradição') || n.etiqueta.includes('Feira');
       }
 
       // Filtro por Texto de Busca
@@ -226,14 +224,14 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <h3 className="font-bold text-slate-900 text-base sm:text-lg font-['Outfit']">
-                  Feed de Notícias & Editais Oficiais
+                  Jornal Cultural de Viamão
                 </h3>
                 <span className="bg-blue-50 text-[#1e40af] text-[11px] font-bold px-2 py-0.5 rounded-full border border-blue-200">
-                  Fontes Primárias Oficiais
+                  Resumos da Web / Notícias
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Atualizações normativas, chamamentos públicos e avisos técnicos do Ministério da Cultura (MinC), SEDAC-RS e Prefeitura de Viamão
+                Giro de notícias gerado através das últimas atualizações, eventos e movimentações da cultura na cidade de Viamão (Google Search)
               </p>
             </div>
 
@@ -253,11 +251,10 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
           {/* Abas por Fonte Primária Oficial */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
             {[
-              { id: 'todos', label: 'Todas as Fontes', count: noticias.length },
-              { id: 'governo-federal', label: 'Ministério da Cultura (MinC)', count: noticias.filter(n => n.origem === 'Federal (MinC)').length },
-              { id: 'sedac-rs', label: 'SEDAC-RS (Pró-Cultura)', count: noticias.filter(n => n.origem === 'Estadual (SEDAC-RS)').length },
-              { id: 'viamao', label: 'Prefeitura de Viamão', count: noticias.filter(n => n.origem === 'Municipal (Viamão)').length },
-              { id: 'editais', label: 'Editais & Chamamentos', count: noticias.filter(n => n.categoria_filtro === 'editais' || Boolean(n.prazo)).length },
+              { id: 'todos', label: 'Últimas Notícias', count: noticias.length },
+              { id: 'viamao', label: 'Cultura Viamão', count: noticias.filter(n => n.jurisdicao === 'Municipal (Viamão)').length },
+              { id: 'editais', label: 'Editais & Fomento', count: noticias.filter(n => n.categoria_filtro === 'editais').length },
+              { id: 'eventos', label: 'Festejos & Eventos', count: noticias.filter(n => n.etiqueta.includes('Evento') || n.etiqueta.includes('Tradição') || n.etiqueta.includes('Feira')).length },
             ].map(tab => (
               <button
                 key={tab.id}

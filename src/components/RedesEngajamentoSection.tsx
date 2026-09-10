@@ -271,7 +271,7 @@ export const RedesEngajamentoSection: React.FC<RedesEngajamentoSectionProps> = (
                     <option value="whatsapp">Grupo / Canal WhatsApp</option>
                     <option value="documento">Documento / MROSC / Prestação de Contas</option>
                     <option value="noticia">Notícia / Matéria de Imprensa</option>
-                    <option value="website">Site Oficial / Portal MinC</option>
+                    
                   </select>
                 </div>
               </div>

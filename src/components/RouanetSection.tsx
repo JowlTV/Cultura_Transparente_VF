@@ -81,8 +81,8 @@ export const RouanetSection: React.FC<RouanetSectionProps> = ({ leisIncentivo })
               <span className="text-[11px] uppercase tracking-wider text-blue-200 font-semibold block">
                 Total Homologado PRONAC
               </span>
-              <span className="text-xl sm:text-2xl font-black text-white font-['Outfit'] block mt-1">
-                {formatBRL(totalAprovado)}
+              <span className={`font-black font-['Outfit'] block mt-1 ${rouanetProjetos.length > 0 ? "text-xl sm:text-2xl text-white" : "text-sm text-white/70"}`}>
+                {rouanetProjetos.length > 0 ? formatBRL(totalAprovado) : 'Aguardando sincronização'}
               </span>
             </div>
 
@@ -90,8 +90,8 @@ export const RouanetSection: React.FC<RouanetSectionProps> = ({ leisIncentivo })
               <span className="text-[11px] uppercase tracking-wider text-emerald-200 font-semibold block">
                 Total Captado no Mercado
               </span>
-              <span className="text-xl sm:text-2xl font-black text-emerald-300 font-['Outfit'] block mt-1">
-                {formatBRL(totalCaptado)}
+              <span className={`font-black font-['Outfit'] block mt-1 ${rouanetProjetos.length > 0 ? "text-xl sm:text-2xl text-emerald-300" : "text-sm text-emerald-200/70"}`}>
+                {rouanetProjetos.length > 0 ? formatBRL(totalCaptado) : 'Aguardando sincronização'}
               </span>
             </div>
           </div>
@@ -115,7 +115,7 @@ export const RouanetSection: React.FC<RouanetSectionProps> = ({ leisIncentivo })
           </p>
           <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-100 flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            <span>Exemplo em Viamão: Restauro e Conservação da Igreja Matriz (PRONAC 23.9012)</span>
+            <span>Projetos de Restauro e Conservação de Patrimônio Histórico</span>
           </div>
         </div>
 
@@ -225,6 +225,21 @@ export const RouanetSection: React.FC<RouanetSectionProps> = ({ leisIncentivo })
 
       {/* Projects List */}
       <div className="space-y-4">
+        
+        {projetosFiltrados.length === 0 && (
+          <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center space-y-4">
+            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
+              <Layers className="w-8 h-8 text-slate-400" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-slate-900 font-['Outfit']">Nenhum projeto encontrado</h3>
+              <p className="text-sm text-slate-500 max-w-md mx-auto">
+                Aguardando sincronização oficial. Não foram encontrados registros de projetos da Lei Rouanet homologados e vinculados à cidade de Viamão na base oficial do Ministério da Cultura.
+              </p>
+            </div>
+          </div>
+        )}
+
         {projetosFiltrados.map(item => {
           const percentualCaptado = item.valor_captado
             ? Math.round((item.valor_captado / item.valor_aprovado) * 100)

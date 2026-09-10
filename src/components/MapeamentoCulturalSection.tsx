@@ -53,7 +53,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
   const [novoPontoId, setNovoPontoId] = useState<string>(pontos[0]?.id || 'ponto-02');
   const [novoTitulo, setNovoTitulo] = useState('');
   const [novaUrl, setNovaUrl] = useState('');
-  const [novoTipo, setNovoTipo] = useState<SharedCommunityLink['tipo']>('website');
+  const [novoTipo, setNovoTipo] = useState<SharedCommunityLink['tipo']>('outro');
   const [novoEnviadoPor, setNovoEnviadoPor] = useState('');
   const [novaDescricao, setNovaDescricao] = useState('');
   const [linkSubmitted, setLinkSubmitted] = useState(false);
@@ -89,8 +89,6 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
         const matchEndereco = p.endereco?.toLowerCase().includes(q) || false;
         const matchAtiv =
           p.informacoes_detalhadas?.atividades_principais?.some(a => a.toLowerCase().includes(q)) || false;
-        const matchCert =
-          p.informacoes_detalhadas?.certificacoes?.some(c => c.toLowerCase().includes(q)) || false;
         if (
           !matchNome &&
           !matchDesc &&
@@ -98,8 +96,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
           !matchFazer &&
           !matchCat &&
           !matchEndereco &&
-          !matchAtiv &&
-          !matchCert
+          !matchAtiv
         )
           return false;
       }
@@ -210,7 +207,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
       setIsLinkModalOpen(false);
       setNovoTitulo('');
       setNovaUrl('');
-      setNovoTipo('website');
+      setNovoTipo('outro');
       setNovoEnviadoPor('');
       setNovaDescricao('');
       setLinkError(null);
@@ -843,20 +840,6 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Certificações & Transparência Pública */}
-            {selectedPonto.informacoes_detalhadas?.certificacoes && (
-              <div className="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200 text-xs space-y-1">
-                <span className="font-bold text-amber-950 text-[11px] uppercase tracking-wider block">
-                  Certificações Oficiais:
-                </span>
-                <ul className="list-disc list-inside space-y-0.5 text-slate-700">
-                  {selectedPonto.informacoes_detalhadas.certificacoes.map((c, i) => (
-                    <li key={i}>{c}</li>
-                  ))}
-                </ul>
               </div>
             )}
 

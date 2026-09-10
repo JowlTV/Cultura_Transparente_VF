@@ -79,8 +79,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
           (p.endereco && p.endereco.toLowerCase().includes(q)) ||
           (p.resumo_geral_cultura && p.resumo_geral_cultura.toLowerCase().includes(q)) ||
           (p.o_que_costumam_fazer && p.o_que_costumam_fazer.toLowerCase().includes(q)) ||
-          p.informacoes_detalhadas?.atividades_principais?.some(a => a.toLowerCase().includes(q)) ||
-          p.informacoes_detalhadas?.certificacoes?.some(c => c.toLowerCase().includes(q))
+          p.informacoes_detalhadas?.atividades_principais?.some(a => a.toLowerCase().includes(q))
       )
       .slice(0, 5)
       .map(p => ({
