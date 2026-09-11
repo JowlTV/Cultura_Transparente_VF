@@ -1243,6 +1243,83 @@ export const INITIAL_FAC_EDITAIS: FacEdital[] = [
 
 export const API_DOCUMENTATION: ApiEndpointDoc[] = [
   {
+    id: 'api-serverless-pnab',
+    nome: 'Endpoint Serverless /api/pnab (Transferegov / MinC)',
+    esfera: 'Serverless Edge (Vercel Python 3.10+)',
+    url: '/api/pnab',
+    metodo: 'GET',
+    descricao: 'Endpoint serverless com TTLCache e retry resiliente que consome dados da PNAB (Termo de Adesão da Prefeitura de Viamão 88.000.914/0001-01).',
+    parametros: [
+      { nome: 'format', tipo: 'string', descricao: 'Formato de resposta (json padrão)', exemplo: 'json' },
+    ],
+    exemploResposta: `{
+  "success": true,
+  "fonte": "Transferegov / Ministério da Cultura",
+  "cached": true,
+  "rate_limit_info": "60 req/min (Transferegov / SICONV MinC)",
+  "data": {
+    "termo_numero": "0335/2023",
+    "cnpj_proponente": "88.000.914/0001-01",
+    "municipio": "Viamão",
+    "uf": "RS",
+    "valor_global": 1827439.95,
+    "data_extrato": "09/09/2026",
+    "status_etapa": "Recursos em Conta Vinculada / Elaboração de Editais Municipais",
+    "base_legal": "Lei Federal nº 14.399/2022 (PNAB)"
+  }
+}`
+  },
+  {
+    id: 'api-serverless-rouanet',
+    nome: 'Endpoint Serverless /api/rouanet (Versalic / SalicNet)',
+    esfera: 'Serverless Edge (Vercel Python 3.10+)',
+    url: '/api/rouanet',
+    metodo: 'GET',
+    descricao: 'Endpoint serverless com filtro estrito municipal de Viamão e protocolo anti-alucinação ("Zero Dados Fictícios").',
+    parametros: [
+      { nome: 'municipio', tipo: 'string', descricao: 'Filtrar por município no RS', exemplo: 'Viamão' },
+      { nome: 'ano', tipo: 'integer', descricao: 'Ano orçamentário', exemplo: '2026' }
+    ],
+    exemploResposta: `{
+  "success": true,
+  "fonte": "Versalic / SalicNet (Ministério da Cultura)",
+  "municipio": "Viamão",
+  "uf": "RS",
+  "total": 0,
+  "projetos": [],
+  "anti_alucinacao_check": "Validação territorial estrita ativa: 0 registros fictícios.",
+  "status_pesquisa": "Aguardando sincronização oficial",
+  "cached": true,
+  "rate_limit_info": "30 req/min (Versalic / SalicNet)"
+}`
+  },
+  {
+    id: 'api-serverless-fac',
+    nome: 'Endpoint Serverless /api/fac (SEDAC-RS Pró-Cultura)',
+    esfera: 'Serverless Edge (Vercel Python 3.10+)',
+    url: '/api/fac',
+    metodo: 'GET',
+    descricao: 'Endpoint serverless com scrapers e fallback de editais abertos para proponentes do Rio Grande do Sul e Viamão.',
+    parametros: [
+      { nome: 'status', tipo: 'string', descricao: 'Filtro por situação do edital', exemplo: 'aberto' }
+    ],
+    exemploResposta: `{
+  "success": true,
+  "fonte": "SEDAC-RS / Pró-Cultura RS (FAC)",
+  "cached": true,
+  "total": 2,
+  "editais": [
+    {
+      "numero_edital": "Edital SEDAC nº 04/2026",
+      "titulo": "FAC Municípios & Territórios Criativos",
+      "status": "Inscrições Abertas",
+      "valor_total": 15000000.0,
+      "elegibilidade": "Ampla concorrência no RS, incluindo agentes sediados em Viamão"
+    }
+  ]
+}`
+  },
+  {
     id: 'api-cgu-emendas',
     nome: 'Portal da Transparência da CGU - Consulta de Emendas Parlamentares',
     esfera: 'Federal (Governo do Brasil)',

@@ -8,6 +8,8 @@ interface HeaderProps {
   onRefresh: () => void;
   isRefreshing: boolean;
   onOpenQuickSearch: () => void;
+  syncStatusText?: string;
+  latencyMs?: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,6 +18,8 @@ export const Header: React.FC<HeaderProps> = ({
   onRefresh,
   isRefreshing,
   onOpenQuickSearch,
+  syncStatusText = 'Dados Oficiais Sincronizados',
+  latencyMs,
 }) => {
   return (
     <header className="border-b border-slate-200 bg-white sticky top-0 z-30 shadow-2xs">
@@ -53,10 +57,15 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
             <span className="text-[11px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 hidden md:inline">
-              Dados CGU / ALRS / FPE Sincronizados
+              {syncStatusText}
             </span>
+            {latencyMs !== undefined && (
+              <span className="text-[10px] font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 hidden lg:inline">
+                {latencyMs}ms
+              </span>
+            )}
             <span className="text-[11px] text-slate-500 hidden xl:inline">
-              Checagem: {lastUpdated}
+              Auditado: {lastUpdated}
             </span>
           </div>
 

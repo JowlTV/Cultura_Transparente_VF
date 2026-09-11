@@ -41,7 +41,7 @@ export const navTabs: NavTabItem[] = [
   { id: 'lpg', label: 'Lei Paulo Gustavo (LPG)', icon: '🎬', lucideIcon: <Film className="w-4 h-4" /> },
   { id: 'rouanet', label: 'Lei Rouanet (SalicNet)', icon: '✨', lucideIcon: <Sparkles className="w-4 h-4" /> },
   { id: 'acompanhe-cultura', label: 'Acompanhe a Cultura', icon: '🎭', lucideIcon: <Building2 className="w-4 h-4" /> },
-  { id: 'apis', label: 'APIs & Fontes Oficiais', icon: '🔌', lucideIcon: <Code2 className="w-4 h-4" /> },
+  { id: 'apis', label: 'APIs & Central de Bots', icon: '🤖', lucideIcon: <Code2 className="w-4 h-4" /> },
   { id: 'controle-social', label: 'Controle Social & LAI', icon: '🛡️', lucideIcon: <ShieldCheck className="w-4 h-4" /> },
 ];
 

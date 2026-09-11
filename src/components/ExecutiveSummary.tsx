@@ -21,7 +21,8 @@ import {
   Building2,
   Search,
   RefreshCw,
-  Award
+  Award,
+  Newspaper
 } from 'lucide-react';
 import { Emenda, PnabRecord, LeiIncentivo, PontoCultural, NewsItem } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
@@ -83,6 +84,18 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
       return matchesCategoria && matchesBusca;
     });
   }, [noticias, filtroCategoria, buscaTexto]);
+
+  // Manchete Principal da Edição (Lead Editorial Story)
+  const manchete = useMemo(() => {
+    if (filtroCategoria === 'todos' && !buscaTexto.trim() && noticiasFiltradas.length > 0) {
+      return noticiasFiltradas[0];
+    }
+    return null;
+  }, [filtroCategoria, buscaTexto, noticiasFiltradas]);
+
+  const demaisNoticias = useMemo(() => {
+    return manchete ? noticiasFiltradas.slice(1) : noticiasFiltradas;
+  }, [manchete, noticiasFiltradas]);
 
   return (
     <div className="space-y-6">
@@ -215,23 +228,39 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
         </button>
       </div>
 
-      {/* MOTOR DO FEED DE NOTÍCIAS E ATUALIZAÇÕES OFICIAIS */}
+      {/* MOTOR DO FEED DE NOTÍCIAS E ATUALIZAÇÕES OFICIAIS - ESTILO JORNAL / GAZETA */}
       <div className="space-y-4">
         {/* Header do Feed, Barra de Busca e Filtros Oficiais */}
         <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-4">
+          <div className="border-b border-slate-100 pb-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 font-mono">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-blue-900 tracking-wider">GAZETA CULTURAL DE VIAMÃO</span>
+              <span>•</span>
+              <span className="text-slate-600">EDIÇÃO MUNICIPAL ATUALIZADA</span>
+            </div>
+            <div className="flex items-center gap-2 font-sans">
+              <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-900 px-2 py-0.5 rounded border border-amber-200 text-[10px] font-bold">
+                <Sparkles className="w-3 h-3 text-amber-600" />
+                Resumos da Web / Clipping Pesquisa Google
+              </span>
+            </div>
+          </div>
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <div className="p-1.5 rounded-lg bg-blue-900 text-white shadow-2xs">
+                  <Newspaper className="w-4 h-4" />
+                </div>
                 <h3 className="font-bold text-slate-900 text-base sm:text-lg font-['Outfit']">
-                  Jornal Cultural de Viamão
+                  Jornal da Cultura & Editais
                 </h3>
                 <span className="bg-blue-50 text-[#1e40af] text-[11px] font-bold px-2 py-0.5 rounded-full border border-blue-200">
-                  Resumos da Web / Notícias
+                  Resumos Verificados
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Giro de notícias gerado através das últimas atualizações, eventos e movimentações da cultura na cidade de Viamão (Google Search)
+              <p className="text-xs text-slate-500 mt-1">
+                Giro informativo e resumos executivos das notícias, eventos e editais da cultura de Viamão indexados na web (Google Search).
               </p>
             </div>
 
@@ -251,7 +280,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
           {/* Abas por Fonte Primária Oficial */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
             {[
-              { id: 'todos', label: 'Últimas Notícias', count: noticias.length },
+              { id: 'todos', label: 'Todas as Notícias', count: noticias.length },
               { id: 'viamao', label: 'Cultura Viamão', count: noticias.filter(n => n.jurisdicao === 'Municipal (Viamão)').length },
               { id: 'editais', label: 'Editais & Fomento', count: noticias.filter(n => n.categoria_filtro === 'editais').length },
               { id: 'eventos', label: 'Festejos & Eventos', count: noticias.filter(n => n.etiqueta.includes('Evento') || n.etiqueta.includes('Tradição') || n.etiqueta.includes('Feira')).length },
@@ -276,8 +305,87 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
           </div>
         </div>
 
-        {/* Feed Cards Grid */}
-        {noticiasFiltradas.length === 0 ? (
+        {/* MANCHETE PRINCIPAL DA SEMANA (Lead Editorial Story) */}
+        {manchete && (
+          <article className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-md border border-blue-900/50 relative overflow-hidden group">
+            <div className="absolute right-0 top-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-md bg-amber-400 text-slate-950 font-black text-[10px] tracking-wider uppercase flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-slate-950" />
+                    Manchete da Edição
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-white/10 text-blue-200 font-semibold text-[11px] border border-white/15">
+                    {manchete.origem}
+                  </span>
+                  <span className="text-slate-300 text-[11px] flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-slate-400" />
+                    {manchete.data}
+                  </span>
+                </div>
+
+                <div className="text-[11px] text-blue-300 bg-blue-900/60 px-2.5 py-1 rounded-md border border-blue-700/50 flex items-center gap-1">
+                  <span>Resumo da Web • Pesquisa Google Indexada</span>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-xl sm:text-2xl font-black font-['Outfit'] text-white group-hover:text-blue-200 transition-colors leading-snug">
+                  {manchete.titulo}
+                </h4>
+                <p className="mt-2 text-xs sm:text-sm text-slate-200 leading-relaxed max-w-4xl">
+                  {manchete.resumo}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10 text-xs">
+                {manchete.prazo && (
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Prazo de Inscrição:</span>
+                    <strong className="text-white font-mono mt-0.5 block">{manchete.prazo}</strong>
+                  </div>
+                )}
+                {manchete.plataforma && (
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Plataforma Oficial:</span>
+                    <strong className="text-blue-200 mt-0.5 block truncate">{manchete.plataforma}</strong>
+                  </div>
+                )}
+                {manchete.elegibilidade && (
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Elegibilidade Territorial:</span>
+                    <strong className="text-amber-300 mt-0.5 block truncate">{manchete.elegibilidade}</strong>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <button
+                  onClick={() => setNoticiaSelecionada(manchete)}
+                  className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                >
+                  <span>Ler Resumo Completo & Requisitos</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+
+                <a
+                  href={manchete.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-all border border-white/20 flex items-center gap-1.5"
+                >
+                  <span>Acessar Portal Oficial</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </article>
+        )}
+
+        {/* Feed Cards Grid (Demais Notícias) */}
+        {demaisNoticias.length === 0 && !manchete ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
             <Info className="w-8 h-8 text-slate-400 mx-auto mb-2" />
             <p className="text-sm font-medium">Nenhum comunicado encontrado para o filtro selecionado.</p>
@@ -290,7 +398,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {noticiasFiltradas.map(item => {
+            {demaisNoticias.map(item => {
               // Estilização do cabeçalho institucional por órgão
               const isMinC = item.origem === 'Federal (MinC)';
               const isSedac = item.origem === 'Estadual (SEDAC-RS)';
