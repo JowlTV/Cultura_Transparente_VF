@@ -94,8 +94,8 @@ export const PnabAuditoriaSection: React.FC<PnabAuditoriaSectionProps> = ({ pnab
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-[#6A0DAD]/20 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 left-1/3 -mb-12 w-64 h-64 bg-[#FF4500]/15 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-3xl">
+        <div className="relative z-10 flex flex-col justify-between gap-4">
+          <div className="space-y-2.5 max-w-4xl">
             {/* Selos Institucionais Oficiais */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 bg-[#6A0DAD]/30 text-purple-200 border border-purple-700/50 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
@@ -117,43 +117,18 @@ export const PnabAuditoriaSection: React.FC<PnabAuditoriaSectionProps> = ({ pnab
               Política Nacional Aldir Blanc (PNAB) - Viamão
             </h1>
 
-            {/* Resumo Jurídico e Contextual */}
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              A <strong className="text-white">Política Nacional Aldir Blanc de Fomento à Cultura (PNAB)</strong>, instituída pela{' '}
-              <strong className="text-white">Lei Federal nº 14.399/2022</strong> e regulamentada pelo{' '}
-              <strong className="text-white">Decreto Federal nº 11.740/2023</strong>, constitui o maior programa estruturante e continuado de descentralização cultural da história brasileira. Financiada pela União através de transferências anuais Fundo a Fundo aos municípios e estados, a política garante investimentos plurianuais para impulsionar editais locais, fortalecer a infraestrutura artística e democratizar o acesso à produção cultural em Viamão.
+            {/* Resumo Jurídico e Contextual Conciso */}
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Programa continuado de fomento cultural da União (Lei nº 14.399/2022 e Decreto nº 11.740/2023) com repasses anuais Fundo a Fundo para editais e ações culturais no município de Viamão.
             </p>
-          </div>
-
-          {/* Botões de Acesso aos Portais Oficiais */}
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
-            <a
-              href="https://cultbr.cultura.gov.br/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#FF4500] hover:bg-[#e03d00] text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-orange-950/40 border border-orange-400/30 group"
-            >
-              <span>Consultar Painel CultBR Editais</span>
-              <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
-
-            <a
-              href="https://portal.transferegov.sistema.gov.br/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#1e1037] hover:bg-purple-900/40 text-purple-200 font-bold text-xs sm:text-sm transition-all border border-purple-800/40 group"
-            >
-              <span>Acessar Transferegov.br</span>
-              <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
           </div>
         </div>
 
         {/* Rodapé Oficial de Auditoria e Transparência */}
-        <div className="mt-6 pt-5 border-t border-purple-900/40 flex items-start sm:items-center gap-3 text-xs text-slate-300">
+        <div className="mt-5 pt-4 border-t border-purple-900/40 flex items-start sm:items-center gap-2.5 text-xs text-slate-300">
           <Info className="w-4 h-4 text-[#FF4500] shrink-0 mt-0.5 sm:mt-0" />
           <span>
-            <strong>Nota Oficial de Auditoria & Transparência:</strong> Os recursos transferidos da União são auditados e acompanhados em conformidade com as regras federais da Lei nº 14.399/2022 e Decreto nº 11.740/2023. Toda gestão, lançamento de editais e prestação de contas operam via plataforma oficial <strong>Transferegov.br</strong> e sob controle social do Conselho Municipal de Cultura.
+            Recursos gerenciados via plataforma oficial <strong>Transferegov.br</strong> e auditados com controle social do Conselho Municipal de Cultura.
           </span>
         </div>
       </div>

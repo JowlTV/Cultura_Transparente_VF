@@ -761,60 +761,19 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
               </button>
             </div>
 
-            {/* Localização / Google Maps */}
-            <div className="p-4 rounded-2xl border bg-[#1a0c30] border-purple-900/40 space-y-2.5 text-xs">
-              <span className="font-bold text-purple-200 uppercase text-[10px] tracking-wider block">
-                Localização & Direcionamento:
-              </span>
-              {selectedPonto.google_maps_presente ? (
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-slate-300 font-medium">
-                    Espaço cultural com rota e localização disponível no mapa interativo
-                  </span>
-                  {selectedPonto.google_maps_url && (
-                    <a
-                      href={sanitizeUrl(selectedPonto.google_maps_url)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl font-bold text-xs transition-all shadow-xs border border-orange-400/30"
-                    >
-                      <MapPin className="w-3.5 h-3.5" />
-                      <span>Abrir no Google Maps</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-1.5 p-3 bg-amber-950/40 rounded-xl border border-amber-800/40">
-                  <p className="text-amber-300 font-bold flex items-center gap-1.5 text-xs">
-                    <Info className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Atuação Comunitária e Territorial Itinerante</span>
-                  </p>
-                  <p className="text-slate-300 text-xs leading-relaxed">
-                    {selectedPonto.nota_maps_explicacao ||
-                      'Entidade de atuação cultural e comunitária territorial itinerante sem endereço físico fixo. As atividades ocorrem em espaços públicos de Viamão (praças, escolas e locais abertos).'}
-                  </p>
-                </div>
-              )}
-
-              {(() => {
-                const contactInfo = validateInstitutionalContact(selectedPonto.contato);
-                if (contactInfo.isAvailable) {
-                  return (
-                    <div className="pt-2 border-t border-purple-900/30 text-slate-300 flex items-center gap-1.5 text-xs font-medium">
-                      <Phone className="w-3.5 h-3.5 text-[#FF4500]" />
-                      <span>Contato Registrado: {contactInfo.display}</span>
-                    </div>
-                  );
-                }
+            {/* Canal de Contato (se disponível) */}
+            {(() => {
+              const contactInfo = validateInstitutionalContact(selectedPonto.contato);
+              if (contactInfo.isAvailable) {
                 return (
-                  <div className="pt-2 border-t border-purple-900/30 text-slate-400 flex items-center gap-1.5 text-xs italic">
-                    <AlertCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                    <span>Informação de canal de contato direto não disponível no cadastro oficial validado.</span>
+                  <div className="p-3.5 rounded-2xl bg-[#1a0c30] border border-purple-900/40 text-slate-300 flex items-center gap-2 text-xs font-medium">
+                    <Phone className="w-4 h-4 text-[#FF4500] shrink-0" />
+                    <span>Contato Registrado: <strong className="text-white">{contactInfo.display}</strong></span>
                   </div>
                 );
-              })()}
-            </div>
+              }
+              return null;
+            })()}
 
             {/* Área de Atuação & Resumo Descritivo */}
             <div className="space-y-1.5">

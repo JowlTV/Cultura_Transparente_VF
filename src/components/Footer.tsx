@@ -7,14 +7,6 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="mt-12 bg-[#0c0517] text-slate-400 text-xs border-t border-purple-900/40">
-      {/* Brand color ribbon at top of footer */}
-      <div className="h-1.5 w-full flex">
-        <div className="h-full w-1/4 bg-[#6A0DAD]"></div>
-        <div className="h-full w-1/4 bg-[#FF4500]"></div>
-        <div className="h-full w-1/4 bg-white/20"></div>
-        <div className="h-full w-1/4 bg-[#6A0DAD]"></div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 py-8 sm:py-10 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-purple-900/30">
           <div className="space-y-1.5 max-w-lg">

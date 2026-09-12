@@ -1,24 +1,44 @@
 import React, { useState, useMemo } from 'react';
 import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area,
+} from 'recharts';
+import {
   Search,
   Filter,
   Download,
   Copy,
   Check,
-  ExternalLink,
   ChevronDown,
   ChevronUp,
-  Landmark,
-  FileText,
   RefreshCw,
-  Database,
   ShieldCheck,
-  Layers,
   ArrowUpDown,
-  Table as TableIcon
+  Table as TableIcon,
+  BarChart3,
+  PieChart as PieIcon,
+  TrendingUp,
+  SlidersHorizontal,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Layers,
+  Building2,
+  DollarSign
 } from 'lucide-react';
 import { Emenda } from '../types/culture';
 import { formatBRL, exportEmendasToCSV } from '../utils/formatters';
+import { BUDGET_CHRONOLOGY } from '../data/initialData';
 
 interface EmendasSectionProps {
   emendas: Emenda[];
@@ -34,10 +54,12 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
   onSimulateApiFetch,
   isFetchingApi,
 }) => {
+  const [showBudgetSummary, setShowBudgetSummary] = useState<boolean>(false);
   const [filtroAno, setFiltroAno] = useState<string>('todos');
   const [filtroEsfera, setFiltroEsfera] = useState<string>('todas');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [filtroPartido, setFiltroPartido] = useState<string>('todos');
+  const [filtroSegmento, setFiltroSegmento] = useState<string>('todos');
   const [busca, setBusca] = useState<string>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -56,6 +78,12 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
   const partidosDisponiveis = useMemo(() => {
     return Array.from(
       new Set(emendas.map(e => e.partido_sigla || e.partido).filter(Boolean))
+    ).sort();
+  }, [emendas]);
+
+  const segmentosDisponiveis = useMemo(() => {
+    return Array.from(
+      new Set(emendas.filter(e => e.is_cultura && e.tipo_projeto_cultural).map(e => e.tipo_projeto_cultural as string))
     ).sort();
   }, [emendas]);
 
@@ -78,6 +106,11 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
       if (filtroPartido !== 'todos') {
         const p = (item.partido_sigla || item.partido || '').toLowerCase();
         if (!p.includes(filtroPartido.toLowerCase())) return false;
+      }
+
+      // Filtro Segmento Cultural
+      if (filtroSegmento !== 'todos' && item.tipo_projeto_cultural !== filtroSegmento) {
+        return false;
       }
 
       // Busca textual
@@ -141,6 +174,7 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
     filtroEsfera,
     filtroStatus,
     filtroPartido,
+    filtroSegmento,
     busca,
     sortField,
     sortOrder,
@@ -155,7 +189,80 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
     return emendasFiltradas.reduce((acc, curr) => acc + (curr.valor_gasto || 0), 0);
   }, [emendasFiltradas]);
 
-  const percentualGeral = totalAlocado > 0 ? ((totalGasto / totalAlocado) * 100).toFixed(1) : '0';
+  const saldoPendente = totalAlocado - totalGasto;
+  const taxaExecucaoNum = totalAlocado > 0 ? (totalGasto / totalAlocado) * 100 : 0;
+  const percentualGeral = taxaExecucaoNum.toFixed(1);
+
+  // 1. Summarized Chart Data: Alocado vs Liquidado por Órgão/Esfera
+  const barDataResumido = useMemo(() => {
+    const map: Record<string, { nome: string; alocado: number; gasto: number }> = {};
+
+    emendasFiltradas.forEach(e => {
+      let label = 'Outros';
+      if (e.esfera.includes('Estadual') || e.secretaria?.includes('SEDAC')) {
+        label = 'SEDAC / RS';
+      } else if (e.esfera.includes('Federal') || e.secretaria?.includes('MinC')) {
+        label = 'MinC / Federal';
+      } else if (e.esfera.includes('Municipal')) {
+        label = 'Municipal';
+      } else {
+        label = e.secretaria?.split(' ')[0] || 'Outros';
+      }
+
+      if (!map[label]) {
+        map[label] = { nome: label, alocado: 0, gasto: 0 };
+      }
+      map[label].alocado += e.valor;
+      map[label].gasto += e.valor_gasto || 0;
+    });
+
+    return Object.values(map).sort((a, b) => b.alocado - a.alocado);
+  }, [emendasFiltradas]);
+
+  // 2. Summarized Chart Data: Distribuição por Segmento Cultural
+  const pieDataResumido = useMemo(() => {
+    const map: Record<string, number> = {};
+
+    emendasFiltradas.forEach(e => {
+      const tipo = e.tipo_projeto_cultural || 'Outras Ações';
+      map[tipo] = (map[tipo] || 0) + e.valor;
+    });
+
+    const colorsMap: Record<string, string> = {
+      'Hip-Hop & Cultura Urbana': '#6A0DAD',
+      'Audiovisual & Cinema': '#FF4500',
+      'Patrimônio & Restauro': '#8b24d6',
+      'Tradição & Folclore': '#ea580c',
+      'Música & Artes Cênicas': '#a855f7',
+      'Literatura & Leitura': '#fb923c',
+      'Outras Ações Culturais': '#c084fc',
+    };
+
+    return Object.entries(map).map(([name, value]) => ({
+      name,
+      value,
+      color: colorsMap[name] || '#6A0DAD',
+    })).sort((a, b) => b.value - a.value);
+  }, [emendasFiltradas]);
+
+  // 3. Summarized Chronology Chart Data
+  const areaDataResumido = useMemo(() => {
+    if (filtroAno === 'todos') {
+      return BUDGET_CHRONOLOGY;
+    }
+    return BUDGET_CHRONOLOGY.filter(p => p.ano === Number(filtroAno));
+  }, [filtroAno]);
+
+  const hasActiveFilters = filtroAno !== 'todos' || filtroEsfera !== 'todas' || filtroStatus !== 'todos' || filtroPartido !== 'todos' || filtroSegmento !== 'todos' || busca.trim().length > 0;
+
+  const resetFilters = () => {
+    setFiltroAno('todos');
+    setFiltroEsfera('todas');
+    setFiltroStatus('todos');
+    setFiltroPartido('todos');
+    setFiltroSegmento('todos');
+    setBusca('');
+  };
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -192,25 +299,40 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
   return (
     <div className="space-y-5">
-      {/* Spreadsheet Control Header - Identidade Visual #6A0DAD e #FF4500 */}
+      {/* Spreadsheet & Dashboard Unified Header */}
       <div className="bg-[#150b24] rounded-2xl p-5 border border-purple-900/40 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-purple-900/30">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-[#FF4500]"></span>
               <h2 className="text-xl font-bold text-white font-['Outfit'] flex items-center gap-2">
-                <span>Planilha de Emendas Orçamentárias</span>
+                <span>Planilha & Painel Orçamentário de Emendas</span>
                 <span className="text-xs bg-[#6A0DAD]/30 text-purple-200 border border-purple-700/50 font-bold px-2.5 py-0.5 rounded-full">
-                  {emendasFiltradas.length} registros
+                  {emendasFiltradas.length} emendas
                 </span>
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-slate-300 mt-1">
-              Registro isento e factual das dotações parlamentares destinadas a Viamão. Dados auditados via SAE/ALRS, FPE-RS e Portal da Transparência Federal.
+              Painel integrado com análise orçamentária resumida e registro detalhado das dotações destinadas à cultura de Viamão.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setShowBudgetSummary(!showBudgetSummary)}
+              className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl border transition-all shadow-xs ${
+                showBudgetSummary
+                  ? 'bg-[#6A0DAD] text-white border-purple-500 hover:bg-[#7c11cb]'
+                  : 'bg-gradient-to-r from-purple-900/70 to-[#1e1037] text-white border-purple-600/70 hover:border-purple-400 hover:bg-purple-900/90 shadow-purple-950/40'
+              }`}
+              title={showBudgetSummary ? 'Ocultar resumo gráfico e indicadores' : 'Exibir painel orçamentário resumido com gráficos e indicadores'}
+            >
+              <BarChart3 className={`w-4 h-4 shrink-0 ${showBudgetSummary ? 'text-white' : 'text-[#FF4500]'}`} />
+              <strong className="font-extrabold tracking-tight">
+                {showBudgetSummary ? 'Ocultar Painel Resumido' : 'Ver Painel Resumido (Gráficos & Indicadores)'}
+              </strong>
+            </button>
+
             <button
               onClick={onSimulateApiFetch}
               disabled={isFetchingApi}
@@ -218,19 +340,20 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
               title="Consultar API Federal da CGU e ALRS"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isFetchingApi ? 'animate-spin' : ''}`} />
-              <span>{isFetchingApi ? 'Sincronizando...' : 'Atualizar Dados'}</span>
+              <span>{isFetchingApi ? 'Sincronizando...' : 'Atualizar'}</span>
             </button>
+
             <button
               onClick={() => exportEmendasToCSV(emendasFiltradas)}
               className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-[#FF4500] hover:bg-[#e03d00] rounded-xl transition-colors shadow-xs"
             >
               <Download className="w-3.5 h-3.5 text-white" />
-              <span>Exportar Planilha (CSV)</span>
+              <span>Exportar (CSV)</span>
             </button>
           </div>
         </div>
 
-        {/* Filter Controls Row */}
+        {/* Search & Dynamic Filter Controls */}
         <div className="mt-4 pt-4 border-t border-purple-900/30 space-y-3">
           {/* Search Input */}
           <div className="relative">
@@ -245,7 +368,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
           </div>
 
           {/* Dropdown Filters Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
             {/* Year */}
             <div>
               <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Exercício / Ano:</label>
@@ -263,7 +386,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
             {/* Esfera */}
             <div>
-              <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Esfera Orçamentária:</label>
+              <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Esfera:</label>
               <select
                 value={filtroEsfera}
                 onChange={e => setFiltroEsfera(e.target.value)}
@@ -272,6 +395,21 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                 <option value="todas">Todas as Esferas</option>
                 {esferasDisponiveis.map(esf => (
                   <option key={esf} value={esf}>{esf}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Segmento Cultural */}
+            <div>
+              <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Segmento Cultural:</label>
+              <select
+                value={filtroSegmento}
+                onChange={e => setFiltroSegmento(e.target.value)}
+                className="w-full bg-[#130722] border border-purple-900/40 rounded-lg p-2 text-xs text-slate-200 focus:outline-hidden focus:border-[#6A0DAD]"
+              >
+                <option value="todos">Todos os Segmentos</option>
+                {segmentosDisponiveis.map(seg => (
+                  <option key={seg} value={seg}>{seg}</option>
                 ))}
               </select>
             </div>
@@ -306,47 +444,231 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
               </select>
             </div>
           </div>
+
+          {/* Active Filter Clear Helper */}
+          {hasActiveFilters && (
+            <div className="flex items-center justify-between pt-2 text-xs text-purple-300/80">
+              <span>Filtros aplicados ({emendasFiltradas.length} de {emendas.filter(e => e.is_cultura).length} emendas culturais listadas)</span>
+              <button
+                onClick={resetFilters}
+                className="text-[11px] text-[#FF4500] hover:underline font-semibold"
+              >
+                Limpar todos os filtros
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Fiscal Metrics Summary Bar (Identidade Visual #6A0DAD e #FF4500) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-[#150b24] p-4 rounded-xl border border-purple-900/40 shadow-xs">
-          <span className="text-[11px] text-purple-300/70 uppercase tracking-wider font-semibold block">Dotação Total Alocada</span>
-          <span className="text-xl font-bold font-['Outfit'] text-[#c084fc] block mt-1">
-            {formatBRL(totalAlocado)}
-          </span>
-          <span className="text-[11px] text-slate-400">{emendasFiltradas.length} emendas culturais</span>
-        </div>
+      {/* PAINEL ORÇAMENTÁRIO RESUMIDO (Compact Budget Dashboard) */}
+      {showBudgetSummary && (
+        <div className="bg-[#12071f] rounded-2xl p-4 sm:p-5 border border-purple-800/40 shadow-md space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-purple-900/40">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-[#FF4500]" />
+              <h3 className="text-sm font-bold text-white font-['Outfit']">
+                Painel Orçamentário Resumido
+              </h3>
+              <span className="text-[10px] bg-purple-900/50 text-purple-200 px-2 py-0.5 rounded-full border border-purple-700/30">
+                Visão Executiva
+              </span>
+            </div>
+            <div className="text-[11px] text-purple-300/70">
+              Taxa Geral de Execução: <strong className="text-[#FF4500]">{percentualGeral}%</strong>
+            </div>
+          </div>
 
-        <div className="bg-[#150b24] p-4 rounded-xl border border-purple-900/40 shadow-xs">
-          <span className="text-[11px] text-purple-300/70 uppercase tracking-wider font-semibold block">Total Liquidado (Pago)</span>
-          <span className="text-xl font-bold font-['Outfit'] text-[#FF4500] block mt-1">
-            {formatBRL(totalGasto)}
-          </span>
-          <span className="text-[11px] text-slate-400">Valores repassados aos proponentes</span>
-        </div>
+          {/* 4 Compact KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Total Alocado */}
+            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40">
+              <span className="text-[10px] text-purple-300/70 uppercase tracking-wider font-semibold block">Dotação Total Alocada</span>
+              <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-[#c084fc] block mt-0.5">
+                {formatBRL(totalAlocado)}
+              </span>
+              <span className="text-[10px] text-slate-400 mt-1 block">{emendasFiltradas.length} emendas culturais</span>
+            </div>
 
-        <div className="bg-[#150b24] p-4 rounded-xl border border-purple-900/40 shadow-xs">
-          <span className="text-[11px] text-purple-300/70 uppercase tracking-wider font-semibold block">Saldo a Executar</span>
-          <span className="text-xl font-bold font-['Outfit'] text-amber-300 block mt-1">
-            {formatBRL(totalAlocado - totalGasto)}
-          </span>
-          <span className="text-[11px] text-slate-400">Recursos em tramitação</span>
+            {/* Total Liquidado */}
+            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40">
+              <span className="text-[10px] text-purple-300/70 uppercase tracking-wider font-semibold block">Total Liquidado (Pago)</span>
+              <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-[#FF4500] block mt-0.5">
+                {formatBRL(totalGasto)}
+              </span>
+              <span className="text-[10px] text-slate-400 mt-1 block">Recursos já repassados</span>
+            </div>
+
+            {/* Saldo Pendente */}
+            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40">
+              <span className="text-[10px] text-purple-300/70 uppercase tracking-wider font-semibold block">Saldo a Executar</span>
+              <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-amber-300 block mt-0.5">
+                {formatBRL(saldoPendente)}
+              </span>
+              <span className="text-[10px] text-slate-400 mt-1 block">Em tramitação contábil</span>
+            </div>
+
+            {/* Taxa & Barra de Execução */}
+            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] text-purple-300/70 uppercase tracking-wider font-semibold block">Ritmo de Liquidação</span>
+                <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-emerald-400 block mt-0.5">
+                  {percentualGeral}% <span className="text-[11px] font-normal text-slate-300">executado</span>
+                </span>
+              </div>
+              <div className="w-full bg-[#11051c] h-2 rounded-full overflow-hidden border border-purple-900/40 mt-2">
+                <div
+                  className="h-full bg-gradient-to-r from-[#6A0DAD] to-[#FF4500] rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, Math.max(0, taxaExecucaoNum))}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 3 Compact Analytical Charts */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+            {/* Chart 1: Alocado vs Liquidado por Órgão */}
+            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40 flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-white font-['Outfit'] flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-[#c084fc]" />
+                  Por Órgão / Esfera
+                </span>
+                <span className="text-[10px] text-purple-300/70">Alocado vs Pago</span>
+              </div>
+              <div className="h-[150px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barDataResumido} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2c114d" vertical={false} />
+                    <XAxis dataKey="nome" stroke="#a78bfa" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#a78bfa" fontSize={10} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-[#0e061b] text-slate-100 p-2.5 rounded-lg text-xs border border-purple-800/60 shadow-xl space-y-1">
+                              <p className="font-bold text-[#FF4500] border-b border-purple-900/50 pb-1">{data.nome}</p>
+                              <div className="text-[#c084fc]">Alocado: <strong>{formatBRL(data.alocado)}</strong></div>
+                              <div className="text-[#FF4500]">Liquidado: <strong>{formatBRL(data.gasto)}</strong></div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar dataKey="alocado" name="Alocado" fill="#6A0DAD" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="gasto" name="Liquidado" fill="#FF4500" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Chart 2: Distribuição por Segmento (Donut) */}
+            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40 flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-white font-['Outfit'] flex items-center gap-1.5">
+                  <PieIcon className="w-3.5 h-3.5 text-[#FF4500]" />
+                  Segmentos Culturais
+                </span>
+                <span className="text-[10px] text-purple-300/70">{pieDataResumido.length} áreas</span>
+              </div>
+              <div className="h-[150px] w-full flex items-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieDataResumido}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={32}
+                      outerRadius={52}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {pieDataResumido.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const item = payload[0];
+                          const pct = totalAlocado > 0 ? ((Number(item.value) / totalAlocado) * 100).toFixed(1) : 0;
+                          return (
+                            <div className="bg-[#0e061b] text-slate-100 p-2.5 rounded-lg text-xs border border-purple-800/60 shadow-xl space-y-0.5">
+                              <p className="font-bold text-white">{item.name}</p>
+                              <p className="text-[#FF4500] font-mono">{formatBRL(Number(item.value))}</p>
+                              <p className="text-[10px] text-purple-300/80">{pct}% do total alocado</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Chart 3: Evolução Histórica (Área) */}
+            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40 flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-white font-['Outfit'] flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                  Evolução Temporal
+                </span>
+                <span className="text-[10px] text-purple-300/70">2024 - 2026</span>
+              </div>
+              <div className="h-[150px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={areaDataResumido} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorAlocadoRes" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#6A0DAD" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#6A0DAD" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorGastoRes" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#FF4500" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#FF4500" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2c114d" vertical={false} />
+                    <XAxis dataKey="mes" stroke="#a78bfa" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#a78bfa" fontSize={10} tickFormatter={v => `R$${(v / 1000000).toFixed(1)}M`} />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-[#0e061b] text-slate-100 p-2.5 rounded-lg text-xs border border-purple-800/60 shadow-xl space-y-1">
+                              <p className="font-bold text-[#FF4500] border-b border-purple-900/50 pb-1">{label}</p>
+                              <div className="text-[#c084fc]">Alocado Acum.: <strong>{formatBRL(payload[0]?.value as number || 0)}</strong></div>
+                              <div className="text-[#FF4500]">Pago Acum.: <strong>{formatBRL(payload[1]?.value as number || 0)}</strong></div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Area type="monotone" dataKey="alocado_acumulado" stroke="#c084fc" strokeWidth={2} fillOpacity={1} fill="url(#colorAlocadoRes)" />
+                    <Area type="monotone" dataKey="gasto_acumulado" stroke="#FF4500" strokeWidth={2} fillOpacity={1} fill="url(#colorGastoRes)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Spreadsheet Table View ("Cara de Planilha") */}
       <div className="bg-[#150b24] rounded-2xl border border-purple-900/40 shadow-xs overflow-hidden">
-        <div className="px-4 py-3 bg-[#1b0d2f] border-b border-purple-900/40 flex items-center justify-between text-xs">
+        <div className="px-4 py-3 bg-[#1b0d2f] border-b border-purple-900/40 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-2 font-semibold text-slate-200">
             <TableIcon className="w-4 h-4 text-[#FF4500]" />
-            <span>Grade de Dados Orçamentários</span>
-            <span className="text-[11px] font-normal text-purple-300/70">
+            <span>Grade de Dados da Planilha de Emendas</span>
+            <span className="text-[11px] font-normal text-purple-300/70 hidden sm:inline">
               (Clique em qualquer linha para abrir a auditoria técnica do empenho e processo)
             </span>
           </div>
-          <div className="text-[11px] text-purple-300/70 hidden sm:block">
+          <div className="text-[11px] text-purple-300/70">
             Ordenado por: <strong className="text-white capitalize">{sortField} ({sortOrder.toUpperCase()})</strong>
           </div>
         </div>
@@ -402,7 +724,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
             <tbody className="divide-y divide-purple-900/30">
               {emendasFiltradas.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400">
+                  <td colSpan={10} className="py-12 text-center text-slate-400">
                     <p className="font-semibold text-white">Nenhum registro localizado para os filtros atuais.</p>
                     <p className="text-xs mt-1 text-slate-400">Altere o termo de busca ou redefina os parâmetros da planilha.</p>
                   </td>
@@ -528,7 +850,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                       {/* Expanded Technical Audit Row */}
                       {isExpanded && (
                         <tr className="bg-[#1b0a2f] border-b border-purple-900/40">
-                          <td colSpan={9} className="p-4 sm:p-5">
+                          <td colSpan={10} className="p-4 sm:p-5">
                             <div className="bg-[#150b24] rounded-xl p-4 border border-purple-900/50 shadow-2xs space-y-3">
                               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-purple-900/30">
                                 <div>
@@ -643,8 +965,8 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                   <td className="py-3 px-3 text-center font-mono text-xs text-white">
                     {percentualGeral}%
                   </td>
-                  <td colSpan={2} className="py-3 px-3.5 text-purple-300/80 text-[11px] font-normal">
-                    Saldo: {formatBRL(totalAlocado - totalGasto)}
+                  <td className="py-3 px-3.5 text-purple-300/80 text-[11px] font-normal whitespace-nowrap">
+                    Saldo: {formatBRL(saldoPendente)}
                   </td>
                 </tr>
               </tfoot>

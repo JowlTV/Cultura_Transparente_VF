@@ -97,30 +97,34 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
     {
       nome: 'Ouvidoria & e-SIC da Prefeitura de Viamão',
       esfera: 'Municipal',
-      papel: 'Protocolo de pedidos de informação e reclamações sobre serviços públicos municipais.',
-      link: 'https://www.viamao.rs.gov.br/ouvidoria',
+      papel: 'Protocolo oficial online de pedidos de informação (e-SIC), denúncias e reclamações na Central 1Doc / Tel: 156.',
+      link: 'https://viamao.1doc.com.br/atendimento',
+      portalSecundario: 'https://www.viamao.rs.gov.br/',
       prazo: 'Até 20 dias',
     },
     {
       nome: 'Tribunal de Contas do Estado do RS (TCE-RS)',
       esfera: 'Estadual',
-      papel: 'Fiscalização de conformidade contábil, financeira e orçamentária do município de Viamão.',
-      link: 'https://portal.tce.rs.gov.br/',
+      papel: 'Ouvidoria e fiscalização da conformidade contábil, financeira e orçamentária do município de Viamão. Canal direto: 0800-541 9800 / E-mail: ouvidoria@tce.rs.gov.br.',
+      link: 'https://tce.rs.gov.br/ouvidoria',
+      portalSecundario: 'https://www.tce.rs.gov.br/',
       prazo: 'Ouvidoria TCE-RS',
     },
     {
       nome: 'Ministério Público do Estado do RS (MP-RS)',
       esfera: 'Estadual / Local',
-      papel: 'Promotoria de Justiça de Viamão - Defesa do Patrimônio Público e Probidade Administrativa.',
-      link: 'https://www.mprs.mp.br/',
+      papel: 'Atendimento ao Cidadão e Promotoria de Justiça de Viamão - Defesa do Patrimônio Público e Probidade.',
+      link: 'https://www.mprs.mp.br/atendimento/',
+      portalSecundario: 'https://www.mprs.mp.br/',
       prazo: 'Notícia de Fato',
     },
     {
       nome: 'Controladoria-Geral da União (Fala.BR / CGU)',
       esfera: 'Federal',
-      papel: 'Fiscalização e denúncias sobre recursos federais transferidos (PNAB, Lei Paulo Gustavo, Emendas).',
+      papel: 'Plataforma Integrada de Ouvidoria e Acesso à Informação para fiscalização de recursos federais (PNAB, Emendas).',
       link: 'https://falabr.cgu.gov.br/',
-      prazo: 'Canal Federal',
+      portalSecundario: 'https://portaldatransparencia.gov.br/',
+      prazo: 'Canal Federal Fala.BR',
     },
   ];
 
@@ -169,12 +173,12 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
               <span>{copiado ? 'Ofício Copiado!' : 'Copiar Texto do Requerimento'}</span>
             </button>
             <a
-              href="https://www.viamao.rs.gov.br/ouvidoria"
+              href="https://viamao.1doc.com.br/atendimento"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3.5 py-2.5 bg-[#1e1037] hover:bg-purple-900/40 text-purple-200 rounded-xl text-xs font-bold border border-purple-800/40 transition-colors"
             >
-              <span>Abrir e-SIC Viamão</span>
+              <span>Abrir Central e-SIC Viamão (1Doc)</span>
               <ExternalLink className="w-3.5 h-3.5 text-purple-300" />
             </a>
           </div>
@@ -278,17 +282,30 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
                 <p className="text-xs text-slate-300 leading-relaxed">{canal.papel}</p>
               </div>
 
-              <div className="pt-2 border-t border-purple-900/30 flex items-center justify-between text-xs">
-                <span className="text-[11px] text-slate-400 font-medium">Prazo / Tipo: {canal.prazo}</span>
-                <a
-                  href={canal.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-bold text-[#FF4500] hover:text-orange-400 transition-colors"
-                >
-                  <span>Acessar Portal</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+              <div className="pt-2.5 border-t border-purple-900/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="text-[11px] text-slate-400 font-medium">{canal.prazo}</span>
+                <div className="flex items-center gap-2">
+                  {canal.portalSecundario && (
+                    <a
+                      href={canal.portalSecundario}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-purple-300 hover:text-white transition-colors"
+                      title="Portal Institucional"
+                    >
+                      Site Oficial
+                    </a>
+                  )}
+                  <a
+                    href={canal.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-bold text-[#FF4500] hover:text-orange-400 transition-colors bg-[#1e1037] px-2.5 py-1 rounded-lg border border-purple-800/40"
+                  >
+                    <span>Acessar Ouvidoria / Protocolo</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
             </div>
           ))}

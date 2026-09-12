@@ -87,7 +87,22 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
         valor: p.valor_exato && p.valor_exato > 0 ? formatBRL(p.valor_exato) : 'Conta Fiduciária',
       }));
 
-    return [...em, ...pnab, ...pt];
+    const aiAssistant = (
+      'auxilio fazedor cultura projeto edital consultor ia inteligência artificial elaborar proposta pdf rouanet fac lpg pnab'
+    ).includes(q)
+      ? [
+          {
+            tipo: 'Assistente Inteligente',
+            tab: 'auxilio-fazedor',
+            icon: '✨',
+            titulo: 'Auxílio ao Fazedor de Cultura (Consultor IA)',
+            subtitulo: 'Estruturação de propostas para PNAB, FAC-RS, Rouanet e exportação em PDF',
+            valor: 'Consultor IA',
+          },
+        ]
+      : [];
+
+    return [...aiAssistant, ...em, ...pnab, ...pt];
   }, [query, emendas, pnabList, pontos]);
 
   if (!isOpen) return null;

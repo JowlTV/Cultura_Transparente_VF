@@ -7,6 +7,7 @@ import { EmendasSection } from './components/EmendasSection';
 import { PnabAuditoriaSection } from './components/PnabAuditoriaSection';
 import { MapeamentoCulturalSection } from './components/MapeamentoCulturalSection';
 import { ControleSocialSection } from './components/ControleSocialSection';
+import { AuxilioFazedorSection } from './components/AuxilioFazedorSection';
 import { QuickSearchModal } from './components/QuickSearchModal';
 import { Footer } from './components/Footer';
 import {
@@ -120,6 +121,11 @@ export default function App() {
       console.error('Error saving shared links to localStorage:', e);
     }
   }, [sharedLinks]);
+
+  // Sempre rolar para o topo ao alternar de aba na aplicação
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [activeTab]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -257,15 +263,11 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'painel' && (
-            <BudgetDashboard
-              emendas={emendas}
-              pnabList={pnabList}
-              onNavigateToPoint={() => setActiveTab('mapa')}
-            />
+          {activeTab === 'auxilio-fazedor' && (
+            <AuxilioFazedorSection onShowToast={showToast} />
           )}
 
-          {activeTab === 'emendas' && (
+          {(activeTab === 'emendas' || activeTab === 'painel') && (
             <EmendasSection
               emendas={emendas}
               onSimulateApiFetch={handleRefreshData}

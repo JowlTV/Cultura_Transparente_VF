@@ -40,11 +40,11 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div className="flex items-center gap-2">
             <span className="font-bold text-white font-['Outfit'] hidden sm:inline">
-              MUNICÍPIO DE VIAMÃO / RS
+              Cultura Transparente
             </span>
             <span className="hidden sm:inline text-purple-400/40">|</span>
             <span className="text-[11px] font-semibold text-purple-200/70">
-              Plataforma de acesso à informação, controle social e centralização de dados.
+              Desenvolvido em conformidade estrita com a Lei de Acesso à Informação (Lei nº 12.527/2011) e a Lei da Transparência (LC nº 131/2009).
             </span>
           </div>
         </div>

@@ -24,7 +24,8 @@ import {
   Check,
   Lock,
   FileCheck,
-  HelpCircle
+  HelpCircle,
+  ArrowRight
 } from 'lucide-react';
 import { Emenda, PnabRecord, PontoCultural, NewsItem } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
@@ -49,7 +50,6 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
 }) => {
   const [filtroCategoria, setFiltroCategoria] = useState<string>('todos');
   const [buscaTexto, setBuscaTexto] = useState<string>('');
-  const [noticiaSelecionada, setNoticiaSelecionada] = useState<NewsItem | null>(null);
   const [isSearchingGoogle, setIsSearchingGoogle] = useState<boolean>(false);
   const [searchFeedback, setSearchFeedback] = useState<{ tipo: 'info' | 'success' | 'alert'; msg: string } | null>(null);
   const [mostrarPesquisaAvancada, setMostrarPesquisaAvancada] = useState<boolean>(false);
@@ -227,6 +227,39 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Banner de Destaque: Auxílio ao Fazedor de Cultura (IA) */}
+      <div className="bg-gradient-to-r from-[#17082e] via-[#1f0b3d] to-[#120524] rounded-2xl p-5 sm:p-6 border border-purple-800/50 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-[#6A0DAD] text-white flex items-center justify-center shrink-0 border border-purple-400/40 shadow-xs mt-0.5">
+            <Sparkles className="w-5 h-5 text-[#FF4500]" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white uppercase tracking-wider font-['Outfit']">
+                Novo Recurso de Apoio
+              </span>
+              <span className="text-[10px] font-bold bg-[#FF4500] text-white px-2 py-0.2 rounded-full uppercase">
+                Consultor IA
+              </span>
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-white">
+              Auxílio ao Fazedor de Cultura • Estruturador de Projetos
+            </h3>
+            <p className="text-xs text-purple-200/70 max-w-2xl leading-relaxed">
+              Elabore sua proposta técnica para a PNAB, FAC-RS, Rouanet e LPG com auxílio inteligente passo a passo, plano de acessibilidade, cronograma, planilha orçamentária e exportação direta em PDF.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => onNavigateTab('auxilio-fazedor')}
+          className="shrink-0 px-4 py-2.5 rounded-xl bg-[#6A0DAD] hover:bg-[#7e12cf] text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-purple-950/40 border border-purple-400/30 transition-all cursor-pointer"
+        >
+          <span>Elaborar Meu Projeto</span>
+          <ArrowRight className="w-4 h-4 text-[#FF4500]" />
+        </button>
       </div>
 
       {/* MOTOR DO FEED DE NOTÍCIAS E ATUALIZAÇÕES OFICIAIS - ESTILO JORNAL / GAZETA */}
@@ -531,51 +564,20 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10 text-xs">
-                {manchete.prazo && (
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Prazo de Inscrição:</span>
-                    <strong className="text-white font-mono mt-0.5 block">{manchete.prazo}</strong>
-                  </div>
-                )}
-                {manchete.plataforma && (
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Plataforma Oficial:</span>
-                    <strong className="text-purple-200 mt-0.5 block truncate">{manchete.plataforma}</strong>
-                  </div>
-                )}
-                {manchete.elegibilidade && (
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Elegibilidade Territorial:</span>
-                    <strong className="text-amber-300 mt-0.5 block truncate">{manchete.elegibilidade}</strong>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                <button
-                  onClick={() => setNoticiaSelecionada(manchete)}
+              <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+                <a
+                  href={
+                    manchete.url_pesquisa_google ||
+                    `https://www.google.com/search?q=${encodeURIComponent(`"${manchete.titulo}" Viamão`)}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-4 py-2 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                  title="Pesquisar esta notícia no Google Search"
                 >
-                  <span>Ler Resumo Completo & Requisitos</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-
-                <div className="flex items-center gap-2">
-                  <a
-                    href={
-                      manchete.url_pesquisa_google ||
-                      `https://www.google.com/search?q=${encodeURIComponent(`"${manchete.titulo}" Viamão`)}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-all border border-white/20 flex items-center gap-1.5"
-                    title="Verificar a repercussão desta notícia no Google Search"
-                  >
-                    <Globe className="w-3.5 h-3.5 text-purple-300" />
-                    <span>Verificar no Google</span>
-                  </a>
-                </div>
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>Pesquisar no Google</span>
+                </a>
               </div>
             </div>
           </article>
@@ -682,54 +684,21 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                       </p>
                     </div>
 
-                    {/* Destaques Técnicos Rápidos */}
-                    <div className="space-y-2 pt-3 border-t border-purple-900/30 text-[11px]">
-                      {item.prazo && (
-                        <div className="flex items-center gap-1.5 text-slate-300">
-                          <Clock className="w-3.5 h-3.5 text-[#FF4500] shrink-0" />
-                          <span>Prazo: <strong className="text-white font-mono">{item.prazo}</strong></span>
-                        </div>
-                      )}
-
-                      {item.plataforma && (
-                        <div className="flex items-center gap-1.5 text-slate-300">
-                          <Layers className="w-3.5 h-3.5 text-[#c084fc] shrink-0" />
-                          <span className="truncate">Plataforma: <strong className="text-purple-200">{item.plataforma}</strong></span>
-                        </div>
-                      )}
-
-                      {item.elegibilidade && (
-                        <div className="text-[11px] text-slate-400 line-clamp-1">
-                          Elegibilidade: <strong className="text-amber-300">{item.elegibilidade}</strong>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Footer do Card com Links Oficiais Seguros */}
-                    <div className="pt-3 border-t border-purple-900/30 flex items-center justify-between gap-1 text-xs">
-                      <button
-                        onClick={() => setNoticiaSelecionada(item)}
-                        className="font-bold text-[#c084fc] hover:text-[#FF4500] hover:underline flex items-center gap-1 text-[11px]"
+                    {/* Footer do Card com Botão de Pesquisa no Google */}
+                    <div className="pt-3 border-t border-purple-900/30 flex items-center justify-end gap-1 text-xs">
+                      <a
+                        href={
+                          item.url_pesquisa_google ||
+                          `https://www.google.com/search?q=${encodeURIComponent(`"${item.titulo}" Viamão`)}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-white hover:text-white bg-[#FF4500] hover:bg-[#e03d00] px-3 py-1.5 rounded-xl transition-all shadow-xs"
+                        title="Pesquisar esta notícia no Google Search"
                       >
-                        <span>Requisitos</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-
-                      <div className="flex items-center gap-1">
-                        <a
-                          href={
-                            item.url_pesquisa_google ||
-                            `https://www.google.com/search?q=${encodeURIComponent(`"${item.titulo}" Viamão`)}`
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-300 hover:text-white bg-[#1e1037] hover:bg-purple-900/40 px-2.5 py-1 rounded-md transition-colors border border-purple-900/40"
-                          title="Verificar autenticidade no Google Search"
-                        >
-                          <Globe className="w-3 h-3 text-[#FF4500]" />
-                          <span>Google</span>
-                        </a>
-                      </div>
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>Pesquisar no Google</span>
+                      </a>
                     </div>
                   </div>
                 </article>
@@ -738,127 +707,6 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
           </div>
         )}
       </div>
-
-      {/* Modal de Detalhes da Notícia / Edital Oficial com Auditoria Completa */}
-      {noticiaSelecionada && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#150b24] rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl border border-purple-900/50 max-h-[90vh] overflow-y-auto text-slate-200">
-            <div className="flex items-start justify-between gap-4 pb-3 border-b border-purple-900/30">
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-bold text-white bg-[#6A0DAD] px-2.5 py-1 rounded-full border border-purple-500/40">
-                    {noticiaSelecionada.etiqueta}
-                  </span>
-                  {noticiaSelecionada.veiculo_imprensa && (
-                    <span className="text-xs font-bold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-800/40 flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                      {noticiaSelecionada.veiculo_imprensa}
-                    </span>
-                  )}
-                </div>
-                <h3 className="font-bold text-white text-lg font-['Outfit'] mt-2">
-                  {noticiaSelecionada.titulo}
-                </h3>
-              </div>
-              <button
-                onClick={() => setNoticiaSelecionada(null)}
-                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-purple-900/40 font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
-              <p>{noticiaSelecionada.resumo}</p>
-
-              {noticiaSelecionada.alerta_inabilitacao && (
-                <div className="p-3 bg-rose-950/60 border border-rose-800/50 rounded-xl text-rose-200 font-medium space-y-1">
-                  <div className="flex items-center gap-1.5 font-bold text-rose-300">
-                    <AlertTriangle className="w-4 h-4 text-rose-400" />
-                    Alerta de Risco de Inabilitação
-                  </div>
-                  <p className="text-xs">{noticiaSelecionada.alerta_inabilitacao}</p>
-                </div>
-              )}
-
-              {noticiaSelecionada.requisitos_praticos && noticiaSelecionada.requisitos_praticos.length > 0 && (
-                <div className="space-y-2 pt-2">
-                  <h5 className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    Requisitos Práticos & Orientações de Submissão:
-                  </h5>
-                  <ul className="space-y-1.5 text-xs text-slate-300">
-                    {noticiaSelecionada.requisitos_praticos.map((req, idx) => (
-                      <li key={idx} className="flex items-start gap-2 bg-[#1e1037] p-2.5 rounded-lg border border-purple-900/40">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF4500] shrink-0 mt-1.5"></span>
-                        <span>{req}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-2 pt-2 text-xs">
-                <div className="bg-[#1e1037] p-2.5 rounded-lg border border-purple-900/40">
-                  <span className="text-[10px] text-purple-300/60 uppercase font-bold block">Órgão Emissor / Veículo</span>
-                  <span className="font-semibold text-slate-100">
-                    {noticiaSelecionada.veiculo_imprensa || noticiaSelecionada.origem}
-                  </span>
-                </div>
-                <div className="bg-[#1e1037] p-2.5 rounded-lg border border-purple-900/40">
-                  <span className="text-[10px] text-purple-300/60 uppercase font-bold block">Data do Comunicado</span>
-                  <span className="font-semibold text-slate-100">{noticiaSelecionada.data}</span>
-                </div>
-                <div className="bg-[#1e1037] p-2.5 rounded-lg border border-purple-900/40">
-                  <span className="text-[10px] text-purple-300/60 uppercase font-bold block">Status de Auditoria</span>
-                  <span className="font-semibold text-emerald-400 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    Fonte Oficial
-                  </span>
-                </div>
-                <div className="bg-[#1e1037] p-2.5 rounded-lg border border-purple-900/40">
-                  <span className="text-[10px] text-purple-300/60 uppercase font-bold block">Jurisdição Territorial</span>
-                  <span className="font-semibold text-slate-100">{noticiaSelecionada.jurisdicao || 'Rio Grande do Sul'}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-purple-900/30 flex items-center justify-between gap-2 flex-wrap">
-              <button
-                onClick={() => setNoticiaSelecionada(null)}
-                className="px-4 py-2 bg-[#1e1037] hover:bg-purple-900/40 text-slate-300 rounded-xl text-xs font-semibold transition-all border border-purple-900/40"
-              >
-                Fechar
-              </button>
-
-              <div className="flex items-center gap-2">
-                <a
-                  href={
-                    noticiaSelecionada.url_pesquisa_google ||
-                    `https://www.google.com/search?q=${encodeURIComponent(`"${noticiaSelecionada.titulo}" Viamão`)}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#1e1037] hover:bg-purple-900/40 text-slate-200 rounded-xl text-xs font-semibold transition-all border border-purple-900/40"
-                >
-                  <Globe className="w-3.5 h-3.5 text-[#FF4500]" />
-                  <span>Conferir no Google</span>
-                </a>
-
-                <a
-                  href={noticiaSelecionada.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl text-xs font-bold transition-all shadow-xs"
-                >
-                  <span>Acessar Portal Oficial</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

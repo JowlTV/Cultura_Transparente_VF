@@ -30,9 +30,9 @@ interface SidebarProps {
 
 export const navTabs: NavTabItem[] = [
   { id: 'visao-geral', label: 'Visão Geral & Editais', icon: '🏛️', lucideIcon: <Landmark className="w-4 h-4" /> },
-  { id: 'emendas', label: 'Planilha de Emendas', icon: '📋', lucideIcon: <FileSpreadsheet className="w-4 h-4" /> },
-  { id: 'painel', label: 'Painel Orçamentário', icon: '📊', lucideIcon: <BarChart3 className="w-4 h-4" /> },
+  { id: 'emendas', label: 'Emendas Parlamentares', icon: '📋', lucideIcon: <FileSpreadsheet className="w-4 h-4" /> },
   { id: 'pnab', label: 'PNAB / Auditoria', icon: '💰', lucideIcon: <Coins className="w-4 h-4" /> },
+  { id: 'auxilio-fazedor', label: 'Auxílio ao Fazedor de Cultura', icon: '✨', badge: 'Novo' },
   { id: 'acompanhe-cultura', label: 'Acompanhe a Cultura', icon: '🎭', lucideIcon: <Building2 className="w-4 h-4" /> },
   { id: 'controle-social', label: 'Controle Social & LAI', icon: '🛡️', lucideIcon: <ShieldCheck className="w-4 h-4" /> },
 ];
@@ -66,14 +66,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           isOpen ? 'translate-x-0' : '-translate-x-full lg:static lg:translate-x-0'
         }`}
       >
-        {/* Brand Color Ribbon (#6A0DAD, #FF4500, Branco, #6A0DAD) */}
-        <div className="h-1.5 w-full flex shrink-0">
-          <div className="h-full w-1/4 bg-[#6A0DAD]"></div>
-          <div className="h-full w-1/4 bg-[#FF4500]"></div>
-          <div className="h-full w-1/4 bg-white/20"></div>
-          <div className="h-full w-1/4 bg-[#6A0DAD]"></div>
-        </div>
-
         {/* Sidebar Header: Municipal Portal Identity */}
         <div className="p-5 border-b border-purple-900/30 shrink-0">
           <div className="flex items-start justify-between gap-3">
@@ -146,6 +138,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="flex items-center gap-2.5 truncate">
                   <span className="text-base shrink-0">{tab.icon}</span>
                   <span className="truncate">{tab.label}</span>
+                  {tab.badge && (
+                    <span className="text-[9px] font-bold bg-[#FF4500] text-white px-1.5 py-0.2 rounded-full uppercase tracking-wider shrink-0">
+                      {tab.badge}
+                    </span>
+                  )}
                 </div>
                 {isActive && (
                   <span className="w-2 h-2 rounded-full bg-[#FF4500] shrink-0 ring-2 ring-white/40"></span>
