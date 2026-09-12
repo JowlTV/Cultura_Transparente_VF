@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, MapPin, FileText, Landmark, Film, ArrowRight, Flame } from 'lucide-react';
-import { Emenda, PnabRecord, LeiIncentivo, PontoCultural } from '../types/culture';
-import { INITIAL_FAC_EDITAIS } from '../data/initialData';
+import { Search, X, ArrowRight } from 'lucide-react';
+import { Emenda, PnabRecord, PontoCultural } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
 
 interface QuickSearchModalProps {
@@ -9,7 +8,6 @@ interface QuickSearchModalProps {
   onClose: () => void;
   emendas: Emenda[];
   pnabList: PnabRecord[];
-  leisIncentivo: LeiIncentivo[];
   pontos: PontoCultural[];
   onSelectResult: (tab: string) => void;
 }
@@ -19,7 +17,6 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
   onClose,
   emendas,
   pnabList,
-  leisIncentivo,
   pontos,
   onSelectResult,
 }) => {
@@ -49,27 +46,6 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
         valor: formatBRL(e.valor),
       }));
 
-    const lpg = leisIncentivo
-      .filter(
-        l =>
-          l.projeto_objeto.toLowerCase().includes(q) ||
-          l.responsavel_execucao.toLowerCase().includes(q) ||
-          l.mecanismo.toLowerCase().includes(q) ||
-          (l.pronac_numero && l.pronac_numero.toLowerCase().includes(q))
-      )
-      .slice(0, 3)
-      .map(l => {
-        const isRouanet = l.mecanismo.toLowerCase().includes('rouanet') || Boolean(l.pronac_numero);
-        return {
-          tipo: isRouanet ? 'Lei Rouanet / SalicNet' : 'Lei Paulo Gustavo (LPG)',
-          tab: isRouanet ? 'rouanet' : 'lpg',
-          icon: isRouanet ? '✨' : '🎬',
-          titulo: l.projeto_objeto,
-          subtitulo: `${l.mecanismo} - ${l.responsavel_execucao}`,
-          valor: formatBRL(l.valor_aprovado),
-        };
-      });
-
     const pt = pontos
       .filter(
         p =>
@@ -91,25 +67,6 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
         valor: 'Viamão/RS',
       }));
 
-    const fac = INITIAL_FAC_EDITAIS
-      .filter(
-        f =>
-          f.nome.toLowerCase().includes(q) ||
-          f.numero_edital.toLowerCase().includes(q) ||
-          f.segmento.toLowerCase().includes(q) ||
-          f.publico_alvo.toLowerCase().includes(q) ||
-          'fundo de apoio à cultura fac sedac-rs pró-cultura'.includes(q)
-      )
-      .slice(0, 3)
-      .map(f => ({
-        tipo: 'Fundo de Apoio à Cultura (FAC)',
-        tab: 'fac',
-        icon: '🏛️',
-        titulo: `${f.numero_edital} - ${f.nome}`,
-        subtitulo: `${f.segmento} • SEDAC-RS (Pró-cultura RS)`,
-        valor: f.valor_maximo_projeto ? formatBRL(f.valor_maximo_projeto) : 'Pró-cultura RS',
-      }));
-
     const pnab = pnabList
       .filter(
         p =>
@@ -118,7 +75,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
           p.termo_numero.toLowerCase().includes(q) ||
           'pnab aldir blanc transferegov minc fundo municipal cultura'.includes(q)
       )
-      .slice(0, 2)
+      .slice(0, 3)
       .map(p => ({
         tipo: 'Política Nacional Aldir Blanc (PNAB)',
         tab: 'pnab',
@@ -130,8 +87,8 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
         valor: p.valor_exato && p.valor_exato > 0 ? formatBRL(p.valor_exato) : 'Conta Fiduciária',
       }));
 
-    return [...em, ...fac, ...pnab, ...pt, ...lpg];
-  }, [query, emendas, leisIncentivo, pontos]);
+    return [...em, ...pnab, ...pt];
+  }, [query, emendas, pnabList, pontos]);
 
   if (!isOpen) return null;
 

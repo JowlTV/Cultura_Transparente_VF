@@ -111,7 +111,7 @@ export const LeisIncentivoSection: React.FC<LeisIncentivoSectionProps> = ({ leis
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-slate-900 font-['Outfit']">Nenhum projeto encontrado</h3>
               <p className="text-sm text-slate-500 max-w-md mx-auto">
-                Aguardando sincronização oficial. Não foram encontrados registros validados para este mecanismo na base oficial do Ministério da Cultura.
+                Dados não coletados, consultar plataformas oficiais. Não foram encontrados registros validados para este mecanismo na base oficial do Ministério da Cultura.
               </p>
             </div>
           </div>

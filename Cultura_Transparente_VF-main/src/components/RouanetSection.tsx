@@ -82,7 +82,7 @@ export const RouanetSection: React.FC<RouanetSectionProps> = ({ leisIncentivo })
                 Total Homologado PRONAC
               </span>
               <span className={`font-black font-['Outfit'] block mt-1 ${rouanetProjetos.length > 0 ? "text-xl sm:text-2xl text-white" : "text-sm text-white/70"}`}>
-                {rouanetProjetos.length > 0 ? formatBRL(totalAprovado) : 'Aguardando sincronização'}
+                {rouanetProjetos.length > 0 ? formatBRL(totalAprovado) : 'Dados não coletados, consultar plataformas oficiais'}
               </span>
             </div>
 
@@ -91,7 +91,7 @@ export const RouanetSection: React.FC<RouanetSectionProps> = ({ leisIncentivo })
                 Total Captado no Mercado
               </span>
               <span className={`font-black font-['Outfit'] block mt-1 ${rouanetProjetos.length > 0 ? "text-xl sm:text-2xl text-emerald-300" : "text-sm text-emerald-200/70"}`}>
-                {rouanetProjetos.length > 0 ? formatBRL(totalCaptado) : 'Aguardando sincronização'}
+                {rouanetProjetos.length > 0 ? formatBRL(totalCaptado) : 'Dados não coletados, consultar plataformas oficiais'}
               </span>
             </div>
           </div>
@@ -234,7 +234,7 @@ export const RouanetSection: React.FC<RouanetSectionProps> = ({ leisIncentivo })
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-slate-900 font-['Outfit']">Nenhum projeto encontrado</h3>
               <p className="text-sm text-slate-500 max-w-md mx-auto">
-                Aguardando sincronização oficial. Não foram encontrados registros de projetos da Lei Rouanet homologados e vinculados à cidade de Viamão na base oficial do Ministério da Cultura.
+                Dados não coletados, consultar plataformas oficiais. Não foram encontrados registros de projetos da Lei Rouanet homologados e vinculados à cidade de Viamão na base oficial do Ministério da Cultura.
               </p>
             </div>
           </div>

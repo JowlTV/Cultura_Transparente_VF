@@ -1,4 +1,4 @@
-import { Emenda, PnabRecord, LeiIncentivo, PontoCultural, NewsItem, ApiEndpointDoc, SharedCommunityLink, FacEdital } from '../types/culture';
+import { Emenda, PnabRecord, PontoCultural, NewsItem, SharedCommunityLink } from '../types/culture';
 import { classificarSetorEmenda } from '../utils/formatters';
 import pnabAuditJson from './pnab_scraped_audit.json';
 
@@ -393,24 +393,6 @@ export const INITIAL_PNAB: PnabRecord[] = [
     base_legal: pnabAuditJson.base_legal || 'Lei Federal nº 14.399/2022, Decreto Federal nº 11.740/2023 e Portarias MinC nº 80/2023 e nº 84/2023',
     fonte_auditada: pnabAuditJson.fonte_auditada || 'Plataforma Transferegov.br / Ministério da Cultura (MinC)',
   },
-];
-
-export const INITIAL_LEIS_INCENTIVO: LeiIncentivo[] = [
-  {
-    id: 'lpg-01',
-    mecanismo: 'Lei Paulo Gustavo (LC nº 195/2022)',
-    projeto_objeto: 'Editais Municipais de Fomento ao Audiovisual, Prêmios de Trajetória e Espaços Culturais',
-    valor_aprovado: 250000.0,
-    valor_captado: 250000.0,
-    origem_recurso: 'Fundo Nacional de Cultura (FNC / Repasse Direto Fundo a Fundo)',
-    destino_recurso: 'Fundo Municipal de Cultura de Viamão (Conta Específica Banco do Brasil)',
-    orgao_liberador: 'Ministério da Cultura (MinC)',
-    responsavel_execucao: 'Prefeitura Municipal de Viamão (Secretaria de Cultura)',
-    status_atual: 'Em Execução (Prestação de Contas & Lançamento Complementar)',
-    como_sera_feito: 'Financiamento a curta-metragens locais, videoclipes de músicos de Viamão, capacitações técnicas e prêmios por histórico artístico a mestres da cultura tradicional.',
-    fonte_oficial: 'https://www.gov.br/cultura/pt-br/assuntos/lei-paulo-gustavo',
-    periodo_execucao: '2024 - 2026',
-  }
 ];
 
 export const INITIAL_PONTOS_CULTURAIS: PontoCultural[] = [
@@ -911,129 +893,8 @@ export const INITIAL_PONTOS_CULTURAIS: PontoCultural[] = [
   },
 ];
 
-export const INITIAL_COMMUNITY_LINKS: SharedCommunityLink[] = [
-  {
-    id: 'slink-01',
-    pontoId: 'ponto-fvcb',
-    pontoNome: 'Fundação Vera Chaves Barcellos (FVCB) - Sala dos Pomares',
-    titulo: 'Instagram Oficial (@fvcb__) - Fundação Vera Chaves Barcellos',
-    url: 'https://www.instagram.com/fvcb__/',
-    tipo: 'instagram',
-    enviadoPor: 'Fundação Vera Chaves Barcellos',
-    data: '10/09/2026',
-    descricao: 'Perfil oficial no Instagram da FVCB com divulgação de exposições na Sala dos Pomares, visitas educativas e feiras culturais em Viamão.',
-  },
-  {
-    id: 'slink-02',
-    pontoId: 'ponto-fvcb',
-    pontoNome: 'Fundação Vera Chaves Barcellos (FVCB) - Sala dos Pomares',
-    titulo: 'Portal Institucional e Catálogo da Sala dos Pomares (FVCB)',
-    url: 'http://fvcb.com.br/',
-    tipo: 'outro',
-    enviadoPor: 'Fundação Vera Chaves Barcellos',
-    data: '09/09/2026',
-    descricao: 'Site institucional da Fundação Vera Chaves Barcellos com catálogo de obras, história e agenda cultural em Viamão.',
-  },
-  {
-    id: 'slink-03',
-    pontoId: 'ponto-mestre-borel',
-    pontoNome: 'Ponto de Cultura e Memória Centro Cultural Mestre Borel',
-    titulo: 'Instagram Oficial (@centro_cultural_mestre_borel) - Mestre Borel',
-    url: 'https://www.instagram.com/centro_cultural_mestre_borel/',
-    tipo: 'instagram',
-    enviadoPor: 'Centro Cultural Mestre Borel',
-    data: '08/09/2026',
-    descricao: 'Canal oficial no Instagram do Ponto de Cultura e Memória Centro Cultural Mestre Borel em Viamão.',
-  },
-  {
-    id: 'slink-04',
-    pontoId: 'ponto-mestre-borel',
-    pontoNome: 'Ponto de Cultura e Memória Centro Cultural Mestre Borel',
-    titulo: 'Página Oficial no Facebook - Centro Cultural Mestre Borel',
-    url: 'https://www.facebook.com/CentroCulturalMestreBorel/',
-    tipo: 'facebook',
-    enviadoPor: 'Centro Cultural Mestre Borel',
-    data: '07/09/2026',
-    descricao: 'Página oficial no Facebook com programação das oficinas de capoeira, percussão afro e projeto Sopa do Bem em Viamão.',
-  },
-  {
-    id: 'slink-05',
-    pontoId: 'ponto-cia-potosi',
-    pontoNome: 'Cia Potosí de Teatro',
-    titulo: 'Página Oficial no Facebook - Cia Potosí de Teatro',
-    url: 'https://www.facebook.com/ciapotosideteatro/',
-    tipo: 'facebook',
-    enviadoPor: 'Cia Potosí de Teatro',
-    data: '06/09/2026',
-    descricao: 'Página oficial da Cia Potosí de Teatro (Ponto de Cultura certificado pelo MinC em Viamão) com registro de montagens cênicas e espetáculos com bonecos.',
-  },
-  {
-    id: 'slink-06',
-    pontoId: 'ponto-cia-potosi',
-    pontoNome: 'Cia Potosí de Teatro',
-    titulo: 'Blog Oficial de Projetos e Dramaturgia - Cia Potosí de Teatro',
-    url: 'http://ciapotosideteatro.blogspot.com/',
-    tipo: 'outro',
-    enviadoPor: 'Cia Potosí de Teatro',
-    data: '05/09/2026',
-    descricao: 'Blog oficial com histórico de espetáculos, oficinas de formas animadas e ações de mediação teatral em Viamão.',
-  },
-  {
-    id: 'slink-07',
-    pontoId: 'ponto-carlos-pinto-mennet',
-    pontoNome: 'Centro Municipal de Cultura Dr. Carlos Pinto Mennet',
-    titulo: 'Secretaria Municipal da Cultura de Viamão - Portal Oficial',
-    url: 'https://www.viamao.rs.gov.br/',
-    tipo: 'outro',
-    enviadoPor: 'Prefeitura Municipal de Viamão',
-    data: '04/09/2026',
-    descricao: 'Página oficial com informações do Centro Dr. Carlos Pinto Mennet, Departamento de Memória Cultural e editais públicos.',
-  },
-  {
-    id: 'slink-08',
-    pontoId: 'ponto-filhos-de-sepe',
-    pontoNome: 'Ponto de Cultura Filhos de Sepé',
-    titulo: 'Registro Pró-Cultura RS / FAC - Ponto de Cultura Filhos de Sepé',
-    url: 'https://procultura.rs.gov.br/',
-    tipo: 'documento',
-    enviadoPor: 'Instituto de Pesquisa e Educação do Campo / SEDAC-RS',
-    data: '03/09/2026',
-    descricao: 'Registro do projeto cultural do Ponto de Cultura Filhos de Sepé no Fundo de Apoio à Cultura (FAC/RS).',
-  },
-  {
-    id: 'slink-09',
-    pontoId: 'ponto-01',
-    pontoNome: 'Igreja Matriz Nossa Senhora da Conceição',
-    titulo: 'Dossiê de Tombamento Federal IPHAN - Matriz de Viamão (1766)',
-    url: 'http://portal.iphan.gov.br/',
-    tipo: 'documento',
-    enviadoPor: 'Instituto do Patrimônio Histórico e Artístico Nacional (IPHAN)',
-    data: '02/09/2026',
-    descricao: 'Inscrição no Livro Belas Artes detalhando a arquitetura barroco-rococó e talha histórica da segunda igreja mais antiga do RS.',
-  },
-  {
-    id: 'slink-10',
-    pontoId: 'ponto-quilombo-anastacia',
-    pontoNome: 'Ponto de Memória Quilombo da Anastácia',
-    titulo: 'Certidão de Autodefinição Quilombola - Fundação Cultural Palmares',
-    url: 'https://www.palmares.gov.br/',
-    tipo: 'documento',
-    enviadoPor: 'Fundação Cultural Palmares',
-    data: '01/09/2026',
-    descricao: 'Certidão oficial de autodefinição e salvaguarda do patrimônio imaterial e saberes tradicionais do Quilombo da Anastácia em Viamão.',
-  },
-  {
-    id: 'slink-11',
-    pontoId: 'ponto-07',
-    pontoNome: 'Ponto Ecológico & Cultural Parque Estadual de Itapuã',
-    titulo: 'Unidade de Conservação e Educação Patrimonial - SEMA/RS',
-    url: 'https://sema.rs.gov.br/parque-estadual-de-itapua',
-    tipo: 'outro',
-    enviadoPor: 'Secretaria do Meio Ambiente e Infraestrutura (SEMA/RS)',
-    data: '30/08/2026',
-    descricao: 'Registro oficial de salvaguarda ambiental, sítios arqueológicos e memória da Revolução Farroupilha em Viamão.',
-  },
-];
+// Mural Comunitário aberto exclusivamente para contribuições sociais cidadãs auditadas
+export const INITIAL_COMMUNITY_LINKS: SharedCommunityLink[] = [];
 
 // Dados históricos de séries temporais para o painel de controle interativo (Linhas e Área)
 export interface BudgetTimeSeriesPoint {
@@ -1061,368 +922,142 @@ export const BUDGET_CHRONOLOGY: BudgetTimeSeriesPoint[] = [
 
 export const INITIAL_NEWS: NewsItem[] = [
   {
-    id: 'news-mut-brasil-2026',
-    data: '01/09/2026',
-    origem: 'Controle Social',
+    id: 'news-diario-gaucho-cena-viamao',
+    data: '11/09/2026',
+    origem: 'Imprensa Regional (RS)',
+    veiculo_imprensa: 'Diário Gaúcho (GZH)',
     categoria_filtro: 'viamao',
-    titulo: 'Viamão sedia Mostra Cultural dos Territórios MUT Brasil 2026',
-    resumo: 'A cidade de Viamão sedia a Mostra Cultural dos Territórios MUT Brasil 2026 na Quadra da Unidos de Vila Isabel, promovendo formação, debates e apresentações artísticas voltadas a populações historicamente invisibilizadas através da arte e da cultura local.',
-    link: 'https://www.sympla.com.br',
-    etiqueta: 'Evento Comunitário',
+    titulo: 'Evento movimenta cena cultural de Viamão com seminários, oficinas de slam e debates',
+    resumo: 'Mobilização cultural em Viamão promove formação de artistas e juventude local com seminários e oficinas de poesia falada (slam), fortalecendo a economia criativa e as manifestações artísticas urbanas no município.',
+    link: 'https://diariogaucho.clicrbs.com.br/',
+    etiqueta: 'Música & Hip-Hop',
     jurisdicao: 'Municipal (Viamão)',
-    elegibilidade: 'Comunidade em geral e coletivos periféricos',
-    prazo: '06 de setembro de 2026',
-    plataforma: 'Quadra da Unidos de Vila Isabel / Viamão'
-  },
-  {
-    id: 'news-talentos-da-terra',
-    data: '15/06/2026',
-    origem: 'Municipal (Viamão)',
-    categoria_filtro: 'viamao',
-    titulo: 'Câmara de Viamão aprova criação do Programa Talentos da Terra',
-    resumo: 'Foi aprovado o Projeto de Lei 36/2026, criando o Programa Talentos da Terra. A iniciativa do poder legislativo municipal estabelece um espaço público voltado para a valorização de artistas da cidade, promovendo apresentações musicais e demonstrações culturais de talentos viamonenses.',
-    link: 'https://camaraviamao.rs.gov.br',
-    etiqueta: 'Políticas Públicas',
-    jurisdicao: 'Municipal (Viamão)',
-    elegibilidade: 'Artistas residentes ou com família em Viamão',
-    prazo: 'Fluxo Contínuo / Institucional',
-    plataforma: 'Câmara Municipal de Viamão'
-  },
-  {
-    id: 'news-viamao-editais-pnab-2026',
-    data: '08/09/2026',
-    origem: 'Municipal (Viamão)',
-    categoria_filtro: 'editais',
-    titulo: 'Prefeitura de Viamão prorroga Editais da PNAB (Literatura, Artesanato e Pareceristas)',
-    resumo: 'A Secretaria de Cultura de Viamão prorrogou os prazos de inscrição para os editais de fomento direto da Política Nacional Aldir Blanc (PNAB) 2026, com oportunidades para Literatura, Artesanato e formação do banco de Pareceristas do município.',
-    link: 'https://www.viamao.rs.gov.br/noticia/detalhe/80942',
-    etiqueta: 'Editais PNAB Viamão',
-    jurisdicao: 'Municipal (Viamão)',
-    elegibilidade: 'Fazedores de Cultura de Viamão e Pareceristas',
-    prazo: 'Prorrogado até Setembro de 2026',
-    plataforma: 'Portal Oficial da Prefeitura de Viamão',
+    elegibilidade: 'Artistas, coletivos comunitários e fazedores de cultura de Viamão',
+    prazo: 'Programação Ativa 2026',
+    plataforma: 'Diário Gaúcho / Coletivos Culturais de Viamão',
+    fonte_confiavel: true,
+    pesquisa_google: true,
+    url_pesquisa_google: 'https://www.google.com/search?q=cena+cultural+viamao+slam+diario+gaucho',
     requisitos_praticos: [
-      'Residência ou atuação comprovada em Viamão',
-      'Inscrição na Plataforma Oficial do Município',
-      'Cadastro no Mapeamento Cultural'
+      'Atuação e residência cultural em Viamão',
+      'Participação aberta e gratuita',
+      'Articulação com redes comunitárias locais'
     ]
   },
   {
-    id: 'news-conferencia-cultura',
-    data: '15/11/2025',
-    origem: 'Municipal (Viamão)',
-    categoria_filtro: 'viamao',
-    titulo: 'Conferência Municipal de Cultura de Viamão elege novo Conselho',
-    resumo: 'Realizada no Centro Municipal de Cultura Dr. Carlos Pinto Mennet, a Etapa Municipal da Conferência Nacional de Cultura debateu diretrizes, políticas de patrimônio, diversidade e economia criativa, além de eleger os novos representantes do Conselho Municipal de Políticas Culturais de Viamão.',
-    link: 'https://www.viamao.rs.gov.br/',
-    etiqueta: 'Gestão Compartilhada',
+    id: 'news-jornal-comercio-viamao-em-rede',
+    data: '08/09/2026',
+    origem: 'Imprensa Regional (RS)',
+    veiculo_imprensa: 'Jornal do Comércio',
+    categoria_filtro: 'editais',
+    titulo: 'Viamão em Rede abre inscrições para qualificação de artistas e profissionais da cultura',
+    resumo: 'Programa estruturado de qualificação técnica para agentes culturais independentes em Viamão, oferecendo suporte para formulação de propostas em editais públicos, gestão de projetos e captação de recursos.',
+    link: 'https://www.jornaldocomercio.com/',
+    etiqueta: 'Qualificação & Fomento',
     jurisdicao: 'Municipal (Viamão)',
-    elegibilidade: 'Agentes Culturais, Sociedade Civil e Poder Público',
-    prazo: 'Conselho Biênio 2025-2027',
-    plataforma: 'Centro Municipal de Cultura Dr. Carlos Pinto Mennet'
+    elegibilidade: 'Artistas e trabalhadores da cultura residentes em Viamão',
+    prazo: 'Inscrições em Fluxo Contínuo',
+    plataforma: 'Jornal do Comércio / Viamão em Rede',
+    fonte_confiavel: true,
+    pesquisa_google: true,
+    url_pesquisa_google: 'https://www.google.com/search?q=viamao+em+rede+artistas+jornal+do+comercio',
+    requisitos_praticos: [
+      'Comprovante de atuação no setor cultural de Viamão',
+      'Adesão aos módulos de capacitação e gestão de projetos',
+      'Foco em democratização do acesso aos recursos públicos'
+    ]
   },
   {
-    id: 'news-feira-literaria',
-    data: '20/10/2025',
-    origem: 'Controle Social',
+    id: 'news-ifrs-sarau-viamao',
+    data: '26/08/2026',
+    origem: 'Instituto Federal (IFRS)',
+    veiculo_imprensa: 'IFRS - Campus Viamão',
     categoria_filtro: 'viamao',
-    titulo: 'Antônio Carlos Côrtes é o patrono da Feira Literária Cultural de Viamão',
-    resumo: 'Com grande participação das escolas da rede pública e exposição de trabalhos inspirados em obras literárias, Viamão realiza sua Feira Literária Cultural, tendo Antônio Carlos Côrtes como patrono, fortalecendo a literatura e a leitura na região.',
-    link: 'https://diariodeviamao.com.br/',
-    etiqueta: 'Feira Literária',
+    titulo: 'Campus Viamão realiza Sarau Cultural e debates sobre Direitos Humanos e Cidadania',
+    resumo: 'O Instituto Federal do Rio Grande do Sul (Campus Viamão) sedia sarau cultural com apresentações musicais, literatura e artes cênicas de artistas locais, promovendo o debate sobre memória, patrimônio e direitos fundamentais.',
+    link: 'https://viamao.ifrs.edu.br/',
+    etiqueta: 'Sarau & Literatura',
     jurisdicao: 'Municipal (Viamão)',
-    elegibilidade: 'Estudantes, Professores e Público em Geral',
-    prazo: 'Evento Literário Anual',
-    plataforma: 'Diário de Viamão / Jornal Opinião'
+    elegibilidade: 'Comunidade local, estudantes, poetas e artistas de Viamão',
+    prazo: 'Evento Periódico Institucional',
+    plataforma: 'Portal Oficial IFRS Campus Viamão',
+    fonte_confiavel: true,
+    pesquisa_google: true,
+    url_pesquisa_google: 'https://www.google.com/search?q=campus+viamao+sarau+cultural+ifrs',
+    requisitos_praticos: [
+      'Espaço público federal aberto à comunidade viamonense',
+      'Inscrições gratuitas para apresentações culturais',
+      'Integração com o calendário acadêmico e comunitário'
+    ]
   },
   {
-    id: 'news-festejos-farroupilhas',
-    data: '10/09/2025',
+    id: 'news-sedac-fac-editais-rs',
+    data: '28/08/2026',
     origem: 'Estadual (SEDAC-RS)',
-    categoria_filtro: 'sedac-rs',
-    titulo: 'Viamão celebra Festejos Farroupilhas destacando arte e tradição no Setembrino',
-    resumo: 'Viamão, historicamente o "Berço da História Gaúcha" e ex-capital, realiza intensa programação nos Festejos Farroupilhas, incluindo atividades musicais do projeto Arte e Tradição, cavalgadas, bailes e exibições para preservação do patrimônio gaúcho nas novas gerações.',
-    link: 'https://www.viamao.rs.gov.br/',
-    etiqueta: 'Tradição e Memória',
+    veiculo_imprensa: 'Secretaria de Estado da Cultura (SEDAC-RS)',
+    categoria_filtro: 'editais',
+    titulo: 'SEDAC-RS divulga chamadas do Fundo de Apoio à Cultura (FAC) e Pró-Cultura RS',
+    resumo: 'A Secretaria de Estado da Cultura do RS mantém chamamentos e editais setoriais pelo FAC, com fomento descentralizado. Proponentes com CEPC ativo no Rio Grande do Sul, inclusive residentes em Viamão, são integralmente elegíveis.',
+    link: 'https://www.procultura.rs.gov.br/',
+    etiqueta: 'Editais FAC / Pró-Cultura',
+    jurisdicao: 'Estadual (RS)',
+    elegibilidade: 'Pessoas Jurídicas e Produtores Culturais com cadastro no Pró-cultura RS',
+    prazo: 'Conforme calendário oficial SEDAC-RS',
+    plataforma: 'Sistema Unificado Pró-cultura RS (www.procultura.rs.gov.br)',
+    fonte_confiavel: true,
+    pesquisa_google: true,
+    url_pesquisa_google: 'https://www.google.com/search?q=site:procultura.rs.gov.br+viamao+editais',
+    requisitos_praticos: [
+      'Cadastro e homologação ativa no Pró-cultura RS',
+      'Regularidade fiscal estadual e federal (CNDT e CND)',
+      'Conta corrente fiduciária vinculada no Banrisul'
+    ]
+  },
+  {
+    id: 'news-pnab-viamao-minc',
+    data: '10/08/2026',
+    origem: 'Federal (MinC)',
+    veiculo_imprensa: 'Ministério da Cultura / Transferegov',
+    categoria_filtro: 'editais',
+    titulo: 'Acompanhamento e Auditoria da PNAB no Município de Viamão (Lei nº 14.399/2022)',
+    resumo: 'Termo de adesão fiduciário fomento a fundo com recursos depositados em conta vinculada do Fundo Municipal de Cultura de Viamão para execução de editais descentralizados de fomento à cultura e agentes locais.',
+    link: 'https://www.transferegov.sistema.gov.br/',
+    etiqueta: 'Editais PNAB Viamão',
     jurisdicao: 'Municipal (Viamão)',
-    elegibilidade: 'CTGs, Entidades Tradicionalistas e Sociedade',
-    prazo: 'Setembro / Mês Farroupilha',
-    plataforma: 'Prefeitura de Viamão / Sistema Pró-Cultura'
+    elegibilidade: 'Fazedores de cultura, coletivos e espaços culturais de Viamão',
+    prazo: 'Ciclo Vigente PNAB 2024-2027',
+    plataforma: 'Plataforma Transferegov.br / MinC',
+    fonte_confiavel: true,
+    pesquisa_google: true,
+    url_pesquisa_google: 'https://www.google.com/search?q=site:viamao.rs.gov.br+pnab+cultura',
+    requisitos_praticos: [
+      'Comprovação de domicílio e atuação em Viamão',
+      'Inscrição nos editais municipais da Secretaria de Cultura',
+      'Cadastro no Mapeamento Cultural do Município'
+    ]
+  },
+  {
+    id: 'news-correio-do-povo-patrimonio',
+    data: '09/04/2026',
+    origem: 'Imprensa Regional (RS)',
+    veiculo_imprensa: 'Correio do Povo',
+    categoria_filtro: 'viamao',
+    titulo: 'Preservação da Memória e Salvaguarda do Patrimônio Histórico em Viamão',
+    resumo: 'Destaque jornalístico sobre as riquezas arquitetônicas e acervos imateriais de Viamão, segunda povoação mais antiga do RS e capital farroupilha, com ênfase na conservação da Igreja Matriz (1766) e centros de memória.',
+    link: 'https://www.correiodopovo.com.br/',
+    etiqueta: 'Patrimônio Histórico',
+    jurisdicao: 'Municipal (Viamão)',
+    elegibilidade: 'Patrimônio público e controle social de preservação',
+    prazo: 'Ações Contínuas de Salvaguarda',
+    plataforma: 'Correio do Povo / IPHAN / IPHAE',
+    fonte_confiavel: true,
+    pesquisa_google: true,
+    url_pesquisa_google: 'https://www.google.com/search?q=viamao+historia+patrimonio+correio+do+povo',
+    requisitos_praticos: [
+      'Salvaguarda conforme diretrizes do IPHAN e IPHAE',
+      'Acesso público aos sítios e monumentos históricos',
+      'Ações pedagógicas nas escolas municipais'
+    ]
   }
 ];
 
-export const INITIAL_FAC_EDITAIS: FacEdital[] = [
-  {
-    id: 'fac-linhas-setoriais',
-    numero_edital: 'Chamadas Públicas FAC (SEDAC-RS)',
-    nome: 'Fundo de Apoio à Cultura - Linhas Setoriais e Descentralizadas',
-    segmento: 'Culturas Populares, Patrimônio, Artes e Periferias',
-    mecanismo: 'Fundo de Apoio à Cultura (FAC)',
-    publico_alvo: 'Pessoas Jurídicas (incluindo MEI) sediadas no RS com atuação cultural de no mínimo 1 ano',
-    exigencia_proponente: 'Obrigatoriamente Pessoa Jurídica com sede no Estado do Rio Grande do Sul e registro homologado no Sistema Pró-cultura RS. Pessoa Física pura não é elegível no mecanismo do FAC.',
-    requisitos_principais: [
-      'Cadastro ativo e homologado no Sistema Unificado Pró-cultura RS (www.procultura.rs.gov.br)',
-      'Certidão de Quitação Tributária Estadual (Receita Estadual/RS), Federal (SRF/PGFN), CNDT e FGTS regulares',
-      'Comprovação de sede/domicílio fiscal no Estado do Rio Grande do Sul há pelo menos 1 ano',
-      'Conta corrente vinculada no Banrisul aberta após homologação do projeto',
-    ],
-    status: 'Sincronização pendente com o Pró-cultura RS',
-    sincronizacao_pendente: true,
-    base_legal: 'Lei Estadual nº 13.490/2010 e Decreto nº 55.498/2020',
-    prazo_inscricao: 'Conforme publicação oficial de cada chamada no Pró-cultura RS',
-    link_oficial: 'https://www.procultura.rs.gov.br/',
-    plataforma: 'Sistema Eletrônico Pró-cultura RS (www.procultura.rs.gov.br)',
-    contrapartida_exigida: 'Ações de democratização de acesso, gratuidade e atividades afirmativas regulamentadas no edital específico.',
-  },
-  {
-    id: 'fac-municipios',
-    numero_edital: 'Co-investimento FAC Municípios',
-    nome: 'FAC Municípios - Co-investimento para Sistemas Municipais de Cultura',
-    segmento: 'Descentralização & Fomento Municipal',
-    mecanismo: 'Fundo de Apoio à Cultura (FAC)',
-    publico_alvo: 'Municípios do RS com Conselho, Plano e Fundo Municipal de Cultura institucionalizados (CPF da Cultura)',
-    exigencia_proponente: 'Prefeituras municipais gaúchas (incluindo Viamão/RS) e órgãos de gestão cultural com regularidade no Sistema Estadual de Cultura.',
-    requisitos_principais: [
-      'Conselho Municipal de Políticas Culturais instituído por lei e atuante',
-      'Fundo Municipal de Cultura ativo com conta específica e movimentação regular',
-      'Plano Municipal de Cultura homologado no Sistema Pró-cultura RS',
-      'Lançamento obrigatório de editais locais pelo município para distribuição aos fazedores de cultura',
-    ],
-    status: 'Sincronização pendente com o Pró-cultura RS',
-    sincronizacao_pendente: true,
-    base_legal: 'Lei Estadual nº 13.490/2010 / Lei Complementar nº 15.549/2020',
-    prazo_inscricao: 'Conforme pactuação e calendário da SEDAC-RS no Pró-cultura RS',
-    link_oficial: 'https://www.procultura.rs.gov.br/',
-    plataforma: 'Portal da SEDAC-RS & Sistema Pró-cultura RS',
-    contrapartida_exigida: 'Contrapartida financeira em conta vinculada e execução cultural local descentralizada.',
-  },
-  {
-    id: 'lic-rs-icms',
-    numero_edital: 'Mecanismo LIC-RS (Fluxo Contínuo)',
-    nome: 'LIC-RS - Financiamento Cultural por Incentivo Fiscal de ICMS',
-    segmento: 'Todos os Segmentos Artísticos e Culturais do RS',
-    mecanismo: 'Lei de Incentivo à Cultura (LIC)',
-    publico_alvo: 'Produtores Culturais habilitados (Pessoa Física ou Jurídica) com CEPC ativo no Pró-cultura RS',
-    exigencia_proponente: 'Pessoa Física ou Jurídica devidamente cadastrada e habilitada como Produtor Cultural (CEPC) no Pró-cultura RS.',
-    requisitos_principais: [
-      'Registro e habilitação ativa de Produtor Cultural no Pró-cultura RS',
-      'Apresentação de projeto técnico com orçamento estruturado conforme instruções normativas da SEDAC-RS',
-      'Captação de patrocínio junto a empresas contribuintes de ICMS no Rio Grande do Sul',
-      'Medidas de acessibilidade universal (física e comunicacional) e democratização do acesso',
-    ],
-    status: 'Inscrições Abertas',
-    sincronizacao_pendente: false,
-    base_legal: 'Lei Estadual nº 13.490/2010 (Pró-cultura RS)',
-    prazo_inscricao: 'Fluxo Contínuo / Calendário Ordinário Pró-cultura RS',
-    link_oficial: 'https://www.procultura.rs.gov.br/',
-    plataforma: 'Sistema Eletrônico Pró-cultura RS (www.procultura.rs.gov.br)',
-    contrapartida_exigida: 'Plano de distribuição pública, medidas de acesso gratuito e contrapartidas sociais comprovadas.',
-  },
-  {
-    id: 'fac-emergencial-reconstrucao',
-    numero_edital: 'Chamamentos Emergenciais SEDAC-RS',
-    nome: 'Ações Emergenciais e de Reconstrução do Setor Cultural Gaúcho',
-    segmento: 'Patrimônio, Salvaguarda e Apoio Emergencial',
-    mecanismo: 'Fundo de Apoio à Cultura (FAC)',
-    publico_alvo: 'Espaços, coletivos, trabalhadores da cultura e acervos culturais do RS',
-    exigencia_proponente: 'Agentes culturais e entidades com domicílio/sede no Rio Grande do Sul atingidos ou priorizados nas resoluções da SEDAC-RS.',
-    requisitos_principais: [
-      'Validação do perfil de proponente no Sistema Pró-cultura RS',
-      'Comprovação de atuação cultural e impacto territorial no RS',
-      'Submissão conforme formulários e diretrizes extraordinárias do portal',
-    ],
-    status: 'Sincronização pendente com o Pró-cultura RS',
-    sincronizacao_pendente: true,
-    base_legal: 'Decretos Estaduais de Fomento e Reconstrução Cultural',
-    prazo_inscricao: 'Conforme cronograma de chamadas extraordinárias da SEDAC-RS',
-    link_oficial: 'https://www.procultura.rs.gov.br/',
-    plataforma: 'Sistema Pró-cultura RS',
-    contrapartida_exigida: 'Prestação de contas simplificada e comprovação de aplicação direta no setor cultural.',
-  },
-];
-
-export const API_DOCUMENTATION: ApiEndpointDoc[] = [
-  {
-    id: 'api-serverless-pnab',
-    nome: 'Endpoint Serverless /api/pnab (Transferegov / MinC)',
-    esfera: 'Serverless Edge (Vercel Python 3.10+)',
-    url: '/api/pnab',
-    metodo: 'GET',
-    descricao: 'Endpoint serverless com TTLCache e retry resiliente que consome dados da PNAB (Termo de Adesão da Prefeitura de Viamão 88.000.914/0001-01).',
-    parametros: [
-      { nome: 'format', tipo: 'string', descricao: 'Formato de resposta (json padrão)', exemplo: 'json' },
-    ],
-    exemploResposta: `{
-  "success": true,
-  "fonte": "Transferegov / Ministério da Cultura",
-  "cached": true,
-  "rate_limit_info": "60 req/min (Transferegov / SICONV MinC)",
-  "data": {
-    "termo_numero": "0335/2023",
-    "cnpj_proponente": "88.000.914/0001-01",
-    "municipio": "Viamão",
-    "uf": "RS",
-    "valor_global": 1827439.95,
-    "data_extrato": "09/09/2026",
-    "status_etapa": "Recursos em Conta Vinculada / Elaboração de Editais Municipais",
-    "base_legal": "Lei Federal nº 14.399/2022 (PNAB)"
-  }
-}`
-  },
-  {
-    id: 'api-serverless-rouanet',
-    nome: 'Endpoint Serverless /api/rouanet (Versalic / SalicNet)',
-    esfera: 'Serverless Edge (Vercel Python 3.10+)',
-    url: '/api/rouanet',
-    metodo: 'GET',
-    descricao: 'Endpoint serverless com filtro estrito municipal de Viamão e protocolo anti-alucinação ("Zero Dados Fictícios").',
-    parametros: [
-      { nome: 'municipio', tipo: 'string', descricao: 'Filtrar por município no RS', exemplo: 'Viamão' },
-      { nome: 'ano', tipo: 'integer', descricao: 'Ano orçamentário', exemplo: '2026' }
-    ],
-    exemploResposta: `{
-  "success": true,
-  "fonte": "Versalic / SalicNet (Ministério da Cultura)",
-  "municipio": "Viamão",
-  "uf": "RS",
-  "total": 0,
-  "projetos": [],
-  "anti_alucinacao_check": "Validação territorial estrita ativa: 0 registros fictícios.",
-  "status_pesquisa": "Aguardando sincronização oficial",
-  "cached": true,
-  "rate_limit_info": "30 req/min (Versalic / SalicNet)"
-}`
-  },
-  {
-    id: 'api-serverless-fac',
-    nome: 'Endpoint Serverless /api/fac (SEDAC-RS Pró-Cultura)',
-    esfera: 'Serverless Edge (Vercel Python 3.10+)',
-    url: '/api/fac',
-    metodo: 'GET',
-    descricao: 'Endpoint serverless com scrapers e fallback de editais abertos para proponentes do Rio Grande do Sul e Viamão.',
-    parametros: [
-      { nome: 'status', tipo: 'string', descricao: 'Filtro por situação do edital', exemplo: 'aberto' }
-    ],
-    exemploResposta: `{
-  "success": true,
-  "fonte": "SEDAC-RS / Pró-Cultura RS (FAC)",
-  "cached": true,
-  "total": 2,
-  "editais": [
-    {
-      "numero_edital": "Edital SEDAC nº 04/2026",
-      "titulo": "FAC Municípios & Territórios Criativos",
-      "status": "Inscrições Abertas",
-      "valor_total": 15000000.0,
-      "elegibilidade": "Ampla concorrência no RS, incluindo agentes sediados em Viamão"
-    }
-  ]
-}`
-  },
-  {
-    id: 'api-cgu-emendas',
-    nome: 'Portal da Transparência da CGU - Consulta de Emendas Parlamentares',
-    esfera: 'Federal (Governo do Brasil)',
-    url: 'https://api.portaldatransparencia.gov.br/api-de-dados/emendas',
-    metodo: 'GET',
-    descricao: 'API REST oficial da Controladoria-Geral da União para busca de emendas individuais e de bancada destinadas ao município de Viamão (Código IBGE 4323002).',
-    parametros: [
-      { nome: 'codigoMunicipioIBGE', tipo: 'string', descricao: 'Código IBGE de Viamão/RS', exemplo: '4323002' },
-      { nome: 'ano', tipo: 'integer', descricao: 'Ano do exercício orçamentário', exemplo: '2026' },
-      { nome: 'pagina', tipo: 'integer', descricao: 'Página da consulta paginada', exemplo: '1' }
-    ],
-    exemploResposta: `{
-  "id": 40120005,
-  "ano": 2026,
-  "tipoEmenda": "Bancada Estadual",
-  "autor": "Bancada Gaúcha Federal",
-  "nomeAutor": "Bancada Gaúcha",
-  "numeroEmenda": "40120005",
-  "localidadeDoGasto": "Viamão - RS",
-  "funcao": "Cultura",
-  "subfuncao": "Difusão Cultural",
-  "valorEmpenhado": "320.000,00",
-  "valorLiquidado": "210.000,00",
-  "valorPago": "210.000,00",
-  "beneficiario": "Prefeitura Municipal de Viamão (CNPJ: 88.000.914/0001-01)"
-}`
-  },
-  {
-    id: 'api-alrs-emendas',
-    nome: 'Assembleia Legislativa do RS (ALRS) - SAE & FPE-RS',
-    esfera: 'Estadual (Rio Grande do Sul)',
-    url: 'https://transparencia.al.rs.gov.br/api/emendas-impositivas',
-    metodo: 'GET',
-    descricao: 'Endpoint de dados abertos para consulta de emendas parlamentares impositivas dos deputados estaduais gaúchos direcionadas a Viamão.',
-    parametros: [
-      { nome: 'municipio', tipo: 'string', descricao: 'Nome do município destinatário', exemplo: 'VIAMÃO' },
-      { nome: 'exercicio', tipo: 'integer', descricao: 'Ano orçamentário da LOA', exemplo: '2026' },
-      { nome: 'area', tipo: 'string', descricao: 'Área orçamentária', exemplo: 'CULTURA' }
-    ],
-    exemploResposta: `[
-  {
-    "numero_proposta": "Ep 1042",
-    "identificador": "Dotação Orçamentária Descentralizada",
-    "municipio_destino": "Viamão",
-    "objeto": "Oficinas Formativas e Ações Comunitárias de Cultura Urbana",
-    "secretaria": "SEDAC - Secretaria de Estado da Cultura",
-    "valor_destinado": 100000.00,
-    "valor_liquidado": 85000.00,
-    "situacao": "Em Execução / Termo de Fomento Ativo",
-    "abrangencia": "Território Municipal de Viamão"
-  },
-  {
-    "numero_proposta": "Ep 2088",
-    "identificador": "Preservação do Patrimônio Arquitetônico",
-    "municipio_destino": "Viamão",
-    "objeto": "Obras Técnicas de Conservação e Preservação Histórica",
-    "secretaria": "SEDAC - Secretaria de Estado da Cultura",
-    "valor_destinado": 200000.00,
-    "valor_liquidado": 145000.00,
-    "situacao": "Em Execução / Obras Técnicas",
-    "abrangencia": "Centro Histórico • Viamão"
-  }
-]`
-  },
-  {
-    id: 'api-transferegov',
-    nome: 'Transferegov.br / MinC - Fundo a Fundo e PNAB',
-    esfera: 'Federal (Ministério da Gestão e da Inovação)',
-    url: 'https://api.transferegov.sistema.gov.br/transferencias/fundo-a-fundo',
-    metodo: 'GET',
-    descricao: 'Consulta direta aos saldos de transferências automáticas fundo a fundo da Política Nacional Aldir Blanc.',
-    parametros: [
-      { nome: 'cnpj_ente', tipo: 'string', descricao: 'CNPJ do Ente Municipal', exemplo: '88000914000101' },
-      { nome: 'programa', tipo: 'string', descricao: 'Código do Programa', exemplo: 'PNAB-2023' }
-    ],
-    exemploResposta: `{
-  "enteFederado": "Município de Viamão / RS",
-  "cnpj": "88.000.914/0001-01",
-  "programa": "Política Nacional Aldir Blanc de Fomento à Cultura (PNAB)",
-  "contaVinculada": "Fundo Municipal de Cultura de Viamão",
-  "statusTransferencia": "Recursos Creditados em Conta Fiduciária Vinculada (Transferegov)"
-}`
-  },
-  {
-    id: 'api-salicnet-pronac',
-    nome: 'SalicNet / Ministério da Cultura - Consulta Aberta PRONAC',
-    esfera: 'Federal (Ministério da Cultura)',
-    url: 'https://aplicacoes.cultura.gov.br/comparar/salicnet/',
-    metodo: 'GET',
-    descricao: 'Novo sistema unificado para consulta de dados abertos e comparação de propostas PRONAC / Lei Rouanet (Lei nº 8.313/1991).',
-    parametros: [
-      { nome: 'uf', tipo: 'string', descricao: 'Sigla da Unidade Federativa', exemplo: 'RS' },
-      { nome: 'municipio', tipo: 'string', descricao: 'Nome do Município', exemplo: 'Viamão' },
-      { nome: 'segmento', tipo: 'string', descricao: 'Segmento Cultural', exemplo: 'Patrimônio Cultural' }
-    ],
-    exemploResposta: `{
-  "sistema": "SalicNet - Ministério da Cultura",
-  "versao_consulta": "2026.1",
-  "municipio": "Viamão - RS",
-  "status_pesquisa": "Aguardando sincronização oficial",
-  "projetos_encontrados": 0,
-  "mensagem": "Não há projetos validados para este município no momento.",
-  "link_dados_oficiais": "https://aplicacoes.cultura.gov.br/comparar/salicnet/"
-}`
-  }
-];

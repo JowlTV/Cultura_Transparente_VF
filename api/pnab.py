@@ -33,6 +33,8 @@ class handler(BaseHTTPRequestHandler):
             
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("X-Frame-Options", "SAMEORIGIN")
             self.send_header("Access-Control-Allow-Origin", "*")
             # Cache Vercel Edge: 1 hora de cache, 24 horas de stale-while-revalidate
             self.send_header("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400")

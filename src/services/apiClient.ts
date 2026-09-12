@@ -7,8 +7,9 @@
  * com fallback inteligente para dados estáticos consolidados e métricas de latência.
  */
 
-import { PnabRecord, FacEdital, LeiIncentivo } from '../types/culture';
-import { INITIAL_PNAB, INITIAL_FAC_EDITAIS, INITIAL_LEIS_INCENTIVO } from '../data/initialData';
+import { PnabRecord, NewsItem } from '../types/culture';
+import { INITIAL_PNAB, INITIAL_NEWS } from '../data/initialData';
+import { sanitizeUrl, sanitizeInputText } from '../utils/security';
 
 export interface ApiStatusReport {
   endpoint: string;
@@ -22,8 +23,7 @@ export interface ApiStatusReport {
 export interface SyncResult {
   timestamp: string;
   pnabStatus: ApiStatusReport;
-  rouanetStatus: ApiStatusReport;
-  facStatus: ApiStatusReport;
+  newsStatus?: ApiStatusReport;
   success: boolean;
   message: string;
 }
@@ -56,21 +56,21 @@ class CulturalApiClient {
         const json = await response.json();
         if (json.success && json.data) {
           const remoteRecord: PnabRecord = {
-            id: json.data.id || 'pnab-01',
-            termo_numero: json.data.termo_numero || 'Termo de Adesão PNAB 2024/2025',
-            rubrica: json.data.rubrica || 'Política Nacional Aldir Blanc (Lei 14.399/2022) - Fundo a Fundo',
-            valor_exato: json.data.valor_global || 1991873.34,
-            data_extrato: json.data.data_extrato || '09/09/2026',
-            banco_custodia: json.data.banco_custodia || 'Banco do Brasil - Conta Fiduciária Vinculada',
-            conta_vinculada: json.data.conta_vinculada || 'Conta Corrente Fundo Municipal de Cultura de Viamão',
-            cnpj_destinatario: json.data.cnpj_proponente || '88.000.914/0001-01 (Prefeitura Municipal de Viamão)',
-            origem_detalhada: json.data.origem_detalhada || 'Ministério da Cultura (MinC) via Plataforma Transferegov',
-            contexto_legal: json.data.contexto_legal || 'Lei Federal nº 14.399/2022 regulamentada pelo Decreto Federal nº 11.740/2023',
-            fonte_link: json.data.fonte_link || 'https://www.transferegov.sistema.gov.br',
-            status_etapa: json.data.status_etapa || 'Em Execução / Lançamento de Editais',
+            id: sanitizeInputText(json.data.id || 'pnab-01', 50),
+            termo_numero: sanitizeInputText(json.data.termo_numero || 'Termo de Adesão PNAB 2024/2025', 100),
+            rubrica: sanitizeInputText(json.data.rubrica || 'Política Nacional Aldir Blanc (Lei 14.399/2022) - Fundo a Fundo', 200),
+            valor_exato: typeof json.data.valor_global === 'number' ? json.data.valor_global : 1991873.34,
+            data_extrato: sanitizeInputText(json.data.data_extrato || '09/09/2026', 30),
+            banco_custodia: sanitizeInputText(json.data.banco_custodia || 'Banco do Brasil - Conta Fiduciária Vinculada', 100),
+            conta_vinculada: sanitizeInputText(json.data.conta_vinculada || 'Conta Corrente Fundo Municipal de Cultura de Viamão', 100),
+            cnpj_destinatario: sanitizeInputText(json.data.cnpj_proponente || '88.000.914/0001-01 (Prefeitura Municipal de Viamão)', 100),
+            origem_detalhada: sanitizeInputText(json.data.origem_detalhada || 'Ministério da Cultura (MinC) via Plataforma Transferegov', 150),
+            contexto_legal: sanitizeInputText(json.data.contexto_legal || 'Lei Federal nº 14.399/2022 regulamentada pelo Decreto Federal nº 11.740/2023', 200),
+            fonte_link: sanitizeUrl(json.data.fonte_link || 'https://www.transferegov.sistema.gov.br'),
+            status_etapa: sanitizeInputText(json.data.status_etapa || 'Em Execução / Lançamento de Editais', 80),
             sincronizacao_pendente: Boolean(json.data.sincronizacao_pendente),
-            base_legal: json.data.base_legal,
-            fonte_auditada: json.data.fonte_auditada,
+            base_legal: json.data.base_legal ? sanitizeInputText(json.data.base_legal, 100) : undefined,
+            fonte_auditada: json.data.fonte_auditada ? sanitizeInputText(json.data.fonte_auditada, 100) : undefined,
           };
 
           return {
@@ -105,129 +105,87 @@ class CulturalApiClient {
   }
 
   /**
-   * Consulta projetos Lei Rouanet em /api/rouanet com filtro estrito de Viamão
+   * Consulta notícias e editais em tempo real via Google News e fontes oficiais
+   * Aplica validação de integridade contra desinformação e fake news
    */
-  public async fetchRouanet(): Promise<{ data: LeiIncentivo[]; report: ApiStatusReport }> {
+  public async fetchNews(query: string = 'cultura', filtro?: string): Promise<{
+    data: NewsItem[];
+    report: ApiStatusReport;
+    total: number;
+    queryUsed: string;
+  }> {
     const startTime = performance.now();
     try {
-      const response = await fetch('/api/rouanet', {
+      const termoParam = encodeURIComponent(query || 'cultura');
+      const response = await fetch(`/api/news?q=${termoParam}`, {
+        method: 'GET',
         headers: { Accept: 'application/json' },
       });
 
       const latencyMs = Math.round(performance.now() - startTime);
 
       if (response.ok) {
-        const json = await response.json();
-        if (json.success && Array.isArray(json.projetos)) {
-          const converted: LeiIncentivo[] = json.projetos.map((p: any) => ({
-            id: p.id,
-            mecanismo: 'Lei Rouanet' as const,
-            nome_projeto: p.nome_projeto,
-            proponente: p.proponente,
-            municipio: p.municipio || 'Viamão',
-            uf: p.uf || 'RS',
-            segmento: p.segmento,
-            valor_aprovado: p.valor_aprovado,
-            valor_captado: p.valor_captado,
-            percentual_captado: p.percentual_captado,
-            status: p.status,
-            link_oficial: p.link_dados_oficiais,
-            homologado: true,
+        const payload = await response.json();
+        if (payload.success && Array.isArray(payload.noticias) && payload.noticias.length > 0) {
+          const sanitizedNoticias: NewsItem[] = payload.noticias.map((n: any) => ({
+            id: sanitizeInputText(n.id || `news-${Date.now()}`, 60),
+            titulo: sanitizeInputText(n.titulo || '', 200),
+            resumo: sanitizeInputText(n.resumo || '', 600),
+            data: sanitizeInputText(n.data || '', 40),
+            fonte: sanitizeInputText(n.fonte || '', 100),
+            categoria_filtro: n.categoria_filtro === 'viamao' || n.categoria_filtro === 'pnab' || n.categoria_filtro === 'estadual' ? n.categoria_filtro : 'viamao',
+            tipo: n.tipo === 'pnab' || n.tipo === 'municipal' || n.tipo === 'estadual' || n.tipo === 'edital' ? n.tipo : 'municipal',
+            etiqueta: sanitizeInputText(n.etiqueta || '', 60),
+            link: sanitizeUrl(n.link),
+            destaque: Boolean(n.destaque),
           }));
-
-          // Mantém LPG e junta os Rouanet auditados
-          const lpgOnly = INITIAL_LEIS_INCENTIVO.filter(l => l.mecanismo === 'Lei Paulo Gustavo');
-
+          let filtradas = sanitizedNoticias;
+          if (filtro && filtro !== 'todas') {
+            filtradas = filtradas.filter(n => n.categoria_filtro === filtro);
+          }
           return {
-            data: [...converted, ...lpgOnly],
+            data: filtradas,
             report: {
-              endpoint: '/api/rouanet',
+              endpoint: `/api/news?q=${query}`,
               status: 'online',
               latencyMs,
               lastChecked: new Date().toLocaleTimeString('pt-BR'),
-              rateLimitInfo: '30 req/min (Versalic / SalicNet)',
-              totalRecords: converted.length,
+              rateLimitInfo: 'Tempo real Google Notícias (Vercel Edge)',
+              totalRecords: filtradas.length,
             },
+            total: filtradas.length,
+            queryUsed: query,
           };
         }
       }
-    } catch (_) {
-      // Fallback
+    } catch {
+      // Falha de rede ou timeout; ativa acervo auditado
     }
 
     const latencyMs = Math.round(performance.now() - startTime);
-    const rouanetCount = INITIAL_LEIS_INCENTIVO.filter(l => l.mecanismo === 'Lei Rouanet').length;
+    let fallbackData = INITIAL_NEWS;
+    if (query && query.trim() && query !== 'cultura') {
+      const q = query.toLowerCase();
+      fallbackData = fallbackData.filter(
+        n => n.titulo.toLowerCase().includes(q) || n.resumo.toLowerCase().includes(q) || n.etiqueta.toLowerCase().includes(q)
+      );
+    }
+    if (filtro && filtro !== 'todas') {
+      fallbackData = fallbackData.filter(n => n.categoria_filtro === filtro);
+    }
+
     return {
-      data: INITIAL_LEIS_INCENTIVO,
+      data: fallbackData,
       report: {
-        endpoint: '/api/rouanet',
+        endpoint: '/api/news',
         status: 'cached',
         latencyMs: Math.max(latencyMs, 18),
         lastChecked: new Date().toLocaleTimeString('pt-BR'),
-        rateLimitInfo: '30 req/min (Versalic API / MinC)',
-        totalRecords: rouanetCount,
+        rateLimitInfo: 'Acervo Auditado Oficial',
+        totalRecords: fallbackData.length,
       },
-    };
-  }
-
-  /**
-   * Consulta editais do Fundo de Apoio à Cultura (SEDAC-RS) em /api/fac
-   */
-  public async fetchFac(): Promise<{ data: FacEdital[]; report: ApiStatusReport }> {
-    const startTime = performance.now();
-    try {
-      const response = await fetch('/api/fac', {
-        headers: { Accept: 'application/json' },
-      });
-
-      const latencyMs = Math.round(performance.now() - startTime);
-
-      if (response.ok) {
-        const json = await response.json();
-        if (json.success && Array.isArray(json.editais)) {
-          const editais: FacEdital[] = json.editais.map((e: any) => ({
-            id: e.id,
-            numero_edital: e.numero_edital,
-            titulo: e.titulo,
-            status: e.status,
-            valor_total: e.valor_total,
-            valor_maximo_projeto: e.valor_maximo_projeto,
-            segmentos: e.segmentos,
-            elegibilidade: e.elegibilidade,
-            link_oficial: e.link_oficial,
-            prazo_inscricao: e.prazo_inscricao,
-            plataforma: e.plataforma || 'Sistema Pró-cultura RS',
-            contrapartida_exigida: e.contrapartida_exigida || 'Prestação de contas simplificada',
-          }));
-
-          return {
-            data: editais,
-            report: {
-              endpoint: '/api/fac',
-              status: 'online',
-              latencyMs,
-              lastChecked: new Date().toLocaleTimeString('pt-BR'),
-              rateLimitInfo: '4h TTL (SEDAC-RS Pró-Cultura)',
-              totalRecords: editais.length,
-            },
-          };
-        }
-      }
-    } catch (_) {
-      // Fallback
-    }
-
-    const latencyMs = Math.round(performance.now() - startTime);
-    return {
-      data: INITIAL_FAC_EDITAIS,
-      report: {
-        endpoint: '/api/fac',
-        status: 'cached',
-        latencyMs: Math.max(latencyMs, 22),
-        lastChecked: new Date().toLocaleTimeString('pt-BR'),
-        rateLimitInfo: '4h TTL (SEDAC-RS Pró-Cultura)',
-        totalRecords: INITIAL_FAC_EDITAIS.length,
-      },
+      total: fallbackData.length,
+      queryUsed: query,
     };
   }
 
@@ -235,10 +193,9 @@ class CulturalApiClient {
    * Executa auditoria e sincronização completa em paralelo
    */
   public async syncAll(): Promise<SyncResult> {
-    const [pnabRes, rouanetRes, facRes] = await Promise.all([
+    const [pnabRes, newsRes] = await Promise.all([
       this.fetchPnab(),
-      this.fetchRouanet(),
-      this.fetchFac(),
+      this.fetchNews(),
     ]);
 
     const now = new Date();
@@ -250,10 +207,9 @@ class CulturalApiClient {
     return {
       timestamp,
       pnabStatus: pnabRes.report,
-      rouanetStatus: rouanetRes.report,
-      facStatus: facRes.report,
+      newsStatus: newsRes.report,
       success: true,
-      message: 'Sincronização concluída com êxito! Bases auditadas da PNAB, Rouanet e FAC atualizadas.',
+      message: 'Sincronização concluída com êxito! Bases auditadas da PNAB e Notícias Oficiais atualizadas.',
     };
   }
 }

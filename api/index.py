@@ -15,8 +15,7 @@ class handler(BaseHTTPRequestHandler):
             "timestamp": datetime.now().isoformat(),
             "rotas_disponiveis": {
                 "/api/pnab": "Auditoria de repasses federais da PNAB (MinC / Transferegov)",
-                "/api/rouanet": "Projetos validados do PRONAC / Lei Rouanet para Viamão",
-                "/api/fac": "Editais e repasses do Fundo de Apoio à Cultura (SEDAC-RS / Pró-Cultura)"
+                "/api/news": "Pesquisa de notícias e editais de Viamão via Google News com filtro anti-fake-news"
             },
             "politica_cache": "Vercel Edge Caching (s-maxage=3600 até 14400s)",
             "timeout_garantido": "Sub-10s (Hobby Free Tier Vercel)"
@@ -25,6 +24,8 @@ class handler(BaseHTTPRequestHandler):
         payload = json.dumps(endpoints, ensure_ascii=False, indent=2).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "SAMEORIGIN")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Cache-Control", "public, s-maxage=300")
         self.send_header("Content-Length", str(len(payload)))

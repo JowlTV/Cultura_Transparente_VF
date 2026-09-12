@@ -41,12 +41,12 @@ export const MINC_NOTICIAS_OFICIAIS: MincNewsItem[] = [
   },
   {
     id: 'minc-04',
-    categoria: 'Lei Rouanet & Fomento Regional',
+    categoria: 'Transparência Municipal & PNAB',
     data: '04/09/2026',
-    orgao: 'Secretaria de Economia Criativa / MinC',
-    titulo: 'Editais regionais incentivam projetos de patrimônio histórico e música na Região Sul',
-    resumo: 'Mecanismo estimula a descentralização de patrocínios fiscais para cidades do interior e regiões metropolitanas com foco em conservação arquitetônica e memória.',
-    link: 'https://www.gov.br/cultura/pt-br/assuntos/incentivo-a-cultura',
+    orgao: 'Secretaria de Gestão e Fomento Cultural',
+    titulo: 'Orientações aos municípios para aplicação dos rendimentos financeiros da conta PNAB',
+    resumo: 'Recursos em conta fiduciária do Fundo Municipal de Cultura devem ter rendimentos reinvestidos integralmente nas metas do Plano Anual de Aplicação dos Recursos (PAAR).',
+    link: 'https://www.gov.br/cultura/pt-br/assuntos/politica-nacional-aldir-blanc',
   },
   {
     id: 'minc-05',
@@ -113,19 +113,13 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
       <div
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
-        className="w-full bg-[#0b1329] text-slate-100 border-b border-blue-950/80 px-3 sm:px-4 py-2 text-xs flex items-center justify-between gap-3 shadow-inner relative overflow-hidden"
+        className="w-full bg-[#18052E] text-slate-100 border-b border-purple-950/80 px-3 sm:px-4 py-2 text-xs flex items-center justify-between gap-3 shadow-inner relative overflow-hidden"
       >
-        {/* Left Badge: MinC Branding */}
+        {/* Left Badge: Informativos Oficiais */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#1e40af] to-[#15803d] text-white px-2.5 py-1 rounded-md font-bold text-[11px] shadow-xs border border-white/20">
-            <span className="text-amber-300">🇧🇷</span>
-            <span className="tracking-wide uppercase font-['Outfit'] hidden sm:inline">Ministério da Cultura</span>
-            <span className="tracking-wide uppercase font-['Outfit'] sm:hidden">MinC</span>
+          <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#6A0DAD] to-[#FF4500] text-white px-2.5 py-1 rounded-md font-bold text-[11px] shadow-xs border border-purple-400/30">
+            <span className="tracking-wide uppercase font-['Outfit']">Informativos Oficiais</span>
           </div>
-          <span className="text-amber-400 font-bold text-[10px] uppercase tracking-wider hidden md:inline-flex items-center gap-1 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
-            <Sparkles className="w-3 h-3 text-amber-300" />
-            Novidades & Editais
-          </span>
         </div>
 
         {/* Central Rotating News Content */}
@@ -134,11 +128,11 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
           className="flex-1 min-w-0 flex items-center gap-2 cursor-pointer group py-0.5"
           title="Clique para ler o informativo completo do Ministério da Cultura"
         >
-          <span className="hidden lg:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-900/60 text-blue-200 border border-blue-700/50 shrink-0">
+          <span className="hidden lg:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-900/60 text-purple-200 border border-purple-700/50 shrink-0">
             {currentNews.categoria}
           </span>
 
-          <span className="font-medium text-slate-200 group-hover:text-amber-300 transition-colors truncate text-xs">
+          <span className="font-medium text-slate-200 group-hover:text-[#FF4500] transition-colors truncate text-xs">
             {currentNews.titulo}
           </span>
 
@@ -146,7 +140,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
             ({currentNews.data})
           </span>
 
-          <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-amber-300 shrink-0 opacity-80" />
+          <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-[#FF4500] shrink-0 opacity-80" />
         </div>
 
         {/* Right Navigation & Status Controls */}
@@ -197,7 +191,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
             <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 text-[#1e40af] border border-blue-200">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-100 text-[#6A0DAD] border border-purple-200">
                     {selectedModalNews.categoria}
                   </span>
                   <span className="text-xs text-slate-500 font-medium">
@@ -238,7 +232,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
                 href={selectedModalNews.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1e40af] hover:bg-[#1d4ed8] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#6A0DAD] hover:bg-[#580b91] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
               >
                 <span>Acessar no Portal do MinC</span>
                 <ExternalLink className="w-3.5 h-3.5" />

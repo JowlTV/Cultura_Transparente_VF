@@ -5,26 +5,20 @@ import { ExecutiveSummary } from './components/ExecutiveSummary';
 import { BudgetDashboard } from './components/BudgetDashboard';
 import { EmendasSection } from './components/EmendasSection';
 import { PnabAuditoriaSection } from './components/PnabAuditoriaSection';
-import { LeisIncentivoSection } from './components/LeisIncentivoSection';
-import { LpgSection } from './components/LpgSection';
-import { RouanetSection } from './components/RouanetSection';
-import { FacSection } from './components/FacSection';
 import { MapeamentoCulturalSection } from './components/MapeamentoCulturalSection';
-import { ApiDocumentationSection } from './components/ApiDocumentationSection';
 import { ControleSocialSection } from './components/ControleSocialSection';
 import { QuickSearchModal } from './components/QuickSearchModal';
 import { Footer } from './components/Footer';
 import {
   INITIAL_EMENDAS,
   INITIAL_PNAB,
-  INITIAL_LEIS_INCENTIVO,
   INITIAL_PONTOS_CULTURAIS,
   INITIAL_NEWS,
   INITIAL_COMMUNITY_LINKS,
-  INITIAL_FAC_EDITAIS,
 } from './data/initialData';
-import { Emenda, PnabRecord, LeiIncentivo, PontoCultural, NewsItem, SharedCommunityLink } from './types/culture';
+import { Emenda, PnabRecord, PontoCultural, NewsItem, SharedCommunityLink } from './types/culture';
 import { apiClient } from './services/apiClient';
+import { sanitizeUrl, isValidHttpUrl, sanitizeInputText } from './utils/security';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
@@ -32,7 +26,6 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [emendas, setEmendas] = useState<Emenda[]>(INITIAL_EMENDAS);
   const [pnabList, setPnabList] = useState<PnabRecord[]>(INITIAL_PNAB);
-  const [leisIncentivo, setLeisIncentivo] = useState<LeiIncentivo[]>(INITIAL_LEIS_INCENTIVO);
   const [noticias, setNoticias] = useState<NewsItem[]>(INITIAL_NEWS);
   const [lastUpdated, setLastUpdated] = useState<string>('11/09/2026 11:25');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -41,7 +34,7 @@ export default function App() {
   const [isQuickSearchOpen, setIsQuickSearchOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Load points with localStorage persistence and purge any legacy neighborhood data
+  // Load points with localStorage persistence and sanitize fields against XSS/injections
   const [pontosCulturais, setPontosCulturais] = useState<PontoCultural[]>(() => {
     try {
       const saved = localStorage.getItem('viamao_pontos_culturais');
@@ -54,10 +47,22 @@ export default function App() {
             if (initialMap.has(p.id)) {
               return {
                 ...initialMap.get(p.id)!,
-                apoios_comunitarios: p.apoios_comunitarios || initialMap.get(p.id)!.apoios_comunitarios,
+                apoios_comunitarios: typeof p.apoios_comunitarios === 'number'
+                  ? Math.max(0, Math.min(p.apoios_comunitarios, 100000))
+                  : initialMap.get(p.id)!.apoios_comunitarios,
               };
             }
-            return clean;
+            return {
+              ...clean,
+              id: typeof clean.id === 'string' ? clean.id.slice(0, 60) : `ponto-${Date.now()}`,
+              nome: sanitizeInputText(clean.nome, 120),
+              descricao: sanitizeInputText(clean.descricao, 1000),
+              resumo_geral_cultura: sanitizeInputText(clean.resumo_geral_cultura, 500),
+              o_que_costumam_fazer: sanitizeInputText(clean.o_que_costumam_fazer, 500),
+              endereco: sanitizeInputText(clean.endereco, 200),
+              contato: sanitizeInputText(clean.contato, 120),
+              google_maps_url: clean.google_maps_url ? sanitizeUrl(clean.google_maps_url) : undefined,
+            };
           });
           try {
             localStorage.setItem('viamao_pontos_culturais', JSON.stringify(sanitized));
@@ -71,14 +76,27 @@ export default function App() {
     return INITIAL_PONTOS_CULTURAIS;
   });
 
-  // Load shared community engagement links with localStorage persistence
+  // Load shared community links: removed pre-filled data, strictly open for genuine social contribution
   const [sharedLinks, setSharedLinks] = useState<SharedCommunityLink[]>(() => {
     try {
       const saved = localStorage.getItem('viamao_shared_community_links');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          // Remove qualquer dado pré-cadastrado antigo com prefixo 'slink-' e sanitiza entradas
+          const genuineContributions = parsed
+            .filter((item: any) => item && typeof item.id === 'string' && !item.id.startsWith('slink-') && isValidHttpUrl(item.url))
+            .map((item: any) => ({
+              ...item,
+              id: typeof item.id === 'string' ? item.id.slice(0, 60) : `link-${Date.now()}`,
+              titulo: sanitizeInputText(item.titulo, 150),
+              url: sanitizeUrl(item.url),
+              pontoNome: sanitizeInputText(item.pontoNome, 120),
+              enviadoPor: sanitizeInputText(item.enviadoPor, 100) || 'Cidadão / Artista Local',
+              descricao: sanitizeInputText(item.descricao, 500),
+              data: sanitizeInputText(item.data, 50) || 'Hoje',
+            }));
+          return genuineContributions;
         }
       }
     } catch (e) {
@@ -115,21 +133,23 @@ export default function App() {
     setIsRefreshing(true);
     try {
       const syncRes = await apiClient.syncAll();
-      const pnabRes = await apiClient.fetchPnab();
-      const rouanetRes = await apiClient.fetchRouanet();
+      const [pnabRes, newsRes] = await Promise.all([
+        apiClient.fetchPnab(),
+        apiClient.fetchNews('cultura'),
+      ]);
 
       if (pnabRes.data && pnabRes.data.length > 0) {
         setPnabList(pnabRes.data);
       }
-      if (rouanetRes.data && rouanetRes.data.length > 0) {
-        setLeisIncentivo(rouanetRes.data);
+      if (newsRes.data && newsRes.data.length > 0) {
+        setNoticias(newsRes.data);
       }
 
-      const avgLat = Math.round((pnabRes.report.latencyMs + rouanetRes.report.latencyMs) / 2);
+      const avgLat = Math.round((pnabRes.report.latencyMs + newsRes.report.latencyMs) / 2);
       setSyncLatency(avgLat);
       setLastUpdated(syncRes.timestamp);
-      setSyncStatusText(`Edge Serverless Ativo (${avgLat}ms)`);
-      showToast(`Bases públicas sincronizadas! PNAB, Versalic e FAC auditados em ${avgLat}ms.`);
+      setSyncStatusText(`Edge Serverless & Google News (${avgLat}ms)`);
+      showToast(`Bases públicas sincronizadas! PNAB e Notícias Oficiais auditados em ${avgLat}ms.`);
     } catch (err) {
       const now = new Date();
       const timeStr = `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', {
@@ -149,6 +169,13 @@ export default function App() {
     const pontoCompleto: PontoCultural = {
       ...novoPonto,
       id,
+      nome: sanitizeInputText(novoPonto.nome, 120),
+      descricao: sanitizeInputText(novoPonto.descricao, 1000),
+      resumo_geral_cultura: sanitizeInputText(novoPonto.resumo_geral_cultura, 500),
+      o_que_costumam_fazer: sanitizeInputText(novoPonto.o_que_costumam_fazer, 500),
+      endereco: sanitizeInputText(novoPonto.endereco, 200),
+      contato: sanitizeInputText(novoPonto.contato, 120),
+      google_maps_url: novoPonto.google_maps_url ? sanitizeUrl(novoPonto.google_maps_url) : undefined,
     };
     setPontosCulturais(prev => [pontoCompleto, ...prev]);
     showToast(`Ponto cultural "${pontoCompleto.nome}" registrado e integrado ao catálogo municipal!`);
@@ -164,9 +191,15 @@ export default function App() {
   };
 
   const handleAddSharedLink = (novoLink: Omit<SharedCommunityLink, 'id' | 'data'>) => {
+    const id = `link-${Date.now()}`;
     const linkCompleto: SharedCommunityLink = {
       ...novoLink,
-      id: `link-${Date.now()}`,
+      id,
+      titulo: sanitizeInputText(novoLink.titulo, 150),
+      url: sanitizeUrl(novoLink.url),
+      pontoNome: sanitizeInputText(novoLink.pontoNome, 120),
+      enviadoPor: sanitizeInputText(novoLink.enviadoPor, 100) || 'Cidadão / Artista Local',
+      descricao: sanitizeInputText(novoLink.descricao, 500),
       data: 'Hoje',
     };
     setSharedLinks(prev => [linkCompleto, ...prev]);
@@ -174,7 +207,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#f8fafc] text-slate-900 font-['Plus_Jakarta_Sans']">
+    <div className="min-h-screen flex bg-[#0c0714] text-slate-100 font-['Plus_Jakarta_Sans']">
       {/* Global Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 text-xs">
@@ -217,10 +250,10 @@ export default function App() {
             <ExecutiveSummary
               emendas={emendas}
               pnabList={pnabList}
-              leisIncentivo={leisIncentivo}
               pontosCulturais={pontosCulturais}
               noticias={noticias}
               onNavigateTab={tab => setActiveTab(tab)}
+              onUpdateNoticias={setNoticias}
             />
           )}
 
@@ -228,7 +261,6 @@ export default function App() {
             <BudgetDashboard
               emendas={emendas}
               pnabList={pnabList}
-              leisIncentivo={leisIncentivo}
               onNavigateToPoint={() => setActiveTab('mapa')}
             />
           )}
@@ -243,22 +275,6 @@ export default function App() {
 
           {activeTab === 'pnab' && <PnabAuditoriaSection pnabList={pnabList} />}
 
-          {activeTab === 'fac' && (
-            <FacSection editais={INITIAL_FAC_EDITAIS} onNavigateToTab={tab => setActiveTab(tab)} />
-          )}
-
-          {activeTab === 'lpg' && (
-            <LpgSection leisIncentivo={leisIncentivo} />
-          )}
-
-          {activeTab === 'rouanet' && (
-            <RouanetSection leisIncentivo={leisIncentivo} />
-          )}
-
-          {activeTab === 'leis-incentivo' && (
-            <LeisIncentivoSection leisIncentivo={leisIncentivo} />
-          )}
-
           {(activeTab === 'acompanhe-cultura' || activeTab === 'centros-culturais' || activeTab === 'mapa' || activeTab === 'redes') && (
             <MapeamentoCulturalSection
               pontos={pontosCulturais}
@@ -268,8 +284,6 @@ export default function App() {
               onSupportPoint={handleSupportPoint}
             />
           )}
-
-          {activeTab === 'apis' && <ApiDocumentationSection />}
 
           {activeTab === 'controle-social' && <ControleSocialSection />}
         </main>
@@ -284,7 +298,6 @@ export default function App() {
         onClose={() => setIsQuickSearchOpen(false)}
         emendas={emendas}
         pnabList={pnabList}
-        leisIncentivo={leisIncentivo}
         pontos={pontosCulturais}
         onSelectResult={tab => setActiveTab(tab)}
       />

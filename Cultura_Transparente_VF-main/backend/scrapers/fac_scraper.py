@@ -15,6 +15,10 @@ from backend.utils import setup_logger, HttpClient
 
 logger = setup_logger("ScraperFAC")
 
+# Mensagem padrão de estado vazio (diretriz anti-alucinação): nunca preencher
+# campos não confirmados pela fonte oficial com valores inventados.
+EMPTY_STATE_MESSAGE = "Dados não coletados, consultar plataformas oficiais"
+
 
 class FacScraper:
     """
@@ -44,9 +48,12 @@ class FacScraper:
         except Exception as e:
             logger.warning(f"Consulta direta ao Pró-Cultura retornou: {e}. Consolidando com base auditada.")
 
-        # Se a extração em tempo real estiver sem novas publicações, retorna os editais vigentes auditados
+        # Se a extração em tempo real não retornar nenhum edital, NÃO preenchemos
+        # com dados fictícios. Conforme diretriz anti-alucinação, uma lista vazia
+        # é o resultado correto quando não há confirmação da fonte oficial; o
+        # front-end deve exibir "Dados não coletados, consultar plataformas oficiais".
         if not editais:
-            editais = self._obter_editais_vigentes_auditados()
+            logger.info("Nenhum edital FAC confirmado via extração em tempo real; retornando lista vazia auditada.")
 
         logger.info(f"Total de {len(editais)} editais FAC consolidados.")
         return editais
@@ -61,18 +68,23 @@ class FacScraper:
             for i, card in enumerate(cards[:5]):
                 titulo_el = card.find(["h2", "h3", "h4", "a"])
                 titulo = titulo_el.get_text(strip=True) if titulo_el else f"Edital FAC 2026-{i+1}"
+                # Apenas o título é confiavelmente extraído do HTML. Valores
+                # financeiros, segmentos e elegibilidade NÃO são inferidos —
+                # inventar esses números seria uma violação da diretriz
+                # anti-alucinação. Eles ficam com o marcador padrão de estado
+                # vazio até que o parser saiba extraí-los com confiança da página.
                 encontrados.append(
                     FACEdital(
                         id=f"fac-scraped-{i+1}",
-                        numero_edital=f"FAC-{2026+i:02d}",
+                        numero_edital=EMPTY_STATE_MESSAGE,
                         titulo=titulo,
-                        status="Em Análise / Aberto",
-                        valor_total=10000000.0,
-                        valor_maximo_projeto=150000.0,
-                        segmentos=["Música", "Artes Cênicas", "Audiovisual"],
-                        elegibilidade="Produtores Culturais do RS (inclui Viamão)",
+                        status="Em Análise / Aberto (confirmar na fonte oficial)",
+                        valor_total=0.0,
+                        valor_maximo_projeto=0.0,
+                        segmentos=[],
+                        elegibilidade=EMPTY_STATE_MESSAGE,
                         link_oficial=self.PROCULTURA_URL,
-                        prazo_inscricao="Calendário Ordinário 2026"
+                        prazo_inscricao=EMPTY_STATE_MESSAGE
                     )
                 )
         except ImportError:
@@ -80,35 +92,4 @@ class FacScraper:
 
         return encontrados
 
-    def _obter_editais_vigentes_auditados(self) -> List[FACEdital]:
-        """Retorna os editais oficiais do FAC com respaldo normativo do Estado do RS."""
-        return [
-            FACEdital(
-                id="fac-01",
-                numero_edital="Edital SEDAC nº 01/2026 - FAC Fundo a Fundo",
-                titulo="FAC Regionalização da Cultura & Coletivos Comunitários",
-                status="Inscrições Homologadas",
-                valor_total=30000000.0,
-                valor_maximo_projeto=100000.0,
-                segmentos=["Patrimônio", "Culturas Populares", "Artes Visuais"],
-                elegibilidade="Pessoas Físicas e Jurídicas com domicílio no RS (incluindo Viamão)",
-                link_oficial="https://www.procultura.rs.gov.br/",
-                prazo_inscricao="Fluxo Contínuo / Etapas Regionais",
-                plataforma="Sistema Pró-cultura RS",
-                municipio_alvo="Viamão / RS"
-            ),
-            FACEdital(
-                id="fac-02",
-                numero_edital="Edital SEDAC nº 03/2026 - FAC Patrimônio & Memória",
-                titulo="Salvaguarda de Bens Tombados e Acervos Históricos",
-                status="Em Execução",
-                valor_total=15000000.0,
-                valor_maximo_projeto=250000.0,
-                segmentos=["Memória", "Arquivos Históricos", "Patrimônio Material e Imaterial"],
-                elegibilidade="Entidades Culturais e Gestores de Museus/Igrejas Históricas",
-                link_oficial="https://www.procultura.rs.gov.br/",
-                prazo_inscricao="Ciclo 2025-2026",
-                plataforma="Sistema Pró-cultura RS",
-                municipio_alvo="Viamão / RS"
-            )
-        ]
+

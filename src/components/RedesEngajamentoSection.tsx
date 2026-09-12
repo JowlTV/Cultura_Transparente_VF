@@ -17,7 +17,7 @@ import {
   Info
 } from 'lucide-react';
 import { PontoCultural, SharedCommunityLink } from '../types/culture';
-import { sanitizeUrl } from '../utils/security';
+import { sanitizeUrl, isValidHttpUrl, sanitizeInputText } from '../utils/security';
 
 interface RedesEngajamentoSectionProps {
   pontos: PontoCultural[];
@@ -39,6 +39,7 @@ export const RedesEngajamentoSection: React.FC<RedesEngajamentoSectionProps> = (
   const [filtroPonto, setFiltroPonto] = useState<string>('todos');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [supportedPoints, setSupportedPoints] = useState<Record<string, boolean>>({});
 
@@ -77,7 +78,17 @@ export const RedesEngajamentoSection: React.FC<RedesEngajamentoSectionProps> = (
 
   const handleSubmitLink = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!novoTitulo.trim() || !novaUrl.trim()) return;
+    setFormError(null);
+
+    const tituloLimpo = sanitizeInputText(novoTitulo, 150);
+    const urlLimpa = novaUrl.trim();
+
+    if (!tituloLimpo || !urlLimpa) return;
+
+    if (!isValidHttpUrl(urlLimpa)) {
+      setFormError('Por favor, informe uma URL válida e segura (ex: https://instagram.com/ponto ou https://youtube.com/...).');
+      return;
+    }
 
     const pontoObj = pontos.find(p => p.id === novoPontoId);
     const pontoNome = pontoObj ? pontoObj.nome : 'Ponto Cultural de Viamão';
@@ -85,11 +96,11 @@ export const RedesEngajamentoSection: React.FC<RedesEngajamentoSectionProps> = (
     onAddSharedLink({
       pontoId: novoPontoId,
       pontoNome,
-      titulo: novoTitulo.trim(),
-      url: novaUrl.trim(),
+      titulo: tituloLimpo,
+      url: sanitizeUrl(urlLimpa),
       tipo: novoTipo,
-      enviadoPor: novoEnviadoPor.trim() || 'Cidadão / Artista Local',
-      descricao: novaDescricao.trim(),
+      enviadoPor: sanitizeInputText(novoEnviadoPor, 100) || 'Cidadão / Artista Local',
+      descricao: sanitizeInputText(novaDescricao, 500),
     });
 
     setFormSubmitted(true);
@@ -101,6 +112,7 @@ export const RedesEngajamentoSection: React.FC<RedesEngajamentoSectionProps> = (
       setNovoTipo('instagram');
       setNovoEnviadoPor('');
       setNovaDescricao('');
+      setFormError(null);
     }, 1600);
   };
 
@@ -233,6 +245,12 @@ export const RedesEngajamentoSection: React.FC<RedesEngajamentoSectionProps> = (
             </div>
           ) : (
             <form onSubmit={handleSubmitLink} className="space-y-4 text-xs">
+              {formError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{formError}</span>
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Target Cultural Point */}
                 <div>

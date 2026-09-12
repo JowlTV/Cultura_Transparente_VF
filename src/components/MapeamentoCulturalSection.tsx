@@ -240,25 +240,29 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#0f172a] via-[#1e3a8a] to-[#1e40af] rounded-2xl p-6 sm:p-7 text-white shadow-xs border border-blue-900/30">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 px-3 py-1 rounded-full text-xs font-semibold text-amber-300 mb-2.5">
-              <Building className="w-3.5 h-3.5 text-amber-400" />
+      <div className="bg-gradient-to-br from-[#1b0a2f] via-[#220d3a] to-[#120622] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-purple-800/40">
+        {/* Background Graphic Accents */}
+        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-[#6A0DAD]/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/3 -mb-12 w-64 h-64 bg-[#FF4500]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl space-y-3">
+            <div className="inline-flex items-center gap-2 bg-[#6A0DAD]/30 border border-purple-700/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-purple-200">
+              <Building className="w-3.5 h-3.5 text-[#FF4500]" />
               Acompanhe a Cultura • Mapeamento e Engajamento Comunitário de Viamão
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold font-['Outfit'] tracking-tight text-white">
               Acompanhe a Cultura
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-slate-200 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Conheça os pontos de cultura, centros e coletivos de Viamão: consulte o resumo de representação cultural, suas atividades recorrentes, localização no Google Maps e acompanhe publicações comunitárias.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             <button
               onClick={() => setActiveTab('cadastro')}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#dc2626] hover:bg-[#b91c1c] text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-xs"
+              className="flex items-center gap-2 px-5 py-3 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md shadow-orange-950/40 border border-orange-400/30"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Cadastrar Novo Espaço</span>
@@ -268,14 +272,14 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
       </div>
 
       {/* Main Unified Navigation Bar */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+      <div className="bg-[#150b24] rounded-2xl p-3 sm:p-4 border border-purple-900/40 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#10071e] rounded-xl border border-purple-900/30">
           <button
             onClick={() => setActiveTab('catalogo')}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'catalogo'
-                ? 'bg-white text-[#1e40af] shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#6A0DAD] text-white shadow-xs'
+                : 'text-slate-300 hover:text-white hover:bg-purple-900/30'
             }`}
           >
             🏛️ Catálogo dos Centros de Cultura ({pontos.length})
@@ -284,8 +288,8 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
             onClick={() => setActiveTab('mural')}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'mural'
-                ? 'bg-white text-[#1e40af] shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#6A0DAD] text-white shadow-xs'
+                : 'text-slate-300 hover:text-white hover:bg-purple-900/30'
             }`}
           >
             📢 Mural Comunitário & Acompanhamento ({sharedLinks.length})
@@ -294,8 +298,8 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
             onClick={() => setActiveTab('cadastro')}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'cadastro'
-                ? 'bg-white text-[#1e40af] shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#6A0DAD] text-white shadow-xs'
+                : 'text-slate-300 hover:text-white hover:bg-purple-900/30'
             }`}
           >
             📝 Cadastrar Espaço
@@ -305,13 +309,13 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
         {/* Quick Search */}
         {activeTab === 'catalogo' && (
           <div className="relative flex-1 max-w-md">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
             <input
               type="text"
               placeholder="Buscar por nome, linguagem cultural, representação ou atividade..."
               value={busca}
               onChange={e => setBusca(e.target.value)}
-              className="w-full pl-8 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden focus:border-[#1e40af]"
+              className="w-full pl-8 pr-4 py-2 text-xs bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-400 focus:outline-hidden focus:border-[#FF4500]"
             />
           </div>
         )}
@@ -321,16 +325,16 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
       {activeTab === 'catalogo' && (
         <div className="space-y-4">
           {/* Filters Row */}
-          <div className="flex flex-wrap items-center gap-3 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <div className="flex items-center gap-1.5 text-slate-700 font-bold">
-              <Filter className="w-3.5 h-3.5 text-[#1e40af]" />
+          <div className="flex flex-wrap items-center gap-3 text-xs bg-[#150b24] p-3.5 rounded-xl border border-purple-900/40 text-slate-200">
+            <div className="flex items-center gap-1.5 text-purple-200 font-bold">
+              <Filter className="w-3.5 h-3.5 text-[#FF4500]" />
               <span>Filtros:</span>
             </div>
 
             <select
               value={filtroCategoria}
               onChange={e => setFiltroCategoria(e.target.value)}
-              className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-hidden text-xs font-medium"
+              className="bg-[#10071e] border border-purple-900/40 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-hidden text-xs font-medium"
             >
               <option value="todas">Todas as Linguagens Culturais</option>
               {categoriasDisponiveis.map(c => (
@@ -344,7 +348,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                   setFiltroCategoria('todas');
                   setBusca('');
                 }}
-                className="text-[11px] text-[#1e40af] hover:underline font-semibold ml-auto"
+                className="text-[11px] text-[#FF4500] hover:underline font-semibold ml-auto"
               >
                 Limpar Filtros
               </button>
@@ -361,7 +365,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                 <div
                   key={ponto.id}
                   onClick={() => setSelectedPonto(ponto)}
-                  className="bg-white rounded-2xl border-2 border-slate-200/90 hover:border-[#1e40af]/60 hover:shadow-md transition-all flex flex-col justify-between cursor-pointer group p-5 space-y-4 relative"
+                  className="bg-[#150b24] rounded-2xl border border-purple-900/40 hover:border-purple-600/60 hover:shadow-lg hover:shadow-purple-950/40 transition-all flex flex-col justify-between cursor-pointer group p-5 space-y-4 relative"
                 >
                   <div className="space-y-3">
                     {/* Header: Area Badge */}
@@ -378,19 +382,19 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                     </div>
 
                     {/* Point Name */}
-                    <h3 className="font-bold text-slate-900 text-base sm:text-lg leading-snug font-['Outfit'] group-hover:text-[#1e40af] transition-colors">
+                    <h3 className="font-bold text-white text-base sm:text-lg leading-snug font-['Outfit'] group-hover:text-[#FF4500] transition-colors">
                       {ponto.nome}
                     </h3>
 
                     {/* Área de Atuação e Resumo Descritivo */}
                     <div className="space-y-2 pt-0.5">
-                      <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-100 space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#1e40af]">
-                          <Sparkles className="w-3.5 h-3.5 text-[#1e40af] shrink-0" />
-                          <span className="uppercase tracking-wider text-[11px]">Área de Atuação:</span>
-                          <span className="text-slate-800 font-semibold">{ponto.categoria}</span>
+                      <div className="p-3.5 rounded-xl bg-[#1a0c30] border border-purple-900/40 space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#FF4500]">
+                          <Sparkles className="w-3.5 h-3.5 text-[#FF4500] shrink-0" />
+                          <span className="uppercase tracking-wider text-[11px] text-purple-200">Área de Atuação:</span>
+                          <span className="text-white font-semibold">{ponto.categoria}</span>
                         </div>
-                        <p className="text-xs text-slate-700 leading-relaxed font-normal">
+                        <p className="text-xs text-slate-300 leading-relaxed font-normal">
                           {ponto.resumo_geral_cultura || ponto.descricao}
                         </p>
                       </div>
@@ -398,13 +402,13 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                   </div>
 
                   {/* Card Bottom Actions */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-purple-900/30 flex items-center justify-between gap-2">
                     <button
                       onClick={e => {
                         e.stopPropagation();
                         setSelectedPonto(ponto);
                       }}
-                      className="flex-1 py-2 bg-[#1e40af] hover:bg-[#1d4ed8] text-white rounded-xl text-xs font-bold text-center transition-colors shadow-2xs flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2.5 bg-[#6A0DAD] hover:bg-[#7b14c7] text-white rounded-xl text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5"
                     >
                       <BookOpen className="w-3.5 h-3.5" />
                       <span>Ver Informações Completas</span>
@@ -416,10 +420,10 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}
-                        className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+                        className="px-3.5 py-2.5 bg-[#1e1037] hover:bg-purple-900/40 text-purple-200 rounded-xl text-xs font-bold transition-colors border border-purple-800/40 flex items-center gap-1.5"
                         title="Ver no Google Maps"
                       >
-                        <MapPin className="w-3.5 h-3.5 text-[#1e40af]" />
+                        <MapPin className="w-3.5 h-3.5 text-[#FF4500]" />
                         <span>Maps</span>
                         <ExternalLink className="w-3 h-3" />
                       </a>
@@ -435,25 +439,25 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
       {/* VIEW 2: Mural Comunitário & Acompanhamento */}
       {activeTab === 'mural' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-[#150b24] rounded-2xl p-5 border border-purple-900/40 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-slate-900 text-base font-['Outfit']">
+                <h3 className="font-bold text-white text-base font-['Outfit']">
                   Mural de Acompanhamento Comunitário & Publicações Oficiais
                 </h3>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-800/40">
+                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
                   Fontes Comprovadas
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-300 mt-0.5">
                 Transparência cidadã, dossiês de tombamento, registros de projetos e links públicos auditados dos pontos de cultura.
               </p>
             </div>
 
             <button
               onClick={() => setIsLinkModalOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#1e40af] hover:bg-[#1d4ed8] text-white rounded-xl text-xs font-bold transition-colors shrink-0 shadow-2xs"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl text-xs font-bold transition-colors shrink-0 shadow-xs border border-orange-400/30"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Contribuir com Link / Registro</span>
@@ -461,15 +465,15 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
           </div>
 
           {/* Filtros do Mural */}
-          <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex flex-col sm:flex-row items-center gap-3">
+          <div className="bg-[#150b24] rounded-2xl p-3 border border-purple-900/40 flex flex-col sm:flex-row items-center gap-3">
             <div className="relative flex-1 w-full">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-purple-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Buscar por título, dossiê, autor ou ponto de cultura..."
                 value={muralBusca}
                 onChange={e => setMuralBusca(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-[#1e40af]"
+                className="w-full pl-9 pr-3 py-2 bg-[#10071e] border border-purple-900/40 rounded-xl text-xs text-slate-100 placeholder-slate-400 focus:outline-hidden focus:border-[#FF4500]"
               />
             </div>
 
@@ -477,7 +481,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
               <select
                 value={muralPontoFiltro}
                 onChange={e => setMuralPontoFiltro(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-hidden focus:border-[#1e40af]"
+                className="w-full px-3 py-2 bg-[#10071e] border border-purple-900/40 rounded-xl text-xs text-slate-200 focus:outline-hidden focus:border-[#FF4500]"
               >
                 <option value="todos">Filtrar por Entidade Cultural (Todos)</option>
                 {pontos.map(p => (
@@ -488,14 +492,14 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
           </div>
 
           {linksFiltrados.length === 0 ? (
-            <div className="bg-white rounded-3xl p-10 border border-slate-200 text-center space-y-2.5">
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
-                <Info className="w-6 h-6" />
+            <div className="bg-[#150b24] rounded-3xl p-10 border border-purple-900/40 text-center space-y-2.5">
+              <div className="w-12 h-12 rounded-full bg-purple-950/60 border border-purple-800/40 flex items-center justify-center mx-auto text-purple-300">
+                <Info className="w-6 h-6 text-[#FF4500]" />
               </div>
-              <h4 className="font-bold text-slate-800 text-sm">
+              <h4 className="font-bold text-white text-sm">
                 Nenhum registro público ou publicação vinculado
               </h4>
-              <p className="text-xs text-slate-500 max-w-lg mx-auto leading-relaxed">
+              <p className="text-xs text-slate-300 max-w-lg mx-auto leading-relaxed">
                 {muralPontoFiltro !== 'todos'
                   ? `Não há registros públicos, mídias ou documentos oficiais vinculados a "${pontos.find(p => p.id === muralPontoFiltro)?.nome || 'este ponto'}" no cadastro oficial auditado.`
                   : 'Não há registros ou publicações que correspondam aos critérios de busca selecionados.'}
@@ -509,40 +513,40 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
               {linksFiltrados.map(item => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs hover:border-[#1e40af]/50 transition-all flex flex-col justify-between space-y-3"
+                  className="bg-[#150b24] rounded-2xl p-4 border border-purple-900/40 shadow-xs hover:border-purple-600/50 transition-all flex flex-col justify-between space-y-3"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 uppercase">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#6A0DAD]/30 text-purple-200 border border-purple-700/40 uppercase">
                         {item.tipo}
                       </span>
-                      <span className="text-[10px] text-slate-500 font-medium">{item.data}</span>
+                      <span className="text-[10px] text-slate-400 font-medium">{item.data}</span>
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-bold text-[#1e40af] truncate">
+                      <span className="text-[11px] font-bold text-[#FF4500] truncate">
                         🏛️ {item.pontoNome}
                       </span>
                     </div>
 
-                    <h4 className="font-bold text-slate-900 text-sm leading-snug">
+                    <h4 className="font-bold text-white text-sm leading-snug">
                       {item.titulo}
                     </h4>
 
                     {item.descricao && (
-                      <p className="text-xs text-slate-600 leading-relaxed">
+                      <p className="text-xs text-slate-300 leading-relaxed">
                         {item.descricao}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 space-y-2">
-                    <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <div className="pt-2 border-t border-purple-900/30 space-y-2">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400">
                       <span className="truncate max-w-[170px]">
-                        Fonte: <strong className="text-slate-700">{item.enviadoPor || 'Cadastro Público'}</strong>
+                        Fonte: <strong className="text-slate-200">{item.enviadoPor || 'Cadastro Público'}</strong>
                       </span>
-                      <span className="inline-flex items-center gap-0.5 text-emerald-700 font-semibold">
-                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                      <span className="inline-flex items-center gap-0.5 text-emerald-400 font-semibold">
+                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
                         Auditado
                       </span>
                     </div>
@@ -555,7 +559,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                         href={sanitizeUrl(item.url)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 hover:bg-blue-50 text-[#1e40af] rounded-lg text-xs font-bold transition-colors"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#1e1037] hover:bg-purple-900/40 text-[#FF4500] hover:text-orange-400 border border-purple-800/40 rounded-lg text-xs font-bold transition-colors"
                       >
                         <span>Acessar</span>
                         <ExternalLink className="w-3 h-3" />
@@ -571,45 +575,45 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
 
       {/* VIEW 3: Formulário de Cadastro de Espaço */}
       {activeTab === 'cadastro' && (
-        <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs max-w-2xl mx-auto space-y-5">
-          <div className="border-b border-slate-100 pb-4">
-            <h3 className="text-lg font-bold text-slate-900 font-['Outfit']">
+        <div className="bg-[#150b24] rounded-3xl p-6 sm:p-8 border border-purple-900/40 shadow-xs max-w-2xl mx-auto space-y-6">
+          <div className="border-b border-purple-900/30 pb-4">
+            <h3 className="text-lg font-bold text-white font-['Outfit']">
               Cadastrar Novo Centro ou Ponto de Cultura
             </h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-300 mt-1">
               Colabore com a cartografia cultural cidadã de Viamão registrando novos coletivos, centros comunitários ou patrimônios locais.
             </p>
           </div>
 
           {formSubmitted ? (
-            <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-2">
-              <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-              <h4 className="font-bold text-emerald-950 text-sm">Espaço Cadastrado com Sucesso!</h4>
-              <p className="text-xs text-emerald-800">
+            <div className="p-6 bg-emerald-950/60 border border-emerald-800/40 rounded-2xl text-center space-y-2">
+              <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+              <h4 className="font-bold text-emerald-200 text-sm">Espaço Cadastrado com Sucesso!</h4>
+              <p className="text-xs text-emerald-300">
                 O novo ponto cultural foi adicionado ao catálogo municipal.
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmitPonto} className="space-y-4 text-xs">
-              <div className="space-y-1">
-                <label className="font-bold text-slate-800">Nome do Centro ou Coletivo Cultural *</label>
+              <div className="space-y-1.5">
+                <label className="font-bold text-purple-200">Nome do Centro ou Coletivo Cultural *</label>
                 <input
                   type="text"
                   required
                   placeholder="Ex: Ponto de Cultura Raízes de Viamão"
                   value={formData.nome}
                   onChange={e => setFormData({ ...formData, nome: e.target.value })}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden focus:border-[#1e40af]"
+                  className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-800">Linguagem Cultural *</label>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-purple-200">Linguagem Cultural *</label>
                   <select
                     value={formData.categoria}
                     onChange={e => setFormData({ ...formData, categoria: e.target.value as PontoCultural['categoria'] })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden text-xs"
+                    className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-200 focus:outline-hidden text-xs focus:border-[#FF4500]"
                   >
                     <option value="Música & Hip-Hop">Música & Hip-Hop</option>
                     <option value="Patrimônio Histórico">Patrimônio Histórico</option>
@@ -622,77 +626,77 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                   </select>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-800">Município de Atuação</label>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-purple-200">Município de Atuação</label>
                   <input
                     type="text"
                     disabled
                     value="Viamão • RS (Território Municipal)"
-                    className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-600 focus:outline-hidden cursor-not-allowed"
+                    className="w-full p-3 bg-[#1a0c30] border border-purple-900/30 rounded-xl text-purple-300/80 focus:outline-hidden cursor-not-allowed"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center gap-2">
+              <div className="space-y-2 p-4 bg-[#1a0c30] rounded-2xl border border-purple-900/40">
+                <div className="flex items-center gap-2.5">
                   <input
                     type="checkbox"
                     id="semEnderecoFixo"
                     checked={formData.semEnderecoFixo}
                     onChange={e => setFormData({ ...formData, semEnderecoFixo: e.target.checked })}
-                    className="rounded text-[#1e40af] focus:ring-0"
+                    className="rounded text-[#FF4500] focus:ring-0 accent-[#FF4500]"
                   />
-                  <label htmlFor="semEnderecoFixo" className="text-xs font-bold text-slate-800 cursor-pointer">
+                  <label htmlFor="semEnderecoFixo" className="text-xs font-bold text-purple-200 cursor-pointer">
                     Atuação Comunitária Territorial (Sem endereço fixo no Google Maps)
                   </label>
                 </div>
 
                 {!formData.semEnderecoFixo && (
-                  <div className="space-y-1 pt-1">
-                    <label className="font-semibold text-slate-700">Endereço no Google Maps</label>
+                  <div className="space-y-1.5 pt-2">
+                    <label className="font-semibold text-slate-300">Endereço no Google Maps</label>
                     <input
                       type="text"
                       placeholder="Ex: Rua, Avenida ou Praça com número..."
                       value={formData.endereco}
                       onChange={e => setFormData({ ...formData, endereco: e.target.value })}
-                      className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                      className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                     />
                   </div>
                 )}
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-slate-800">Resumo: O que este espaço representa de modo geral para a cultura de Viamão? *</label>
+              <div className="space-y-1.5">
+                <label className="font-bold text-purple-200">Resumo: O que este espaço representa de modo geral para a cultura de Viamão? *</label>
                 <textarea
                   required
                   rows={2}
                   placeholder="Descreva brevemente o significado cultural, histórico ou comunitário..."
                   value={formData.resumo_geral_cultura}
                   onChange={e => setFormData({ ...formData, resumo_geral_cultura: e.target.value })}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                  className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-slate-800">O que costumam fazer? (Atividades, oficinas, eventos) *</label>
+              <div className="space-y-1.5">
+                <label className="font-bold text-purple-200">O que costumam fazer? (Atividades, oficinas, eventos) *</label>
                 <textarea
                   required
                   rows={2}
                   placeholder="Ex: Oficinas de música, saraus poéticos, cursos de formação..."
                   value={formData.o_que_costumam_fazer}
                   onChange={e => setFormData({ ...formData, o_que_costumam_fazer: e.target.value })}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                  className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-slate-800">Contato Oficial (E-mail ou Telefone)</label>
+              <div className="space-y-1.5">
+                <label className="font-bold text-purple-200">Contato Oficial (E-mail ou Telefone)</label>
                 <input
                   type="text"
                   placeholder="(51) 99999-9999 ou contato@espaco.org"
                   value={formData.contato}
                   onChange={e => setFormData({ ...formData, contato: e.target.value })}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                  className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                 />
               </div>
 
@@ -700,13 +704,13 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                 <button
                   type="button"
                   onClick={() => setActiveTab('catalogo')}
-                  className="px-4 py-2 text-slate-600 hover:text-slate-900 text-xs font-bold"
+                  className="px-4 py-2.5 text-slate-400 hover:text-white text-xs font-bold transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-[#1e40af] hover:bg-[#1d4ed8] text-white rounded-xl font-bold text-xs shadow-xs"
+                  className="px-5 py-2.5 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl font-bold text-xs shadow-md shadow-orange-950/40 border border-orange-400/30 transition-all"
                 >
                   Confirmar Cadastro
                 </button>
@@ -716,20 +720,20 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
         </div>
       )}
 
-      {/* DETAIL MODAL FOR SELECTED CULTURAL POINT (No photos, no social media links, pure deep information) */}
+      {/* DETAIL MODAL FOR SELECTED CULTURAL POINT */}
       {selectedPonto && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200"
           onClick={() => setSelectedPonto(null)}
         >
           <div
-            className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 max-h-[90vh] overflow-y-auto"
+            className="bg-[#150b24] rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-purple-800/60 text-white space-y-5 max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+            <div className="flex items-start justify-between gap-4 border-b border-purple-900/40 pb-4">
               <div>
-                <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span
                     className={`text-[10px] font-bold px-2.5 py-0.5 rounded-md ${getCategoriaBadgeStyle(
                       selectedPonto.categoria
@@ -737,34 +741,34 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                   >
                     {selectedPonto.categoria}
                   </span>
-                  <span className="text-xs font-bold text-[#1e40af] bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-200">
+                  <span className="text-xs font-bold text-purple-200 bg-[#6A0DAD]/30 px-2.5 py-0.5 rounded-md border border-purple-700/50">
                     Viamão • RS
                   </span>
-                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800/40 flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
                     Escopo Isolado & Verificado
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-['Outfit']">
+                <h3 className="text-xl sm:text-2xl font-bold text-white font-['Outfit']">
                   {selectedPonto.nome}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedPonto(null)}
-                className="text-slate-400 hover:text-slate-700 p-1 font-bold text-lg rounded-lg hover:bg-slate-100"
+                className="text-slate-400 hover:text-white p-1.5 font-bold text-lg rounded-lg hover:bg-purple-900/40 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Localização / Google Maps */}
-            <div className="p-4 rounded-2xl border bg-slate-50/80 border-slate-200 space-y-2 text-xs">
-              <span className="font-bold text-slate-800 uppercase text-[10px] tracking-wider block">
+            <div className="p-4 rounded-2xl border bg-[#1a0c30] border-purple-900/40 space-y-2.5 text-xs">
+              <span className="font-bold text-purple-200 uppercase text-[10px] tracking-wider block">
                 Localização & Direcionamento:
               </span>
               {selectedPonto.google_maps_presente ? (
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-slate-700 font-medium">
+                  <span className="text-slate-300 font-medium">
                     Espaço cultural com rota e localização disponível no mapa interativo
                   </span>
                   {selectedPonto.google_maps_url && (
@@ -772,7 +776,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                       href={sanitizeUrl(selectedPonto.google_maps_url)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1e40af] hover:bg-[#1d4ed8] text-white rounded-lg font-bold text-xs transition-colors shadow-2xs"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl font-bold text-xs transition-all shadow-xs border border-orange-400/30"
                     >
                       <MapPin className="w-3.5 h-3.5" />
                       <span>Abrir no Google Maps</span>
@@ -781,12 +785,12 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                   )}
                 </div>
               ) : (
-                <div className="space-y-1.5 p-3 bg-amber-50/80 rounded-xl border border-amber-200">
-                  <p className="text-amber-900 font-bold flex items-center gap-1.5 text-xs">
-                    <Info className="w-3.5 h-3.5 text-amber-700" />
+                <div className="space-y-1.5 p-3 bg-amber-950/40 rounded-xl border border-amber-800/40">
+                  <p className="text-amber-300 font-bold flex items-center gap-1.5 text-xs">
+                    <Info className="w-3.5 h-3.5 text-amber-400" />
                     <span>Atuação Comunitária e Territorial Itinerante</span>
                   </p>
-                  <p className="text-slate-700 text-xs leading-relaxed">
+                  <p className="text-slate-300 text-xs leading-relaxed">
                     {selectedPonto.nota_maps_explicacao ||
                       'Entidade de atuação cultural e comunitária territorial itinerante sem endereço físico fixo. As atividades ocorrem em espaços públicos de Viamão (praças, escolas e locais abertos).'}
                   </p>
@@ -797,15 +801,15 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                 const contactInfo = validateInstitutionalContact(selectedPonto.contato);
                 if (contactInfo.isAvailable) {
                   return (
-                    <div className="pt-2 border-t border-slate-200 text-slate-700 flex items-center gap-1.5 text-xs font-medium">
-                      <Phone className="w-3.5 h-3.5 text-[#1e40af]" />
+                    <div className="pt-2 border-t border-purple-900/30 text-slate-300 flex items-center gap-1.5 text-xs font-medium">
+                      <Phone className="w-3.5 h-3.5 text-[#FF4500]" />
                       <span>Contato Registrado: {contactInfo.display}</span>
                     </div>
                   );
                 }
                 return (
-                  <div className="pt-2 border-t border-slate-200 text-slate-500 flex items-center gap-1.5 text-xs italic">
-                    <AlertCircle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <div className="pt-2 border-t border-purple-900/30 text-slate-400 flex items-center gap-1.5 text-xs italic">
+                    <AlertCircle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                     <span>Informação de canal de contato direto não disponível no cadastro oficial validado.</span>
                   </div>
                 );
@@ -814,13 +818,13 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
 
             {/* Área de Atuação & Resumo Descritivo */}
             <div className="space-y-1.5">
-              <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100 space-y-2">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#1e40af]">
-                  <Sparkles className="w-4 h-4 text-[#1e40af] shrink-0" />
-                  <span className="uppercase tracking-wider text-[11px]">Área de Atuação:</span>
-                  <span className="text-slate-900 font-semibold">{selectedPonto.categoria}</span>
+              <div className="p-4 rounded-2xl bg-[#1a0c30] border border-purple-900/40 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#FF4500]">
+                  <Sparkles className="w-4 h-4 text-[#FF4500] shrink-0" />
+                  <span className="uppercase tracking-wider text-[11px] text-purple-200">Área de Atuação:</span>
+                  <span className="text-white font-semibold">{selectedPonto.categoria}</span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   {selectedPonto.resumo_geral_cultura || selectedPonto.descricao}
                 </p>
               </div>
@@ -829,13 +833,13 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
             {/* Principais Atividades Detalhadas */}
             {selectedPonto.informacoes_detalhadas?.atividades_principais && (
               <div className="space-y-2">
-                <span className="font-bold text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#1e40af]" />
+                <span className="font-bold text-purple-200 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#FF4500]" />
                   Atividades e Oficinas Específicas:
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {selectedPonto.informacoes_detalhadas.atividades_principais.map((ativ, i) => (
-                    <div key={i} className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-slate-800 text-xs font-medium">
+                    <div key={i} className="bg-[#10071e] p-3 rounded-xl border border-purple-900/40 text-slate-200 text-xs font-medium">
                       ✓ {ativ}
                     </div>
                   ))}
@@ -847,11 +851,11 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
             {selectedPonto.links_referencia && selectedPonto.links_referencia.length > 0 ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-800 text-[11px] uppercase tracking-wider block">
+                  <span className="font-bold text-purple-200 text-[11px] uppercase tracking-wider block">
                     Documentos & Fontes Oficiais Auditadas:
                   </span>
-                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                  <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
                     Registros Verificados
                   </span>
                 </div>
@@ -862,31 +866,31 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                       href={sanitizeUrl(ref.url)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 flex items-center justify-between text-xs transition-colors"
+                      className="p-3 rounded-xl bg-[#10071e] hover:bg-purple-900/30 border border-purple-900/40 flex items-center justify-between text-xs transition-colors"
                     >
                       <div>
-                        <span className="font-bold text-slate-900 block">{ref.titulo}</span>
-                        {ref.descricao && <span className="text-[11px] text-slate-500">{ref.descricao}</span>}
+                        <span className="font-bold text-white block">{ref.titulo}</span>
+                        {ref.descricao && <span className="text-[11px] text-slate-400">{ref.descricao}</span>}
                       </div>
-                      <ExternalLink className="w-3.5 h-3.5 text-[#1e40af] shrink-0 ml-2" />
+                      <ExternalLink className="w-3.5 h-3.5 text-[#FF4500] shrink-0 ml-2" />
                     </a>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
-                <Info className="w-4 h-4 text-slate-400 shrink-0" />
-                <span className="text-xs text-slate-500">
+              <div className="p-3 bg-[#10071e] border border-purple-900/40 rounded-xl flex items-center gap-2">
+                <Info className="w-4 h-4 text-purple-400 shrink-0" />
+                <span className="text-xs text-slate-400">
                   Sem publicações, mídias ou documentos adicionais vinculados a este ponto na base oficial auditada.
                 </span>
               </div>
             )}
 
             {/* Modal Bottom Actions */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-end">
+            <div className="pt-3 border-t border-purple-900/40 flex items-center justify-end">
               <button
                 onClick={() => setSelectedPonto(null)}
-                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
+                className="px-5 py-2.5 bg-[#1e1037] hover:bg-purple-900/40 text-purple-200 border border-purple-800/40 text-xs font-bold rounded-xl transition-colors"
               >
                 Fechar
               </button>
@@ -898,46 +902,46 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
       {/* MODAL FOR CONTRIBUTING COMMUNITY LINK */}
       {isLinkModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200"
           onClick={() => setIsLinkModalOpen(false)}
         >
           <div
-            className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4"
+            className="bg-[#150b24] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-purple-800/60 text-white space-y-4"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-start justify-between border-b border-purple-900/40 pb-3">
               <div>
-                <h3 className="font-bold text-slate-900 text-base font-['Outfit']">
+                <h3 className="font-bold text-white text-base font-['Outfit']">
                   Contribuir com Link / Registro
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-300">
                   Compartilhe um link público oficial, publicação ou notícia cultural.
                 </p>
               </div>
               <button
                 onClick={() => setIsLinkModalOpen(false)}
-                className="text-slate-400 hover:text-slate-700 p-1"
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-purple-900/40 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {linkSubmitted ? (
-              <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-2">
-                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-                <h4 className="font-bold text-emerald-950 text-sm">Link Enviado com Sucesso!</h4>
-                <p className="text-xs text-emerald-800">
+              <div className="p-6 bg-emerald-950/60 border border-emerald-800/40 rounded-2xl text-center space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+                <h4 className="font-bold text-emerald-200 text-sm">Link Enviado com Sucesso!</h4>
+                <p className="text-xs text-emerald-300">
                   A publicação foi adicionada ao mural comunitário.
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleCadastrarLink} className="space-y-3 text-xs">
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-800">Ponto Cultural Vinculado *</label>
+              <form onSubmit={handleCadastrarLink} className="space-y-3.5 text-xs">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-purple-200">Ponto Cultural Vinculado *</label>
                   <select
                     value={novoPontoId}
                     onChange={e => setNovoPontoId(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                    className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-200 focus:outline-hidden focus:border-[#FF4500]"
                   >
                     {pontos.map(p => (
                       <option key={p.id} value={p.id}>{p.nome}</option>
@@ -945,70 +949,70 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
                   </select>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-800">Título da Publicação / Registro *</label>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-purple-200">Título da Publicação / Registro *</label>
                   <input
                     type="text"
                     required
                     placeholder="Ex: Dossiê Histórico, Chamada de Oficinas..."
                     value={novoTitulo}
                     onChange={e => setNovoTitulo(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                    className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                   />
                 </div>
 
                 {linkError && (
-                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800/40 text-rose-300 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
                     <span>{linkError}</span>
                   </div>
                 )}
 
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-800">URL / Link Web *</label>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-purple-200">URL / Link Web *</label>
                   <input
                     type="url"
                     required
                     placeholder="https://..."
                     value={novaUrl}
                     onChange={e => setNovaUrl(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                    className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-800">Seu Nome / Coletivo</label>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-purple-200">Seu Nome / Coletivo</label>
                   <input
                     type="text"
                     placeholder="Ex: Amigos da Cultura, Artista Local..."
                     value={novoEnviadoPor}
                     onChange={e => setNovoEnviadoPor(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                    className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-800">Descrição Breve</label>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-purple-200">Descrição Breve</label>
                   <textarea
                     rows={2}
                     placeholder="Resumo do conteúdo..."
                     value={novaDescricao}
                     onChange={e => setNovaDescricao(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-hidden"
+                    className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
                   />
                 </div>
 
-                <div className="pt-2 flex items-center justify-end gap-2">
+                <div className="pt-2 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
                     onClick={() => setIsLinkModalOpen(false)}
-                    className="px-4 py-2 text-slate-600 hover:text-slate-900 text-xs font-bold"
+                    className="px-4 py-2 text-slate-400 hover:text-white text-xs font-bold transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-[#1e40af] hover:bg-[#1d4ed8] text-white rounded-xl font-bold text-xs shadow-xs"
+                    className="px-5 py-2.5 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl font-bold text-xs shadow-md shadow-orange-950/40 border border-orange-400/30 transition-all"
                   >
                     Publicar Link
                   </button>

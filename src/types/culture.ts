@@ -137,7 +137,7 @@ export interface SharedCommunityLink {
 export interface NewsItem {
   id: string;
   data: string;
-  origem: 'Federal (MinC)' | 'Municipal (Viamão)' | 'Estadual (SEDAC-RS)' | 'Controle Social' | 'Ministério Público';
+  origem: 'Federal (MinC)' | 'Municipal (Viamão)' | 'Estadual (SEDAC-RS)' | 'Controle Social' | 'Ministério Público' | 'Imprensa Regional (RS)' | 'Instituto Federal (IFRS)' | string;
   categoria_filtro: 'editais' | 'ministerio-publico' | 'governo-federal' | 'sedac-rs' | 'viamao';
   titulo: string;
   resumo: string;
@@ -150,6 +150,10 @@ export interface NewsItem {
   plataforma?: string;
   requisitos_praticos?: string[];
   alerta_inabilitacao?: string;
+  veiculo_imprensa?: string;
+  fonte_confiavel?: boolean;
+  pesquisa_google?: boolean;
+  url_pesquisa_google?: string;
 }
 
 export interface ApiEndpointDoc {
