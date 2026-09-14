@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   DollarSign,
   FileText,
-  MapPin,
   ExternalLink,
   ShieldCheck,
   Building,
@@ -27,14 +26,12 @@ import {
   HelpCircle,
   ArrowRight
 } from 'lucide-react';
-import { Emenda, PnabRecord, PontoCultural, NewsItem } from '../types/culture';
+import { Emenda, NewsItem } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
 import { apiClient } from '../services/apiClient';
 
 interface ExecutiveSummaryProps {
   emendas: Emenda[];
-  pnabList: PnabRecord[];
-  pontosCulturais: PontoCultural[];
   noticias: NewsItem[];
   onNavigateTab: (tab: string) => void;
   onUpdateNoticias?: (items: NewsItem[]) => void;
@@ -42,8 +39,6 @@ interface ExecutiveSummaryProps {
 
 export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
   emendas,
-  pnabList,
-  pontosCulturais,
   noticias,
   onNavigateTab,
   onUpdateNoticias,
@@ -110,8 +105,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
   const totalEmendasCulturais = emendasCulturais.reduce((acc, curr) => acc + curr.valor, 0);
   const totalEmendasGastas = emendasCulturais.reduce((acc, curr) => acc + (curr.valor_gasto || 0), 0);
 
-  const totalPnabEmCaixa = pnabList.reduce((acc, curr) => acc + curr.valor_exato, 0);
-  const volumeTotalCultura = totalEmendasCulturais + totalPnabEmCaixa;
+  const volumeTotalCultura = totalEmendasCulturais;
 
   // Filtragem e Motor do Feed de Notícias Oficiais
   const noticiasFiltradas = useMemo(() => {
@@ -174,10 +168,10 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
 
       {/* KPI Cards Grid (3 Colunas Equilibradas) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Total Verbas */}
+        {/* Total Emendas Culturais */}
         <div className="bg-[#150b24] rounded-2xl p-5 border border-purple-900/40 shadow-xs hover:border-[#6A0DAD] transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Volume Total Rastreado</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Emendas Culturais</span>
             <div className="w-9 h-9 rounded-xl bg-purple-900/40 text-[#c084fc] flex items-center justify-center border border-purple-700/40">
               <DollarSign className="w-5 h-5" />
             </div>
@@ -187,15 +181,15 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
               {formatBRL(volumeTotalCultura)}
             </div>
             <p className="text-xs text-slate-400 mt-1">
-              Soma de recursos PNAB e Emendas Culturais em Viamão
+              Total consolidado em emendas parlamentares para Viamão
             </p>
           </div>
         </div>
 
-        {/* Emendas Culturais */}
+        {/* Status das Emendas */}
         <div className="bg-[#150b24] rounded-2xl p-5 border border-purple-900/40 shadow-xs hover:border-[#FF4500] transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Emendas para Cultura</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Execução das Emendas</span>
             <div className="w-9 h-9 rounded-xl bg-orange-950/50 text-[#FF4500] flex items-center justify-center border border-orange-800/40">
               <FileText className="w-5 h-5" />
             </div>
@@ -210,20 +204,24 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
           </div>
         </div>
 
-        {/* Espaços Culturais */}
-        <div className="bg-[#150b24] rounded-2xl p-5 border border-purple-900/40 shadow-xs hover:border-[#6A0DAD] transition-colors">
+        {/* PNAB Painel Oficial */}
+        <div 
+          onClick={() => onNavigateTab('pnab')}
+          className="bg-[#150b24] rounded-2xl p-5 border border-purple-900/40 shadow-xs hover:border-purple-500 transition-all cursor-pointer group"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Espaços Mapeados</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-900/40 text-[#c084fc] flex items-center justify-center border border-purple-700/40">
-              <MapPin className="w-5 h-5" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-purple-300/70">Painel Oficial PNAB</span>
+            <div className="w-9 h-9 rounded-xl bg-purple-900/40 text-[#c084fc] flex items-center justify-center border border-purple-700/40 group-hover:bg-purple-800/50 transition-colors">
+              <Award className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-bold text-white font-['Outfit']">
-              {pontosCulturais.length} Entidades
+            <div className="text-2xl font-bold text-white font-['Outfit'] flex items-center gap-2">
+              <span>Painel MinC</span>
+              <ArrowRight className="w-4 h-4 text-[#FF4500] group-hover:translate-x-1 transition-transform" />
             </div>
             <p className="text-xs text-slate-400 mt-1">
-              Pontos e espaços culturais validados em Viamão
+              Consulta interativa via Power BI oficial do Ministério da Cultura
             </p>
           </div>
         </div>

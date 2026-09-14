@@ -4,11 +4,11 @@
  * Módulo: src/services/apiClient.ts
  * =============================================================================
  * Fornece consumo resiliente dos endpoints Python em /api (Vercel Serverless)
- * com fallback inteligente para dados estáticos consolidados e métricas de latência.
+ * com fallback inteligente para dados auditados consolidados e métricas de latência.
  */
 
-import { PnabRecord, NewsItem, LeiIncentivo, FacEdital } from '../types/culture';
-import { INITIAL_PNAB, INITIAL_NEWS, INITIAL_LEIS_INCENTIVO, INITIAL_FAC_EDITAIS } from '../data/initialData';
+import { NewsItem, LpgPlanoAcao, Emenda } from '../types/culture';
+import { INITIAL_NEWS, INITIAL_LPG_DATA, INITIAL_EMENDAS } from '../data/initialData';
 import { sanitizeUrl, sanitizeInputText } from '../utils/security';
 
 export interface ApiStatusReport {
@@ -22,8 +22,9 @@ export interface ApiStatusReport {
 
 export interface SyncResult {
   timestamp: string;
-  pnabStatus: ApiStatusReport;
+  lpgStatus?: ApiStatusReport;
   newsStatus?: ApiStatusReport;
+  emendasStatus?: ApiStatusReport;
   success: boolean;
   message: string;
 }
@@ -63,11 +64,11 @@ class CulturalApiClient {
   }
 
   /**
-   * Consulta auditoria da PNAB em /api/pnab com fallback seguro e single-flight
+   * Consulta auditoria da Lei Paulo Gustavo em /api/lpg via Transferegov Fundo a Fundo
    */
-  public async fetchPnab(): Promise<{ data: PnabRecord[]; report: ApiStatusReport }> {
-    const cacheKey = 'pnab_all';
-    const cached = this.getCached<{ data: PnabRecord[]; report: ApiStatusReport }>(cacheKey);
+  public async fetchLpg(): Promise<{ data: LpgPlanoAcao; report: ApiStatusReport }> {
+    const cacheKey = 'lpg_viamao';
+    const cached = this.getCached<{ data: LpgPlanoAcao; report: ApiStatusReport }>(cacheKey);
     if (cached) {
       return {
         ...cached,
@@ -85,7 +86,7 @@ class CulturalApiClient {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-        const response = await fetch('/api/pnab', {
+        const response = await fetch('/api/lpg?cnpj=88000914000101', {
           headers: { Accept: 'application/json' },
           signal: controller.signal
         });
@@ -95,34 +96,44 @@ class CulturalApiClient {
 
         if (response.ok) {
           const json = await response.json();
-          if (json.success && json.data) {
-            const remoteRecord: PnabRecord = {
-              id: sanitizeInputText(json.data.id || 'pnab-01', 50),
-              termo_numero: sanitizeInputText(json.data.termo_numero || 'Termo de Adesão PNAB 2024/2025', 100),
-              rubrica: sanitizeInputText(json.data.rubrica || 'Política Nacional Aldir Blanc (Lei 14.399/2022) - Fundo a Fundo', 200),
-              valor_exato: typeof json.data.valor_global === 'number' ? json.data.valor_global : 1991873.34,
-              data_extrato: sanitizeInputText(json.data.data_extrato || '09/09/2026', 30),
-              banco_custodia: sanitizeInputText(json.data.banco_custodia || 'Banco do Brasil - Conta Fiduciária Vinculada', 100),
-              conta_vinculada: sanitizeInputText(json.data.conta_vinculada || 'Conta Corrente Fundo Municipal de Cultura de Viamão', 100),
-              cnpj_destinatario: sanitizeInputText(json.data.cnpj_proponente || '88.000.914/0001-01 (Prefeitura Municipal de Viamão)', 100),
-              origem_detalhada: sanitizeInputText(json.data.origem_detalhada || 'Ministério da Cultura (MinC) via Plataforma Transferegov', 150),
-              contexto_legal: sanitizeInputText(json.data.contexto_legal || 'Lei Federal nº 14.399/2022 regulamentada pelo Decreto Federal nº 11.740/2023', 200),
-              fonte_link: sanitizeUrl(json.data.fonte_link || 'https://www.transferegov.sistema.gov.br'),
-              status_etapa: sanitizeInputText(json.data.status_etapa || 'Em Execução / Lançamento de Editais', 80),
-              sincronizacao_pendente: Boolean(json.data.sincronizacao_pendente),
-              base_legal: json.data.base_legal ? sanitizeInputText(json.data.base_legal, 100) : undefined,
-              fonte_auditada: json.data.fonte_auditada ? sanitizeInputText(json.data.fonte_auditada, 100) : undefined,
+          if (json.success && json.plano_acao) {
+            const p = json.plano_acao;
+            const lpgData: LpgPlanoAcao = {
+              id_plano_acao: p.id_plano_acao || 10014,
+              codigo_plano_acao: sanitizeInputText(p.codigo_plano_acao || '30882120230006-010014', 50),
+              situacao: sanitizeInputText(p.situacao || 'AUTORIZADO', 40),
+              valor_total_repasse: typeof p.valor_total_repasse === 'number' ? p.valor_total_repasse : 2046951.79,
+              data_inicio_vigencia: sanitizeInputText(p.data_inicio_vigencia || '2023-06-12', 30),
+              data_fim_vigencia: sanitizeInputText(p.data_fim_vigencia || '2024-12-31', 30),
+              diagnostico: sanitizeInputText(p.diagnostico || '', 500),
+              objetivos: sanitizeInputText(p.objetivos || '', 500),
+              ente_recebedor: {
+                cnpj: '88.000.914/0001-01',
+                nome: sanitizeInputText(p.ente_recebedor?.nome || 'MUNICIPIO DE VIAMAO', 100),
+                uf: sanitizeInputText(p.ente_recebedor?.uf || 'RS', 10),
+                municipio: sanitizeInputText(p.ente_recebedor?.municipio || 'VIAMÃO', 50),
+                fundo_orgao: sanitizeInputText(p.ente_recebedor?.fundo_orgao || 'Secretaria Municipal da Cultura', 100),
+              },
+              orgao_repassador: {
+                sigla: sanitizeInputText(p.orgao_repassador?.sigla || 'MinC', 20),
+                nome: sanitizeInputText(p.orgao_repassador?.nome || 'Ministério da Cultura', 100),
+                fundo: sanitizeInputText(p.orgao_repassador?.fundo || 'FUNDO NACIONAL DA CULTURA', 100),
+              },
+              metas: Array.isArray(p.metas) && p.metas.length > 0 ? p.metas : INITIAL_LPG_DATA.metas,
+              dados_bancarios: Array.isArray(p.dados_bancarios) && p.dados_bancarios.length > 0 ? p.dados_bancarios : INITIAL_LPG_DATA.dados_bancarios,
+              base_legal: sanitizeInputText(p.base_legal || 'Lei Complementar nº 195/2022', 100),
+              fonte_oficial: sanitizeInputText(p.fonte_oficial || 'Plataforma Transferegov.br / Fundo a Fundo / MinC', 150),
             };
 
             const result = {
-              data: [remoteRecord],
+              data: lpgData,
               report: {
-                endpoint: '/api/pnab',
+                endpoint: '/api/lpg',
                 status: 'online' as const,
                 latencyMs,
                 lastChecked: new Date().toLocaleTimeString('pt-BR'),
-                rateLimitInfo: json.rate_limit_info || 'Alta Concorrência Otimizada (1000+ req/s)',
-                totalRecords: 1,
+                rateLimitInfo: 'Transferegov Fundo a Fundo (60 req/min)',
+                totalRecords: lpgData.metas.length,
               },
             };
             this.setCached(cacheKey, result);
@@ -130,19 +141,19 @@ class CulturalApiClient {
           }
         }
       } catch (_) {
-        // Fallback resiliente para dados auditados
+        // Fallback para base auditada
       }
 
       const latencyMs = Math.round(performance.now() - startTime);
       const result = {
-        data: INITIAL_PNAB,
+        data: INITIAL_LPG_DATA,
         report: {
-          endpoint: '/api/pnab',
+          endpoint: '/api/lpg',
           status: 'cached' as const,
           latencyMs: Math.max(latencyMs, 5),
           lastChecked: new Date().toLocaleTimeString('pt-BR'),
-          rateLimitInfo: 'Buffer Local Concorrente',
-          totalRecords: INITIAL_PNAB.length,
+          rateLimitInfo: 'Buffer Oficial Transferegov Fundo a Fundo',
+          totalRecords: INITIAL_LPG_DATA.metas.length,
         },
       };
       this.setCached(cacheKey, result);
@@ -206,11 +217,10 @@ class CulturalApiClient {
               resumo: sanitizeInputText(n.resumo || '', 600),
               data: sanitizeInputText(n.data || '', 40),
               fonte: sanitizeInputText(n.fonte || '', 100),
-              categoria_filtro: n.categoria_filtro === 'viamao' || n.categoria_filtro === 'pnab' || n.categoria_filtro === 'estadual' ? n.categoria_filtro : 'viamao',
-              tipo: n.tipo === 'pnab' || n.tipo === 'municipal' || n.tipo === 'estadual' || n.tipo === 'edital' ? n.tipo : 'municipal',
+              categoria_filtro: n.categoria_filtro === 'viamao' || n.categoria_filtro === 'pnab' || n.categoria_filtro === 'sedac-rs' || n.categoria_filtro === 'editais' ? n.categoria_filtro : 'viamao',
+              origem: sanitizeInputText(n.origem || 'Municipal (Viamão)', 60),
               etiqueta: sanitizeInputText(n.etiqueta || '', 60),
               link: sanitizeUrl(n.link),
-              destaque: Boolean(n.destaque),
             }));
             let filtradas = sanitizedNoticias;
             if (filtro && filtro !== 'todas') {
@@ -274,86 +284,30 @@ class CulturalApiClient {
   }
 
   /**
-   * Consulta projetos da Lei Rouanet em /api/rouanet com protocolo anti-alucinação
+   * Consulta emendas parlamentares em /api/emendas via CGU e Portal RS (CAGE)
    */
-  public async fetchRouanet(): Promise<{ data: LeiIncentivo[]; report: ApiStatusReport }> {
-    const cacheKey = 'rouanet_all';
-    const cached = this.getCached<{ data: LeiIncentivo[]; report: ApiStatusReport }>(cacheKey);
-    if (cached) return cached;
+  public async fetchEmendas(options?: {
+    esfera?: 'all' | 'federal' | 'estadual';
+    anos?: string;
+    apenasCultura?: boolean;
+  }): Promise<{
+    data: Emenda[];
+    report: ApiStatusReport;
+    statusFontes?: Record<string, any>;
+    isFallback: boolean;
+  }> {
+    const esfera = options?.esfera || 'all';
+    const anos = options?.anos || '2024,2025,2026';
+    const apenasCultura = options?.apenasCultura ?? false;
+    const cacheKey = `emendas_${esfera}_${anos}_${apenasCultura}`;
 
-    if (this.inFlightRequests.has(cacheKey)) {
-      return this.inFlightRequests.get(cacheKey);
-    }
-
-    const promise = (async () => {
-      const startTime = performance.now();
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000);
-        const response = await fetch('/api/rouanet?municipio=Viamao&uf=RS', {
-          method: 'GET',
-          headers: { Accept: 'application/json' },
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-
-        const latencyMs = Math.round(performance.now() - startTime);
-        if (response.ok) {
-          const payload = await response.json();
-          const projetos = Array.isArray(payload.projetos) ? payload.projetos : [];
-          // Preserve LPG projects from initial data and merge any Rouanet projects found
-          const lpgProjects = INITIAL_LEIS_INCENTIVO.filter(p => !p.mecanismo.toLowerCase().includes('rouanet'));
-          const merged: LeiIncentivo[] = [...lpgProjects, ...projetos];
-
-          const result = {
-            data: merged,
-            report: {
-              endpoint: '/api/rouanet',
-              status: 'online' as const,
-              latencyMs,
-              lastChecked: new Date().toLocaleTimeString('pt-BR'),
-              rateLimitInfo: 'Versalic / SalicNet MinC',
-              totalRecords: projetos.length
-            }
-          };
-          this.setCached(cacheKey, result);
-          return result;
-        }
-      } catch {
-        // Fallback auditado
-      }
-
-      const latencyMs = Math.round(performance.now() - startTime);
-      const result = {
-        data: INITIAL_LEIS_INCENTIVO,
-        report: {
-          endpoint: '/api/rouanet',
-          status: 'cached' as const,
-          latencyMs: Math.max(latencyMs, 10),
-          lastChecked: new Date().toLocaleTimeString('pt-BR'),
-          rateLimitInfo: 'Base Auditada',
-          totalRecords: INITIAL_LEIS_INCENTIVO.filter(p => p.mecanismo.toLowerCase().includes('rouanet')).length
-        }
+    const cached = this.getCached<any>(cacheKey);
+    if (cached) {
+      return {
+        ...cached,
+        report: { ...cached.report, status: 'cached', latencyMs: 1 }
       };
-      this.setCached(cacheKey, result);
-      return result;
-    })();
-
-    this.inFlightRequests.set(cacheKey, promise);
-    try {
-      return await promise;
-    } finally {
-      this.inFlightRequests.delete(cacheKey);
     }
-  }
-
-  /**
-   * Consulta editais do FAC (SEDAC-RS / Pró-cultura) em /api/fac
-   */
-  public async fetchFac(): Promise<{ data: FacEdital[]; report: ApiStatusReport }> {
-    const cacheKey = 'fac_all';
-    const cached = this.getCached<{ data: FacEdital[]; report: ApiStatusReport }>(cacheKey);
-    if (cached) return cached;
 
     if (this.inFlightRequests.has(cacheKey)) {
       return this.inFlightRequests.get(cacheKey);
@@ -363,8 +317,10 @@ class CulturalApiClient {
       const startTime = performance.now();
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000);
-        const response = await fetch('/api/fac', {
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+        const url = `/api/emendas?esfera=${esfera}&anos=${encodeURIComponent(anos)}&apenas_cultura=${apenasCultura ? 'true' : 'false'}`;
+        const response = await fetch(url, {
           method: 'GET',
           headers: { Accept: 'application/json' },
           signal: controller.signal
@@ -372,39 +328,89 @@ class CulturalApiClient {
         clearTimeout(timeoutId);
 
         const latencyMs = Math.round(performance.now() - startTime);
+
         if (response.ok) {
           const payload = await response.json();
-          if (payload.success && Array.isArray(payload.editais) && payload.editais.length > 0) {
+          if (payload.success && Array.isArray(payload.emendas)) {
+            const sanitizedEmendas: Emenda[] = payload.emendas.map((e: any, idx: number) => {
+              const valorAlocado = typeof e.valor === 'number' ? e.valor : parseFloat(e.valor || 0);
+              const valorPago = typeof e.pago === 'number' ? e.pago : (typeof e.valor_gasto === 'number' ? e.valor_gasto : parseFloat(e.pago || 0));
+              const esferaNormalizada = (e.esfera && e.esfera.includes('Federal')) ? 'Federal (API CGU)' : 'Estadual (ALRS)';
+              
+              return {
+                id: sanitizeInputText(e.id || `emenda-${idx + 1}`, 60),
+                ano: typeof e.ano === 'number' ? e.ano : 2026,
+                parlamentar: sanitizeInputText(e.autor || e.parlamentar || 'Parlamentar', 100),
+                partido: sanitizeInputText(e.partido || 'S/P', 20),
+                partido_sigla: sanitizeInputText(e.partido || e.partido_sigla || 'S/P', 20),
+                esfera: esferaNormalizada,
+                orgao: sanitizeInputText(e.orgao || 'Órgão Público', 120),
+                secretaria: sanitizeInputText(e.orgao || e.secretaria || 'Secretaria de Estado / Ministério', 120),
+                projeto: sanitizeInputText(e.objeto || e.subprojeto || 'Ações Comunitárias', 200),
+                subprojeto: sanitizeInputText(e.subprojeto || e.objeto || 'Ações Comunitárias', 200),
+                valor: valorAlocado,
+                valor_gasto: valorPago,
+                status: (e.status === 'Concluída' || e.status === 'Em Execução / Vigente' || e.status === 'Parceria') ? e.status : 'Em Execução / Vigente',
+                is_cultura: Boolean(e.is_cultura),
+                area_atuacao: sanitizeInputText(e.area_atuacao || (e.is_cultura ? 'Cultura & Turismo' : 'Demais Áreas'), 60),
+                tipo_projeto_cultural: e.tipo_projeto_cultural || (e.is_cultura ? 'Outras Áreas' : undefined),
+                justificativa: sanitizeInputText(e.justificativa || `Emenda parlamentar registrada no ${e.fonte || 'Portal da Transparência'}.`, 300),
+                fonte: sanitizeInputText(e.fonte || 'Portal da Transparência', 100),
+                fontes_cruzadas: Array.isArray(e.fontes_cruzadas) ? e.fontes_cruzadas : [e.fonte || 'Portal da Transparência'],
+                numeroEmenda: sanitizeInputText(e.numero_emenda || e.numeroEmenda || '', 40),
+                beneficiario: sanitizeInputText(e.beneficiario || 'Município de Viamão', 100),
+              };
+            });
+
             const result = {
-              data: payload.editais,
+              data: sanitizedEmendas,
               report: {
-                endpoint: '/api/fac',
+                endpoint: '/api/emendas',
                 status: 'online' as const,
                 latencyMs,
                 lastChecked: new Date().toLocaleTimeString('pt-BR'),
-                rateLimitInfo: 'Pró-cultura RS / SEDAC',
-                totalRecords: payload.editais.length
-              }
+                rateLimitInfo: 'CGU API (120 req/min) & Transparência RS',
+                totalRecords: sanitizedEmendas.length,
+              },
+              statusFontes: payload.status_fontes,
+              isFallback: false
             };
             this.setCached(cacheKey, result);
             return result;
           }
         }
       } catch {
-        // Fallback auditado
+        // Falha de rede; ativa base auditada consolidada como fallback explícito
       }
 
       const latencyMs = Math.round(performance.now() - startTime);
+      let fallbackData = INITIAL_EMENDAS;
+      if (esfera === 'federal') {
+        fallbackData = fallbackData.filter(e => e.esfera.includes('Federal'));
+      } else if (esfera === 'estadual') {
+        fallbackData = fallbackData.filter(e => e.esfera.includes('Estadual'));
+      }
+      if (apenasCultura) {
+        fallbackData = fallbackData.filter(e => e.is_cultura);
+      }
+
       const result = {
-        data: INITIAL_FAC_EDITAIS,
+        data: fallbackData,
         report: {
-          endpoint: '/api/fac',
+          endpoint: '/api/emendas',
           status: 'cached' as const,
-          latencyMs: Math.max(latencyMs, 10),
+          latencyMs: Math.max(latencyMs, 6),
           lastChecked: new Date().toLocaleTimeString('pt-BR'),
-          rateLimitInfo: 'Base Auditada',
-          totalRecords: INITIAL_FAC_EDITAIS.length
-        }
+          rateLimitInfo: 'Base Auditada Consolidada (Fallback)',
+          totalRecords: fallbackData.length,
+        },
+        statusFontes: {
+          fallback: {
+            status: 'fallback_active',
+            mensagem: 'Exibindo acervo consolidado auditado localmente.'
+          }
+        },
+        isFallback: true
       };
       this.setCached(cacheKey, result);
       return result;
@@ -422,9 +428,10 @@ class CulturalApiClient {
    * Executa auditoria e sincronização completa em paralelo
    */
   public async syncAll(): Promise<SyncResult> {
-    const [pnabRes, newsRes] = await Promise.all([
-      this.fetchPnab(),
+    const [lpgRes, newsRes, emendasRes] = await Promise.all([
+      this.fetchLpg(),
       this.fetchNews(),
+      this.fetchEmendas(),
     ]);
 
     const now = new Date();
@@ -435,10 +442,11 @@ class CulturalApiClient {
 
     return {
       timestamp,
-      pnabStatus: pnabRes.report,
+      lpgStatus: lpgRes.report,
       newsStatus: newsRes.report,
+      emendasStatus: emendasRes.report,
       success: true,
-      message: 'Sincronização concluída com êxito! Bases auditadas da PNAB e Notícias Oficiais atualizadas.',
+      message: 'Sincronização concluída com êxito! Bases auditadas da LPG, Notícias Oficiais e Emendas Parlamentares atualizadas.',
     };
   }
 }

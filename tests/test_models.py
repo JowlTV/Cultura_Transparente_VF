@@ -6,10 +6,8 @@ Módulo: tests/test_models.py
 
 import unittest
 from backend.models import (
-    PNABRecord,
-    FACEdital,
     LPGProject,
-    RouanetProject,
+    LPGMeta,
     EmendaRecord,
     validar_cnpj
 )
@@ -26,63 +24,40 @@ class TestModels(unittest.TestCase):
         self.assertFalse(validar_cnpj("12345678901234"))
         self.assertFalse(validar_cnpj(""))
 
-    def test_pnab_record_creation_and_serialization(self):
-        pnab = PNABRecord(
-            id="pnab-01",
-            termo_numero="123456/2024",
-            cnpj_proponente="88.000.914/0001-01",
+    def test_lpg_project_creation(self):
+        lpg = LPGProject(
+            id="lpg-viamao-10014",
+            codigo_plano_acao="30882120230006-010014",
+            objeto="Executar os artigos 6 (Audiovisual) e 8 (Demais Áreas) da LC 195/2022",
+            valor_total_repasse=2046951.79,
+            situacao="AUTORIZADO",
+            data_inicio_vigencia="2023-06-12",
+            data_fim_vigencia="2024-12-31",
             municipio="Viamão",
-            uf="RS",
-            valor_global=1500000.0,
-            data_extrato="10/09/2026",
-            banco_custodia="Banco do Brasil",
-            conta_vinculada="FMC Viamão",
-            objeto="Ações de Fomento PNAB",
-            base_legal="Lei nº 14.399/2022",
-            fonte_auditada="Transferegov.br",
-            status_etapa="Em execução"
+            uf="RS"
         )
-        data = pnab.to_dict()
-        self.assertEqual(data["id"], "pnab-01")
-        self.assertEqual(data["valor_global"], 1500000.0)
-        self.assertEqual(data["municipio"], "Viamão")
+        self.assertEqual(lpg.valor_total_repasse, 2046951.79)
+        self.assertEqual(lpg.situacao, "AUTORIZADO")
+        self.assertEqual(lpg.municipio, "Viamão")
 
-        # Reconstrução a partir de dict
-        reconstruido = PNABRecord.from_dict(data)
-        self.assertEqual(reconstruido.id, pnab.id)
-        self.assertEqual(reconstruido.valor_global, pnab.valor_global)
-
-    def test_rouanet_project_creation(self):
-        proj = RouanetProject(
-            id="rouanet-123456",
-            pronac_numero="123456",
-            nome_projeto="Música na Praça",
-            proponente="Associação Cultural",
-            municipio="Viamão",
-            uf="RS",
-            segmento="Música",
-            valor_aprovado=100000.0,
-            valor_captado=50000.0,
-            percentual_captado=50.0,
-            status="Em Captação"
+    def test_emenda_record_creation(self):
+        emenda = EmendaRecord(
+            id="emenda-1",
+            autor="Deputado Exemplo",
+            partido="ABC",
+            tipo="Individual",
+            ano=2024,
+            orgao="Ministério da Cultura",
+            objeto="Reforma de Espaço Cultural",
+            valor=250000.0,
+            pago=250000.0,
+            status="Liquidado",
+            is_cultura=True,
+            area_atuacao="Cultura & Turismo",
+            municipio="Viamão"
         )
-        self.assertEqual(proj.percentual_captado, 50.0)
-        self.assertEqual(proj.municipio, "Viamão")
-
-    def test_fac_edital_creation(self):
-        edital = FACEdital(
-            id="fac-01",
-            numero_edital="01/2026",
-            titulo="FAC Regional",
-            status="Aberto",
-            valor_total=20000000.0,
-            valor_maximo_projeto=100000.0,
-            segmentos=["Artes Visuais", "Música"],
-            elegibilidade="RS Amplo",
-            link_oficial="https://procultura.rs.gov.br",
-            prazo_inscricao="30/10/2026"
-        )
-        self.assertEqual(edital.valor_maximo_projeto, 100000.0)
+        self.assertTrue(emenda.is_cultura)
+        self.assertEqual(emenda.valor, 250000.0)
 
 
 if __name__ == "__main__":

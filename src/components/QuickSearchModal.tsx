@@ -1,14 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, ArrowRight } from 'lucide-react';
-import { Emenda, PnabRecord, PontoCultural } from '../types/culture';
+import { Emenda } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
 
 interface QuickSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   emendas: Emenda[];
-  pnabList: PnabRecord[];
-  pontos: PontoCultural[];
   onSelectResult: (tab: string) => void;
 }
 
@@ -16,8 +14,6 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
   isOpen,
   onClose,
   emendas,
-  pnabList,
-  pontos,
   onSelectResult,
 }) => {
   const [query, setQuery] = useState('');
@@ -46,49 +42,55 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
         valor: formatBRL(e.valor),
       }));
 
-    const pt = pontos
-      .filter(
-        p =>
-          p.nome.toLowerCase().includes(q) ||
-          p.categoria.toLowerCase().includes(q) ||
-          p.descricao.toLowerCase().includes(q) ||
-          (p.endereco && p.endereco.toLowerCase().includes(q)) ||
-          (p.resumo_geral_cultura && p.resumo_geral_cultura.toLowerCase().includes(q)) ||
-          (p.o_que_costumam_fazer && p.o_que_costumam_fazer.toLowerCase().includes(q)) ||
-          p.informacoes_detalhadas?.atividades_principais?.some(a => a.toLowerCase().includes(q))
-      )
-      .slice(0, 5)
-      .map(p => ({
-        tipo: 'Ponto Cultural',
-        tab: 'acompanhe-cultura',
-        icon: p.categoria.includes('Hip-Hop') ? '🎤' : '📍',
-        titulo: p.nome,
-        subtitulo: `${p.categoria} • Viamão/RS`,
-        valor: 'Viamão/RS',
-      }));
+    const pnabEntry = (
+      'pnab aldir blanc transferegov minc fundo municipal cultura repasse fiduciario painel power bi'.includes(q) ||
+      q.includes('pnab') ||
+      q.includes('aldir')
+    )
+      ? [
+          {
+            tipo: 'Política Nacional Aldir Blanc (PNAB)',
+            tab: 'pnab',
+            icon: '🏛️',
+            titulo: 'Painel Oficial PNAB (Ministério da Cultura)',
+            subtitulo: 'Acompanhamento interativo e indicadores oficiais no Power BI do MinC',
+            valor: 'Painel MinC',
+          },
+        ]
+      : [];
 
-    const pnab = pnabList
-      .filter(
-        p =>
-          p.rubrica.toLowerCase().includes(q) ||
-          p.origem_detalhada.toLowerCase().includes(q) ||
-          p.termo_numero.toLowerCase().includes(q) ||
-          'pnab aldir blanc transferegov minc fundo municipal cultura'.includes(q)
-      )
-      .slice(0, 3)
-      .map(p => ({
-        tipo: 'Política Nacional Aldir Blanc (PNAB)',
-        tab: 'pnab',
-        icon: '💰',
-        titulo: p.rubrica,
-        subtitulo: p.termo_numero && p.termo_numero.trim() !== '' && !p.termo_numero.includes('registrado')
-          ? `Termo nº ${p.termo_numero} • ${p.conta_vinculada}`
-          : `PNAB Viamão/RS • ${p.conta_vinculada}`,
-        valor: p.valor_exato && p.valor_exato > 0 ? formatBRL(p.valor_exato) : 'Conta Fiduciária',
-      }));
+    const fomentoTabs = [
+      {
+        keywords: 'lpg lei paulo gustavo audiovisual plano acao metas repasse',
+        tipo: 'Lei Paulo Gustavo (LPG)',
+        tab: 'lpg',
+        icon: '🎬',
+        titulo: 'Lei Paulo Gustavo (LPG)',
+        subtitulo: 'Auditoria do Plano de Ação nº 30882120230006-010014 e metas em Viamão',
+        valor: 'LC 195/2022',
+      },
+      {
+        keywords: 'api apis rest json serverless dados abertos python vercel endpoint',
+        tipo: 'Dados Abertos & APIs',
+        tab: 'apis',
+        icon: '⚡',
+        titulo: 'Central de APIs & Dados Abertos',
+        subtitulo: 'Catálogo de endpoints públicos e sandbox interativo de testes',
+        valor: 'REST API',
+      },
+      {
+        keywords: 'controle social lai ouvidoria tce tce-rs denúncia fiscalização ministério público transparência',
+        tipo: 'Cidadania & Fiscalização',
+        tab: 'controle-social',
+        icon: '🛡️',
+        titulo: 'Controle Social & LAI',
+        subtitulo: 'Canais de ouvidoria oficiais (TCE-RS, Câmaras, Ministério Público e LAI)',
+        valor: 'Cidadania',
+      },
+    ].filter(item => item.keywords.includes(q));
 
     const aiAssistant = (
-      'auxilio fazedor cultura projeto edital consultor ia inteligência artificial elaborar proposta pdf rouanet fac lpg pnab'
+      'auxilio fazedor cultura projeto edital consultor ia inteligência artificial elaborar proposta pdf lpg pnab'
     ).includes(q)
       ? [
           {
@@ -96,14 +98,14 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
             tab: 'auxilio-fazedor',
             icon: '✨',
             titulo: 'Auxílio ao Fazedor de Cultura (Consultor IA)',
-            subtitulo: 'Estruturação de propostas para PNAB, FAC-RS, Rouanet e exportação em PDF',
+            subtitulo: 'Estruturação de propostas técnicas e exportação em PDF',
             valor: 'Consultor IA',
           },
         ]
       : [];
 
-    return [...aiAssistant, ...em, ...pnab, ...pt];
-  }, [query, emendas, pnabList, pontos]);
+    return [...aiAssistant, ...em, ...pnabEntry, ...fomentoTabs];
+  }, [query, emendas]);
 
   if (!isOpen) return null;
 

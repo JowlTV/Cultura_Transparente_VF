@@ -14,8 +14,9 @@ class handler(BaseHTTPRequestHandler):
             "versao": "2.5.0",
             "timestamp": datetime.now().isoformat(),
             "rotas_disponiveis": {
-                "/api/pnab": "Auditoria de repasses federais da PNAB (MinC / Transferegov)",
-                "/api/news": "Pesquisa de notícias e editais de Viamão via Google News com filtro anti-fake-news"
+                "/api/lpg": "Auditoria de repasses e metas da Lei Paulo Gustavo (MinC / Transferegov Fundo a Fundo)",
+                "/api/news": "Pesquisa de notícias e editais de Viamão via Google News com filtro anti-fake-news",
+                "/api/emendas": "Coleta e auditoria de emendas parlamentares federais (CGU) e estaduais (Portal RS / CAGE)"
             },
             "politica_cache": "Vercel Edge Caching (s-maxage=3600 até 14400s)",
             "timeout_garantido": "Sub-10s (Hobby Free Tier Vercel)"

@@ -19,33 +19,9 @@ import {
   ChevronUp,
   Sparkles,
 } from 'lucide-react';
-import { PnabRecord } from '../types/culture';
-import { InstitutionalValidationBadge } from './InstitutionalValidationBadge';
-import { OFFICIAL_VIAMAO_CNPJ } from '../utils/institutionalValidation';
 
-interface PnabAuditoriaSectionProps {
-  pnabList: PnabRecord[];
-}
-
-export const PnabAuditoriaSection: React.FC<PnabAuditoriaSectionProps> = ({ pnabList }) => {
+export const PnabAuditoriaSection: React.FC = () => {
   const [mostrarGuiaDetalhado, setMostrarGuiaDetalhado] = useState<boolean>(false);
-  const pnabPrincipal = pnabList[0] || {
-    id: 'pnab-01',
-    rubrica: 'Política Nacional Aldir Blanc (PNAB) - Recursos Descentralizados da União',
-    valor_exato: 0,
-    data_extrato: '09/09/2026',
-    banco_custodia: 'Conta Corrente Fiduciária Vinculada (Transferegov.br)',
-    conta_vinculada: 'Fundo Municipal de Cultura de Viamão',
-    cnpj_destinatario: OFFICIAL_VIAMAO_CNPJ,
-    origem_detalhada: 'Fundo Nacional de Cultura / Transferegov.br (Política Nacional Aldir Blanc - Lei nº 14.399/2022)',
-    contexto_legal: 'Recursos descentralizados da União sob custódia fiduciária pública do Fundo Municipal de Cultura para cumprimento das fases formais de lançamento de editais municipais. Regulados pela Lei nº 14.399/2022 e Decreto nº 11.740/2023.',
-    fonte_link: 'https://portal.transferegov.sistema.gov.br/',
-    termo_numero: 'Termo de Adesão oficial registrado no Transferegov',
-    status_etapa: 'Fase de Elaboração e Publicação de Editais',
-    sincronizacao_pendente: false,
-    base_legal: 'Lei Federal nº 14.399/2022, Decreto Federal nº 11.740/2023 e Portarias MinC nº 80/2023 e nº 84/2023',
-    fonte_auditada: 'Plataforma Transferegov.br / Ministério da Cultura (MinC)',
-  };
 
   const etapasTramitacao = [
     {

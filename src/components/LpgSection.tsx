@@ -3,42 +3,36 @@ import {
   Film,
   ExternalLink,
   CheckCircle2,
-  DollarSign,
   FileText,
-  Clock,
   Layers,
   Sparkles,
-  HelpCircle,
-  AlertTriangle,
-  Building,
   ShieldCheck,
-  RefreshCw
+  RefreshCw,
+  Building,
+  CreditCard,
+  Target,
+  ArrowUpRight,
+  Info
 } from 'lucide-react';
-import { LeiIncentivo } from '../types/culture';
+import { LpgPlanoAcao } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
 
 interface LpgSectionProps {
-  leisIncentivo: LeiIncentivo[];
+  lpgData: LpgPlanoAcao;
   isLoading?: boolean;
 }
 
-export const LpgSection: React.FC<LpgSectionProps> = ({ leisIncentivo, isLoading }) => {
-  const [filtroArtigo, setFiltroArtigo] = useState<string>('todos');
+export const LpgSection: React.FC<LpgSectionProps> = ({ lpgData, isLoading }) => {
+  const [filtroMeta, setFiltroMeta] = useState<string>('todas');
 
-  // Filtrar apenas projetos da Lei Paulo Gustavo (LC 195/2022)
-  const lpgProjetos = leisIncentivo.filter(item =>
-    item.mecanismo.toLowerCase().includes('paulo gustavo') || item.mecanismo.toLowerCase().includes('lpg')
-  );
-
-  const projetosFiltrados = lpgProjetos.filter(item => {
-    if (filtroArtigo === 'todos') return true;
-    if (filtroArtigo === 'audiovisual') return item.projeto_objeto.toLowerCase().includes('audiovisual') || item.projeto_objeto.toLowerCase().includes('documentário') || item.projeto_objeto.toLowerCase().includes('cinema');
-    if (filtroArtigo === 'multilinguagens') return !item.projeto_objeto.toLowerCase().includes('audiovisual') && !item.projeto_objeto.toLowerCase().includes('cinema');
+  const metasFiltradas = lpgData.metas.filter(m => {
+    if (filtroMeta === 'todas') return true;
+    if (filtroMeta === 'audiovisual') return m.nome_meta_plano_acao.includes('Art. 6º') || m.descricao_meta_plano_acao.toLowerCase().includes('audiovisual') || m.descricao_meta_plano_acao.toLowerCase().includes('cinema');
+    if (filtroMeta === 'demais') return m.nome_meta_plano_acao.includes('Art. 8º') || m.descricao_meta_plano_acao.toLowerCase().includes('demais');
     return true;
   });
 
-  const totalAprovado = lpgProjetos.reduce((acc, curr) => acc + curr.valor_aprovado, 0);
-  const totalRepassado = lpgProjetos.reduce((acc, curr) => acc + (curr.valor_captado || curr.valor_aprovado), 0);
+  const totalMetas = lpgData.metas.reduce((acc, curr) => acc + curr.valor_meta_plano_acao, 0);
 
   return (
     <div className="space-y-6">
@@ -49,91 +43,104 @@ export const LpgSection: React.FC<LpgSectionProps> = ({ leisIncentivo, isLoading
           <div className="max-w-2xl space-y-2">
             <div className="inline-flex items-center gap-2 bg-purple-800/80 border border-purple-400/40 px-3 py-1 rounded-full text-xs font-semibold text-purple-200">
               <Film className="w-3.5 h-3.5 text-purple-300" />
-              Lei Complementar nº 195/2022 (LPG)
+              {lpgData.base_legal}
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold font-['Outfit'] tracking-tight">
-              Lei Paulo Gustavo em Viamão
+              Lei Paulo Gustavo em Viamão/RS
             </h2>
             <p className="text-xs sm:text-sm text-purple-100/90 leading-relaxed">
-              Mapeamento técnico da execução emergencial e continuada dos recursos da <strong>LC nº 195/2022</strong>. O município de Viamão operou repasses diretos divididos entre o <strong>Audiovisual (Art. 6º)</strong> e <strong>Demais Áreas Culturais (Art. 8º)</strong>.
+              Auditoria do <strong>Plano de Ação nº {lpgData.codigo_plano_acao}</strong> homologado no Ministério da Cultura. Os recursos foram transferidos na modalidade fundo a fundo para a Secretaria Municipal da Cultura de Viamão para fomento ao audiovisual (Art. 6º) e às demais linguagens culturais (Art. 8º).
             </p>
           </div>
 
-          <div className="flex gap-3">
-            <div className="bg-white/10 backdrop-blur-xs border border-white/20 p-4 rounded-xl text-center shrink-0">
+          <div className="flex flex-wrap sm:flex-nowrap gap-3">
+            <div className="bg-white/10 backdrop-blur-xs border border-white/20 p-4 rounded-xl text-center shrink-0 min-w-[150px]">
               <span className="text-[11px] uppercase tracking-wider text-purple-200 font-semibold block">
-                Total Homologado
+                Valor Total Repassado
               </span>
               <span className="text-xl sm:text-2xl font-black text-white font-['Outfit'] block mt-1">
-                {formatBRL(totalAprovado)}
+                {formatBRL(lpgData.valor_total_repasse)}
+              </span>
+              <span className="text-[10px] text-emerald-300 font-semibold mt-0.5 block">
+                Situação: {lpgData.situacao}
               </span>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-xs border border-white/20 p-4 rounded-xl text-center shrink-0">
-              <span className="text-[11px] uppercase tracking-wider text-emerald-200 font-semibold block">
-                Total Liquidado
+            <div className="bg-white/10 backdrop-blur-xs border border-white/20 p-4 rounded-xl text-center shrink-0 min-w-[150px]">
+              <span className="text-[11px] uppercase tracking-wider text-purple-200 font-semibold block">
+                Vigência do Plano
               </span>
-              <span className="text-xl sm:text-2xl font-black text-emerald-300 font-['Outfit'] block mt-1">
-                {formatBRL(totalRepassado)}
+              <span className="text-sm font-bold text-white font-['Outfit'] block mt-2">
+                {lpgData.data_inicio_vigencia} a {lpgData.data_fim_vigencia}
+              </span>
+              <span className="text-[10px] text-purple-200 mt-1 block">
+                {lpgData.metas.length} Metas Aprovadas
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Orientações Práticas para Fazedores de Cultura (LPG) */}
+      {/* Dados Institucionais & Contas Fiduciárias */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
           <div className="space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-sm">
-              1
+            <div className="flex items-center gap-2 text-purple-900 font-bold text-sm">
+              <Building className="w-4 h-4 text-purple-700" />
+              <span>Ente e Fundo Recebedor</span>
             </div>
-            <h4 className="font-bold text-slate-900 text-sm font-['Outfit']">
-              Prestação de Contas Simplificada
-            </h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Conforme o Decreto Federal nº 11.525/2023, a comprovação é prioritariamente focada no <strong>cumprimento do objeto</strong> (fotos, relatórios de atividades, listas de presença e clipping), exigindo relatório financeiro apenas em caso de indício de irregularidade.
-            </p>
+            <div className="space-y-1 text-xs text-slate-700 pt-1">
+              <p><strong>Ente:</strong> {lpgData.ente_recebedor.nome} ({lpgData.ente_recebedor.municipio}/{lpgData.ente_recebedor.uf})</p>
+              <p><strong>CNPJ:</strong> {lpgData.ente_recebedor.cnpj}</p>
+              <p><strong>Órgão Gestor:</strong> {lpgData.ente_recebedor.fundo_orgao}</p>
+              <p><strong>Repassador:</strong> {lpgData.orgao_repassador.nome} ({lpgData.orgao_repassador.fundo})</p>
+            </div>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-semibold text-purple-700">
             <ShieldCheck className="w-3.5 h-3.5" />
-            Relatório de Execução do Objeto
+            Transferegov Fundo a Fundo
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
           <div className="space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-100 text-[#1e40af] flex items-center justify-center font-bold text-sm">
-              2
+            <div className="flex items-center gap-2 text-purple-900 font-bold text-sm">
+              <CreditCard className="w-4 h-4 text-purple-700" />
+              <span>Contas Fiduciárias Vinculadas</span>
             </div>
-            <h4 className="font-bold text-slate-900 text-sm font-['Outfit']">
-              Contrapartida Social Obrigatória
-            </h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Todos os contemplados devem realizar exibição pública gratuita de produções, oficinas com a rede pública escolar de Viamão ou ações afirmativas para públicos em vulnerabilidade social.
-            </p>
+            <div className="space-y-2 text-xs text-slate-700 pt-1">
+              {lpgData.dados_bancarios.map((cb, idx) => (
+                <div key={idx} className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                  <div className="font-semibold text-slate-900 flex justify-between">
+                    <span>{cb.nome_programa_agil_conta_plano_acao_dado_bancario || `Conta ${idx+1}`}</span>
+                    <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">Ativa</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-0.5">
+                    {cb.nome_banco_plano_acao_dado_bancario} | Ag: {cb.numero_agencia_plano_acao_dado_bancario}-{cb.dv_agencia_plano_acao_dado_bancario || '9'} | C/C: {cb.numero_conta_plano_acao_dado_bancario}-{cb.dv_conta_plano_acao_dado_bancario || 'X'}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-semibold text-[#1e40af]">
-            <Sparkles className="w-3.5 h-3.5" />
-            Acesso 100% Gratuito
+          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-semibold text-blue-700">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Movimentação Rastreável Fiduciária
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
           <div className="space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm">
-              3
+            <div className="flex items-center gap-2 text-purple-900 font-bold text-sm">
+              <ShieldCheck className="w-4 h-4 text-purple-700" />
+              <span>Regras de Prestação de Contas</span>
             </div>
-            <h4 className="font-bold text-slate-900 text-sm font-['Outfit']">
-              Acompanhamento no Transferegov
-            </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              O município de Viamão opera a prestação de contas dos saldos da conta bancária específica no portal Transferegov, sob fiscalização do Ministério da Cultura e do controle social municipal.
+              Em conformidade com o Decreto Federal nº 11.525/2023, o monitoramento avalia o <strong>cumprimento do objeto</strong> e contrapartidas sociais gratuitas à comunidade escolar e bairros periféricos de Viamão.
             </p>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-semibold text-amber-700">
-            <Layers className="w-3.5 h-3.5" />
-            Conta Fiduciária Caixa
+            <Sparkles className="w-3.5 h-3.5" />
+            Acesso e Contrapartida 100% Gratuitos
           </div>
         </div>
       </div>
@@ -141,18 +148,18 @@ export const LpgSection: React.FC<LpgSectionProps> = ({ leisIncentivo, isLoading
       {/* Filter Tabs */}
       <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-700">Segmentação LPG:</span>
+          <span className="text-xs font-semibold text-slate-700">Filtrar Metas:</span>
           <div className="flex items-center gap-1.5">
             {[
-              { id: 'todos', label: 'Todos os Projetos LPG' },
-              { id: 'audiovisual', label: 'Artigo 6º (Audiovisual & Salas)' },
-              { id: 'multilinguagens', label: 'Artigo 8º (Demais Linguagens)' },
+              { id: 'todas', label: 'Todas as Metas (4)' },
+              { id: 'audiovisual', label: 'Artigo 6º (Audiovisual)' },
+              { id: 'demais', label: 'Artigo 8º (Demais Linguagens)' },
             ].map(m => (
               <button
                 key={m.id}
-                onClick={() => setFiltroArtigo(m.id)}
+                onClick={() => setFiltroMeta(m.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  filtroArtigo === m.id
+                  filtroMeta === m.id
                     ? 'bg-purple-900 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
@@ -164,99 +171,82 @@ export const LpgSection: React.FC<LpgSectionProps> = ({ leisIncentivo, isLoading
         </div>
 
         <span className="text-xs text-slate-500">
-          Exibindo <strong>{projetosFiltrados.length}</strong> projetos homologados
+          Total Alocado nas Metas: <strong>{formatBRL(totalMetas)}</strong>
         </span>
       </div>
 
-      {/* Projects List */}
+      {/* Metas List */}
       <div className="space-y-4">
         {isLoading && (
           <div className="bg-white rounded-2xl border border-purple-200 p-8 text-center space-y-3">
             <RefreshCw className="w-8 h-8 text-purple-600 animate-spin mx-auto" />
-            <p className="text-xs text-slate-600 font-semibold">Carregando dados da Lei Paulo Gustavo...</p>
+            <p className="text-xs text-slate-600 font-semibold">Atualizando dados da Lei Paulo Gustavo via Transferegov...</p>
           </div>
         )}
 
-        {!isLoading && projetosFiltrados.length === 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center space-y-4">
-            <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto">
-              <Film className="w-8 h-8 text-purple-400" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-lg font-bold text-slate-900 font-['Outfit']">Nenhum projeto encontrado</h3>
-              <p className="text-sm text-slate-500 max-w-md mx-auto">
-                Não foram encontrados projetos da Lei Paulo Gustavo para os critérios selecionados. Conforme a diretriz anti-alucinação, nenhum dado fictício é exibido.
-              </p>
-            </div>
-          </div>
-        )}
-        {projetosFiltrados.map(item => (
+        {metasFiltradas.map((meta, idx) => (
           <div
-            key={item.id}
+            key={meta.id_meta_plano_acao || idx}
             className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs hover:shadow-md transition-shadow space-y-4"
           >
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-slate-100">
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
-                    {item.mecanismo}
+                    {meta.numero_meta_plano_acao} • {meta.nome_meta_plano_acao}
                   </span>
                   <span className="text-xs text-slate-400">•</span>
-                  <span className="text-xs font-semibold text-slate-600">{item.periodo_execucao || '2023 - 2026'}</span>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    {item.status_atual || item.status || 'Executado'}
+                    Autorizado
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    Plano nº {lpgData.codigo_plano_acao}
                   </span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 font-['Outfit'] pt-1">
-                  {item.projeto_objeto}
+                  {meta.descricao_meta_plano_acao}
                 </h3>
               </div>
 
               <div className="text-left md:text-right shrink-0">
-                <span className="text-xs text-slate-500 font-medium block">Valor Homologado:</span>
-                <span className="text-xl sm:text-2xl font-black text-slate-900 font-['Outfit'] block">
-                  {formatBRL(item.valor_aprovado)}
+                <span className="text-xs text-slate-500 font-medium block">Valor Homologado na Meta:</span>
+                <span className="text-xl sm:text-2xl font-black text-slate-900 font-['Outfit'] block text-purple-950">
+                  {formatBRL(meta.valor_meta_plano_acao)}
                 </span>
                 <span className="text-xs text-emerald-700 font-semibold block">
-                  {formatBRL(item.valor_captado || item.valor_aprovado)} liquidado
+                  {((meta.valor_meta_plano_acao / lpgData.valor_total_repasse) * 100).toFixed(1)}% do total do município
                 </span>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {item.como_sera_feito || item.detalhes}
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2 text-xs text-slate-600">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600">
               <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                <span className="text-[10px] text-slate-500 uppercase font-bold block">Proponente / Beneficiário</span>
-                <span className="font-semibold text-slate-800">{item.responsavel_execucao || item.proponente}</span>
+                <span className="text-[10px] text-slate-500 uppercase font-bold block">Artigo Normativo</span>
+                <span className="font-semibold text-slate-800">{meta.nome_meta_plano_acao} (LC 195/2022)</span>
               </div>
 
               <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                <span className="text-[10px] text-slate-500 uppercase font-bold block">Órgão Gestor Municipal</span>
-                <span className="font-semibold text-slate-800">{item.orgao_liberador || 'SMC / Prefeitura de Viamão'}</span>
+                <span className="text-[10px] text-slate-500 uppercase font-bold block">Destinação dos Recursos</span>
+                <span className="font-semibold text-slate-800">Editais e Prêmios em Viamão</span>
               </div>
 
               <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                <span className="text-[10px] text-slate-500 uppercase font-bold block">Fonte Normativa</span>
-                <span className="font-semibold text-slate-800">LC nº 195/2022 & Decreto 11.525</span>
+                <span className="text-[10px] text-slate-500 uppercase font-bold block">Comprovação Exigida</span>
+                <span className="font-semibold text-slate-800">Relatório de Execução do Objeto</span>
               </div>
             </div>
 
-            {(item.fonte_oficial || item.link_oficial) && (
-              <div className="pt-2 flex justify-end">
-                <a
-                  href={item.fonte_oficial || item.link_oficial}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-purple-100 text-purple-900 text-xs font-semibold rounded-lg transition-colors border border-slate-200"
-                >
-                  <span>Ver termo oficial de homologação</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            )}
+            <div className="pt-2 flex justify-end">
+              <a
+                href="https://api.transferegov.gestao.gov.br/fundoafundo/plano_acao?id_programa=eq.47&cnpj_ente_recebedor_plano_acao=eq.88000914000101"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-purple-100 text-purple-900 text-xs font-semibold rounded-lg transition-colors border border-slate-200"
+              >
+                <span>Consultar registro no Transferegov Fundo a Fundo</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
           </div>
         ))}
       </div>

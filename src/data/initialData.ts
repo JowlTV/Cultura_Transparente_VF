@@ -1,6 +1,5 @@
-import { Emenda, PnabRecord, PontoCultural, NewsItem, SharedCommunityLink, LeiIncentivo, FacEdital, ApiEndpointDoc } from '../types/culture';
+import { Emenda, NewsItem, LpgPlanoAcao, ApiEndpointDoc } from '../types/culture';
 import { classificarSetorEmenda } from '../utils/formatters';
-import pnabAuditJson from './pnab_scraped_audit.json';
 
 const rawEmendas = [
   {
@@ -168,59 +167,29 @@ const rawEmendas = [
     processo_administrativo: 'PROA nº 26/1100-0005992-3',
   },
   {
-    id: 'em-fed-2026-01',
+    id: 'em-fed-2026-02',
     ano: 2026,
-    parlamentar: 'Bancada Gaúcha Federal (Indicação Conjunta)',
-    partido: 'Bancada Federal/RS',
-    partido_sigla: 'BANCADA RS',
-    foto_parlamentar: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=400&q=80',
+    parlamentar: 'Deputada Denise Pessôa (PT/RS)',
+    partido: 'PT/RS',
+    partido_sigla: 'PT',
+    foto_parlamentar: 'https://www.camara.leg.br/internet/deputado/bandep/220559.jpg',
     esfera: 'Federal (API CGU)' as const,
     orgao: 'Ministério da Cultura (MinC)',
     secretaria: 'Ministério da Cultura (MinC)',
-    projeto: 'Fomento a Projetos de Economia Criativa e Pontos de Cultura',
-    subprojeto: 'Equipagem de Espaços Culturais Comunitários de Viamão',
-    numeroEmenda: 'Emenda 40120005',
-    beneficiario: 'Fundo Municipal de Cultura / Pontos de Cultura de Viamão',
+    projeto: 'Fomento a Ações Culturais e Cidadania - OGU',
+    subprojeto: 'Fortalecimento e Circulação Cultural - Associação da Cultura Hip Hop de Viamão',
+    numeroEmenda: 'Emenda OGU 2026',
+    beneficiario: 'Associação da Cultura Hip-Hop de Viamão (CNPJ: 14.892.411/0001-38)',
     tipo_projeto_cultural: 'Hip-Hop & Cultura Urbana' as const,
-    valor: 320000.0,
-    valor_gasto: 210000.0,
+    valor: 200000.0,
+    valor_gasto: 0.0,
     status: 'Em Execução / Vigente' as const,
-    fonte: 'API Oficial do Portal da Transparência (CGU)',
+    fonte: 'Gabinete Parlamentar / Diário de Viamão / OGU',
     fontes_cruzadas: [
-      'Portal da Transparência CGU (Código Emenda: 202640120005)',
-      'SIGA Brasil - Senado Federal (Dotação LOA 2026)',
-      'Transferegov.br (Proposta nº 042910/2026)',
-      'Diário Oficial da União (Seção 3 - Extrato de Convênio)',
+      'Orçamento Geral da União (OGU 2026 / MinC)',
+      'Gabinete Oficial Dep. Denise Pessôa (Publicação Oficial de Destinação)',
+      'Diário de Viamão (Notícia Institucional de Repasse Municipal)',
     ],
-    empenho_numero: '2026NE000412',
-    processo_administrativo: 'Processo MinC nº 01400.002812/2026-19',
-  },
-  {
-    id: 'em-fed-2025-01',
-    ano: 2025,
-    parlamentar: 'Deputada Fernanda Melchionna (PSOL/RS)',
-    partido: 'PSOL/RS',
-    partido_sigla: 'PSOL',
-    foto_parlamentar: 'https://www.camara.leg.br/internet/deputado/bandep/204407.jpg',
-    esfera: 'Federal (API CGU)' as const,
-    orgao: 'Ministério da Cultura (MinC)',
-    secretaria: 'Ministério da Cultura (MinC)',
-    projeto: 'Preservação de Acervos e Memória Comunitária Periférica',
-    subprojeto: 'Modernização do Acervo da Biblioteca Pública Municipal de Viamão',
-    numeroEmenda: 'Emenda 38290001',
-    beneficiario: 'Biblioteca Pública Municipal e Pontos de Leitura Comunitários de Viamão',
-    tipo_projeto_cultural: 'Literatura & Leitura' as const,
-    valor: 180000.0,
-    valor_gasto: 180000.0,
-    status: 'Concluída' as const,
-    fonte: 'API Oficial do Portal da Transparência (CGU)',
-    fontes_cruzadas: [
-      'Portal da Transparência CGU (Código Emenda: 202538290001)',
-      'SIAFI / Tesouro Nacional (Ordem Bancária 2025OB801244)',
-      'Diário Oficial de Viamão (Termo de Recebimento Definitivo dos Bens)',
-    ],
-    empenho_numero: '2025NE001923',
-    processo_administrativo: 'Processo MinC nº 01400.001920/2025-44',
   },
   // Demais áreas para controle comparativo de transparência
   {
@@ -337,29 +306,6 @@ const rawEmendas = [
     fontes_cruzadas: ['Sistema SAE - ALRS', 'FPE-RS (Empenho Liquidado)'],
     empenho_numero: 'NE 2025/004812',
     processo_administrativo: 'PROA nº 25/1800-0005120-4',
-  },
-  {
-    id: 'em-fed-2025-02',
-    ano: 2025,
-    parlamentar: 'Deputado Sanderson (PL/RS)',
-    partido: 'PL/RS',
-    partido_sigla: 'PL',
-    foto_parlamentar: 'https://www.camara.leg.br/internet/deputado/bandep/204386.jpg',
-    esfera: 'Federal (API CGU)' as const,
-    orgao: 'Ministério da Saúde',
-    secretaria: 'Ministério da Saúde',
-    projeto: 'Estruturação da Atenção Especializada',
-    subprojeto: 'Aquisição de Ambulância para o Hospital de Viamão',
-    numeroEmenda: 'Emenda 29100004',
-    beneficiario: 'Hospital de Viamão',
-    tipo_projeto_cultural: 'Outras Áreas' as const,
-    valor: 250000.0,
-    valor_gasto: 250000.0,
-    status: 'Concluída' as const,
-    fonte: 'API Oficial do Portal da Transparência (CGU)',
-    fontes_cruzadas: ['Portal da Transparência CGU', 'Fundo Nacional de Saúde (FNS)'],
-    empenho_numero: '2025NE800412',
-    processo_administrativo: 'Processo MS nº 25000.081290/2025-11',
   }
 ];
 
@@ -372,529 +318,6 @@ export const INITIAL_EMENDAS: Emenda[] = rawEmendas.map(item => {
     justificativa: justificativa,
   };
 });
-
-export const INITIAL_PNAB: PnabRecord[] = [
-  {
-    id: 'pnab-01',
-    rubrica: 'Política Nacional Aldir Blanc (PNAB) - Recursos Descentralizados da União',
-    valor_exato: pnabAuditJson.valor_global || 0,
-    data_extrato: pnabAuditJson.data_extrato || '09/09/2026',
-    banco_custodia: pnabAuditJson.banco_custodia || 'Conta Corrente Fiduciária Vinculada (Transferegov.br)',
-    conta_vinculada: pnabAuditJson.conta_vinculada || 'Fundo Municipal de Cultura de Viamão',
-    cnpj_destinatario: pnabAuditJson.cnpj_proponente || '88.000.914/0001-01',
-    origem_detalhada: pnabAuditJson.termo_numero && pnabAuditJson.termo_numero.trim() !== '' && !pnabAuditJson.termo_numero.toLowerCase().includes('pendente')
-      ? `Fundo Nacional de Cultura / Transferegov.br (Termo de Adesão oficial registrado no Transferegov)`
-      : 'Fundo Nacional de Cultura / Transferegov.br (Política Nacional Aldir Blanc - Lei nº 14.399/2022)',
-    contexto_legal: 'Recursos descentralizados da União sob custódia fiduciária pública do Fundo Municipal de Cultura para cumprimento das fases formais de lançamento de editais municipais. Regulados pela Lei nº 14.399/2022 e Decreto nº 11.740/2023.',
-    fonte_link: pnabAuditJson.fonte_link || 'https://portal.transferegov.sistema.gov.br/',
-    termo_numero: pnabAuditJson.termo_numero || 'Termo de Adesão oficial registrado no Transferegov',
-    status_etapa: pnabAuditJson.status_etapa || 'Fase de Elaboração e Publicação de Editais',
-    sincronizacao_pendente: pnabAuditJson.sincronizacao_pendente ?? false,
-    base_legal: pnabAuditJson.base_legal || 'Lei Federal nº 14.399/2022, Decreto Federal nº 11.740/2023 e Portarias MinC nº 80/2023 e nº 84/2023',
-    fonte_auditada: pnabAuditJson.fonte_auditada || 'Plataforma Transferegov.br / Ministério da Cultura (MinC)',
-  },
-];
-
-export const INITIAL_PONTOS_CULTURAIS: PontoCultural[] = [
-  {
-    id: 'ponto-mestre-borel',
-    nome: 'Ponto de Cultura e Memória Centro Cultural Mestre Borel',
-    categoria: 'Matriz Afro-Brasileira & Memória',
-    endereco: 'Rua Antônio Vivaldi, 153 - Jardim Viamar',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Ponto de Cultura comunitário que atua na periferia de Viamão. Promove atividades de capoeira, percussão, artesanato afro-brasileiro e o projeto Sopa do Bem.',
-    o_que_costumam_fazer: 'Oficinas continuadas de capoeira angola e regional, aulas de atabaque e percussão, produção de artesanato e distribuição semanal de sopa comunitária (Sopa do Bem) para moradores em vulnerabilidade.',
-    descricao: 'Fundado na região do Jardim Viamar, o Centro Cultural Mestre Borel é um espaço de resistência e preservação da cultura afro-brasileira. Integra esporte, cultura e assistência social.',
-    links_referencia: [
-      {
-        titulo: 'Instagram Oficial - @centro_cultural_mestre_borel',
-        url: 'https://www.instagram.com/centro_cultural_mestre_borel/',
-        tipo: 'instagram',
-        descricao: 'Canal oficial no Instagram do Ponto de Cultura e Memória Centro Cultural Mestre Borel.',
-      },
-      {
-        titulo: 'Página Oficial no Facebook - Centro Cultural Mestre Borel',
-        url: 'https://www.facebook.com/CentroCulturalMestreBorel/',
-        tipo: 'facebook',
-        descricao: 'Página oficial com registros de oficinas, capoeira e ação comunitária Sopa do Bem.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Oficinas de Capoeira Angola, Regional e Expressão Corporal Afro',
-        'Toques de Atabaque, Ritmos Tradicionais e Percussão Afro-Gaúcha',
-        'Projeto Comunitário e Ação Solidária Sopa do Bem',
-        'Rodas de Diálogo sobre Ancestralidade Negra e Memória Periférica',
-      ],
-      publico_alvo: 'Crianças, jovens, famílias e a comunidade cultural de Viamão.',
-      horario_funcionamento: 'Conforme programação das oficinas e encontros comunitários.',
-      como_participar: 'Inscrições e participações nas oficinas são abertas à comunidade através das redes oficiais.',
-    },
-  },
-  {
-    id: 'ponto-fvcb',
-    nome: 'Fundação Vera Chaves Barcellos (FVCB) - Sala dos Pomares',
-    categoria: 'Artes Cênicas & Audiovisual',
-    endereco: 'Rodovia Tapir Rocha (RS-040), nº 8480 (Parada 54) - Viamão/RS',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Instituição cultural privada e sem fins lucrativos sediada em Viamão, reconhecida como Ponto de Cultura pelo edital Cultura Viva. Preserva um vasto acervo de arte contemporânea e difunde a obra de Vera Chaves Barcellos com exposições e projetos educativos.',
-    o_que_costumam_fazer: 'Exposições públicas gratuitas de artes visuais na Sala dos Pomares, visitas mediadas educativas para escolas, encontros de formação artística e a tradicional Feira Cultural nos Pomares.',
-    descricao: 'Sede da Sala dos Pomares e Reserva Técnica da Fundação Vera Chaves Barcellos em Viamão. Centro de difusão de arte contemporânea, mediação cultural e preservação de acervo histórico.',
-    redes: {
-      instagram: 'https://www.instagram.com/fvcb__/',
-      site: 'http://fvcb.com.br/',
-    },
-    links_referencia: [
-      {
-        titulo: 'Instagram Oficial - @fvcb__',
-        url: 'https://www.instagram.com/fvcb__/',
-        tipo: 'instagram',
-        descricao: 'Canal oficial da Fundação Vera Chaves Barcellos com programação das exposições em Viamão.',
-      },
-      {
-        titulo: 'Portal Institucional da Fundação Vera Chaves Barcellos',
-        url: 'http://fvcb.com.br/',
-        tipo: 'outro',
-        descricao: 'Site oficial com pesquisa de acervo, catálogo de exposições e agenda da Sala dos Pomares.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Exposições de Arte Contemporânea e Visuais na Sala dos Pomares',
-        'Visitas Educativas Mediadas para Escolas Públicas e Privadas',
-        'Feira Cultural nos Pomares com Artistas e Empreendedores Locais',
-        'Pesquisa e Consulta Técnica de Acervo de Artes Visuais e Fotografia',
-      ],
-      publico_alvo: 'Estudantes, educadores, artistas, pesquisadores e público geral.',
-      horario_funcionamento: 'Visitações em temporadas expositivas e agendamentos para escolas.',
-      como_participar: 'Visitas escolares e em grupo podem ser agendadas através dos canais oficiais da fundação.',
-    },
-  },
-  {
-    id: 'ponto-joana-taborda',
-    nome: 'Complexo Cultural Joana Taborda',
-    categoria: 'Artes Cênicas & Audiovisual',
-    endereco: 'Rua Palermo, 226 - Bairro Parque Índio Jari, Viamão/RS',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Complexo cultural inaugurado em abril de 2017 por Patrik Simões Pereira e Guilherme Velho de Castro no Parque Índio Jari para acolher e impulsionar produções cênicas em Viamão. Abriga o teatro Sala João Acir (capacidade para 50 espectadores), a Minibiblioteca Ronald Radde (com mais de 1.000 títulos), salas de ensaio e galeria.',
-    o_que_costumam_fazer: 'Apresentações de peças teatrais, espetáculos musicais, ensaios de companhias artísticas locais, saraus de poesia e consultas à Minibiblioteca Ronald Radde.',
-    descricao: 'Espaço cultural independente dotado de teatro com capacidade para 50 pessoas (Sala João Acir), Minibiblioteca Ronald Radde, área para exposições e ensaios artísticos.',
-    links_referencia: [
-      {
-        titulo: 'Registro Cultural e Inauguração do Complexo Joana Taborda',
-        url: 'https://www.viamao.rs.gov.br/',
-        tipo: 'noticia',
-        descricao: 'Matéria de inauguração e registro do complexo no circuito de artes cênicas de Viamão.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Temporadas de espetáculos teatrais e artes cênicas na Sala João Acir',
-        'Acervo literário e de dramaturgia na Minibiblioteca Ronald Radde',
-        'Ensaios e encontros de artistas cênicos locais',
-        'Exposições de artes visuais e encontros poéticos',
-      ],
-      publico_alvo: 'Comunidade viamonense, artistas cênicos, estudantes e amantes das artes.',
-      horario_funcionamento: 'Conforme agenda de espetáculos e ensaios programados.',
-      como_participar: 'Ingressos e reservas para apresentações são informados nos canais das produções em cartaz.',
-    },
-  },
-  {
-    id: 'ponto-carlos-pinto-mennet',
-    nome: 'Centro Municipal de Cultura Dr. Carlos Pinto Mennet',
-    categoria: 'Coletivo Comunitário',
-    endereco: 'Rua Açores, 951 - Bairro Tarumã, Viamão/RS',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Principal complexo cultural público administrado pela Secretaria Municipal da Cultura de Viamão. Sede do Departamento de Memória Cultural, de conferências municipais de cultura e do Conselho Municipal de Política Cultural.',
-    o_que_costumam_fazer: 'Conferências municipais e pré-conferências setoriais de cultura, visitas guiadas do programa Cultura na Escola, oficinas públicas de arte, reuniões comunitárias e mostras de projetos locais.',
-    descricao: 'Centro municipal de cultura de Viamão localizado no bairro Tarumã. Espaço público oficial para deliberações de políticas públicas, memória cultural e formação artística comunitária.',
-    redes: {
-      site: 'https://www.viamao.rs.gov.br/',
-    },
-    links_referencia: [
-      {
-        titulo: 'Portal Oficial da Prefeitura Municipal e Secretaria da Cultura de Viamão',
-        url: 'https://www.viamao.rs.gov.br/',
-        tipo: 'outro',
-        descricao: 'Página institucional com editais, conferências e notícias do Centro Dr. Carlos Pinto Mennet.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Conferências Municipais de Cultura e Fóruns Setoriais de Políticas Públicas',
-        'Programa Cultura na Escola: Visitas guiadas ao Departamento de Memória Cultural',
-        'Reuniões plenárias do Conselho Municipal de Política Cultural de Viamão',
-        'Exposições temporárias e oficinas públicas formativas',
-      ],
-      publico_alvo: 'Fazedores de cultura, artistas, estudantes de escolas municipais e cidadãos de Viamão.',
-      horario_funcionamento: 'Segunda a Sexta-feira das 08h às 17h.',
-      como_participar: 'Acesso público gratuito. Informações de eventos e editais disponíveis no portal da prefeitura.',
-    },
-  },
-  {
-    id: 'ponto-cia-potosi',
-    nome: 'Cia Potosí de Teatro',
-    categoria: 'Artes Cênicas & Audiovisual',
-    endereco: 'Viamão / RS (Atuação Territorial & Itinerante)',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Companhia de teatro sediada em Viamão com mais de três décadas de história (desde o início dos anos 1990), certificada pelo Ministério da Cultura como Ponto de Cultura. Especializada em teatro de formas animadas, bonecos e dramaturgia de reflexão sociopolítica.',
-    o_que_costumam_fazer: 'Montagem e circulação de espetáculos teatrais com bonecos (como "Titereteiro – Uma Encenação da Vida"), oficinas de confecção e manipulação de formas animadas, intervenções em praças e escolas.',
-    descricao: 'Ponto de Cultura certificado pelo Ministério da Cultura em Viamão. Coletivo teatral com sólida trajetória em teatro de bonecos, oficinas formativas e mediação comunitária.',
-    redes: {
-      facebook: 'https://www.facebook.com/ciapotosideteatro/',
-      site: 'http://ciapotosideteatro.blogspot.com/',
-    },
-    links_referencia: [
-      {
-        titulo: 'Página Oficial no Facebook - Cia Potosí de Teatro',
-        url: 'https://www.facebook.com/ciapotosideteatro/',
-        tipo: 'facebook',
-        descricao: 'Página oficial no Facebook com fotos de espetáculos, oficinas e bastidores cênicos.',
-      },
-      {
-        titulo: 'Blog Oficial da Cia Potosí de Teatro',
-        url: 'http://ciapotosideteatro.blogspot.com/',
-        tipo: 'outro',
-        descricao: 'Blog com histórico de espetáculos, dramaturgia e projetos cênicos em Viamão.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Apresentações teatrais de formas animadas e espetáculos com títeres',
-        'Oficinas de iniciação teatral e manipulação de bonecos para jovens',
-        'Participação nas pré-conferências e conferências de cultura de Viamão',
-      ],
-      publico_alvo: 'Estudantes, crianças, artistas e público amante do teatro.',
-      horario_funcionamento: 'Conforme temporadas artísticas e circulação de peças.',
-      como_participar: 'Acompanhe as divulgações das apresentações e oficinas pelo Facebook oficial.',
-    },
-  },
-  {
-    id: 'ponto-viandante',
-    nome: 'Espaço de Arte Viandantes',
-    categoria: 'Artes Cênicas & Audiovisual',
-    endereco: 'Rua Teresa Sica Nunes, 566 (esquina com Rua Francisco Carvalho da Cunha)',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Centro cultural independente fundado em 27 de março de 2008 após o fechamento do Teatro Municipal André Ribeiro Cancella. Idealizado por Niltamara Gomes e Alê Fraga, é um polo vital de resistência artística, formação cênica e solidariedade social em Viamão.',
-    o_que_costumam_fazer: 'Oficinas continuadas e aulas de teatro, dança contemporânea, saraus poéticos, apresentações de artes cênicas, além de apoio humanitário e cultural a comunidades tradicionais e indígenas da região, como a aldeia Tekoá Nhe’engatu.',
-    descricao: 'Espaço de fomento cênico independente inaugurado em 2008. Desenvolve atividades formativas em teatro e dança, integração artística e apoio a comunidades vulneráveis de Viamão.',
-    links_referencia: [
-      {
-        titulo: 'Registro de Atuação Comunitária e Cultural em Viamão',
-        url: 'https://www.viamao.rs.gov.br/',
-        tipo: 'noticia',
-        descricao: 'Centro cultural independente articulador de teatro, dança e acolhimento comunitário.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Oficinas de artes cênicas, expressão corporal e jogos teatrais',
-        'Aulas e laboratórios de dança contemporânea e popular',
-        'Temporadas de espetáculos teatrais independentes e saraus',
-        'Ações de suporte e integração com a aldeia indígena Tekoá Nhe’engatu',
-      ],
-      publico_alvo: 'Artistas independentes, estudantes, comunidades tradicionais e público em geral.',
-      horario_funcionamento: 'Visitações e ensaios sob agendamento e programação prévia das temporadas artísticas.',
-      como_participar: 'Participação em oficinas e ensaios cênicos conforme convocações e temporadas divulgadas publicamente.',
-    },
-  },
-  {
-    id: 'ponto-filhos-de-sepe',
-    nome: 'Ponto de Cultura Filhos de Sepé',
-    categoria: 'Tradição & Folclore',
-    endereco: 'Assentamento Filhos de Sepé - Viamão/RS',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Ponto de Cultura do campo sediado no Assentamento Filhos de Sepé em Viamão (maior produtor de arroz orgânico da América Latina). Articulado pelo Instituto de Pesquisa e Educação do Campo e apoiado pelo FAC/RS, atua na salvaguarda da memória camponesa, feiras agroecológicas e cultura popular.',
-    o_que_costumam_fazer: 'Oficinas de memória e tradição rural, feiras culturais de sementes crioulas e produtos agroecológicos, rodas de causos, cantoria popular e formação em soberania cultural da terra.',
-    descricao: 'Ponto de cultura do campo em Viamão, articulando a preservação da identidade camponesa, a educação agroecológica e a música de raiz.',
-    links_referencia: [
-      {
-        titulo: 'Registro no Fundo de Apoio à Cultura (FAC) - SEDAC/RS',
-        url: 'https://procultura.rs.gov.br/',
-        tipo: 'documento',
-        descricao: 'Projeto cultural do Ponto de Cultura Filhos de Sepé apoiado pelo Pró-Cultura RS / FAC.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Oficinas de Tradição, Oralidade e Memória Camponesa',
-        'Feiras Culturais e Agroecológicas da Terra',
-        'Rodas de Cantoria Regional e Encontros de Educação Popular do Campo',
-      ],
-      publico_alvo: 'Famílias assentadas, agricultores, estudantes, pesquisadores e comunidade regional.',
-      horario_funcionamento: 'Conforme calendário de feiras agroecológicas e oficinas comunitárias.',
-      como_participar: 'Encontros e feiras com acesso livre e aberto à comunidade de Viamão.',
-    },
-  },
-  {
-    id: 'ponto-02',
-    nome: 'Associação da Cultura Hip-Hop de Viamão',
-    categoria: 'Música & Hip-Hop',
-    endereco: 'Atuação Comunitária Territorial Itinerante (Praça da Santa Isabel / Espaços Públicos)',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Referência em cultura urbana e cidadania periférica em Viamão. Representa a valorização da juventude negra e periférica através da arte independente, educação popular e protagonismo comunitário.',
-    o_que_costumam_fazer: 'Oficinas gratuitas dos 4 elementos do Hip-Hop (Breakdance, Graffiti, DJ e Rima/MC), saraus literários periféricos, a tradicional Batalha da Santa na Praça da Santa Isabel e rodas de diálogo.',
-    descricao: 'Ponto de Cultura certificado pelo Programa Cultura Viva do Ministério da Cultura. Coletivo de cultura urbana atuante em Viamão na formação continuada nos 4 elementos do Hip-Hop e organização da tradicional Batalha da Santa.',
-    links_referencia: [
-      {
-        titulo: 'Registro Oficial no Cadastro Nacional Cultura Viva (MinC)',
-        url: 'https://culturaviva.gov.br/',
-        tipo: 'outro',
-        descricao: 'Certificação federal sob a Lei nº 13.018/2014 como Ponto de Cultura comunitário.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Oficinas de Breakdance e Danças Urbanas para jovens',
-        'Graffiti e Arte Urbana: técnicas de muralismo e customização visual',
-        'Formação de DJs: mixagem e técnicas sonoras',
-        'Oficinas de Rima, Poesia Falada e Composição',
-        'Batalha da Santa: circuito de rimas e freestyle de Viamão',
-      ],
-      publico_alvo: 'Crianças, adolescentes e jovens de Viamão (acesso 100% gratuito).',
-      horario_funcionamento: 'Itinerante conforme programação em praças e escolas.',
-      como_participar: 'Encontros abertos e gratuitos nas praças e eventos divulgados publicamente.',
-    },
-  },
-  {
-    id: 'ponto-01',
-    nome: 'Igreja Matriz Nossa Senhora da Conceição',
-    categoria: 'Patrimônio Histórico',
-    endereco: 'Praça Júlio de Castilhos, s/n - Centro Histórico',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Patrimônio histórico e arquitetônico nacional de 1766 (segunda igreja mais antiga do RS). Representa as origens coloniais, a arte sacra barroco-rococó e o berço da formação urbana de Viamão.',
-    o_que_costumam_fazer: 'Visitas guiadas de educação patrimonial para estudantes, guarda de acervo documental tricentenário, concertos de música erudita e de câmara, celebrações tradicionais e conservação de talha dourada.',
-    descricao: 'Segunda igreja mais antiga do Rio Grande do Sul (construção iniciada em 1766), tombada pelo IPHAN em 1938. Abriga talha barroca-rococó, acervo sacro tricentenário e concertos periódicos.',
-    links_referencia: [
-      {
-        titulo: 'Tombamento IPHAN - Processo nº 96-T-1938 (Livro Belas Artes)',
-        url: 'http://portal.iphan.gov.br/',
-        tipo: 'documento',
-        descricao: 'Inscrição nº 184 no Livro do Tombo Belas Artes do Instituto do Patrimônio Histórico e Artístico Nacional.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Visitas mediadas para escolas de Viamão e Região Metropolitana',
-        'Concertos de música sacra e apresentações corais históricas',
-        'Acervo documental e cartorial tricentenário para pesquisadores',
-      ],
-      publico_alvo: 'Estudantes, pesquisadores, cidadãos viamonenses e turistas.',
-      horario_funcionamento: 'Terça a Sábado das 09h às 18h; Domingos das 08h às 12h e 17h às 20h.',
-      como_participar: 'Visitas mediadas escolares e em grupos devem ser agendadas presencialmente na administração paroquial.',
-    },
-  },
-  {
-    id: 'ponto-biblioteca-erico-verissimo',
-    nome: 'Biblioteca Pública Municipal Erico Verissimo',
-    categoria: 'Literatura & Biblioteca',
-    endereco: 'Rua Cirurgião Vaz Ferreira, 400 - Centro, Viamão/RS',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Biblioteca pública municipal mantida pela Secretaria Municipal da Cultura de Viamão. Polo de incentivo à leitura, mediação literária, contação de histórias e preservação de documentos históricos municipais.',
-    o_que_costumam_fazer: 'Empréstimo gratuito de acervo bibliográfico, círculos de contação de histórias para crianças, apoio a pesquisas escolares e mediação de leitura comunitária.',
-    descricao: 'Biblioteca pública de Viamão dedicada à democratização do acesso ao livro, preservação da memória literária local e encontros com leitores.',
-    links_referencia: [
-      {
-        titulo: 'Secretaria Municipal de Cultura - Biblioteca Pública Municipal',
-        url: 'https://www.viamao.rs.gov.br/',
-        tipo: 'outro',
-        descricao: 'Informações institucionais e serviços da Biblioteca Pública Municipal Erico Verissimo.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Empréstimo gratuito e consulta de títulos de literatura brasileira e universal',
-        'Projetos de incentivo à leitura infantojuvenil e contação de histórias',
-        'Pesquisa bibliográfica e histórica sobre o município de Viamão',
-      ],
-      publico_alvo: 'Estudantes, professores, pesquisadores, crianças e leitores de Viamão.',
-      horario_funcionamento: 'Segunda a Sexta-feira das 08h30 às 17h.',
-      como_participar: 'Cadastro de leitor gratuito com documento de identidade e comprovante de residência.',
-    },
-  },
-  {
-    id: 'ponto-brazil-estrangeiro',
-    nome: 'Centro de Cultura Negra Brazil Estrangeiro - Terra Produção',
-    categoria: 'Matriz Afro-Brasileira & Memória',
-    endereco: 'Rua Felisberto José Pacheco, 327 (esquina nº 297) - Bairro Santa Cecília',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Polo referencial de valorização da cultura de matriz afro-brasileira, dança contemporânea e memória da mulher negra periférica em Viamão. Congrega a atuação histórica da Cia de Dança Brazil Estrangeiro (fundada em 1991 por Carla Pires) e da produtora Terra Produção (direção de Mário Terra).',
-    o_que_costumam_fazer: 'Ensaios continuados da Cia de Dança Brazil Estrangeiro, oficinas de dança afro-brasileira, espetáculos coreográficos autorais, rodas de conversa sobre a mulher negra periférica e participação na Semana Municipal da Consciência Negra.',
-    descricao: 'Espaço cultural e sede artística dedicada à cultura de matriz afro-brasileira, dança e teatro em Viamão. Sob coordenação de Mário Terra e Carla Pires, promove a preservação da ancestralidade negra e formação corporal afrodescendente.',
-    links_referencia: [
-      {
-        titulo: 'Registro de Atuação Cultural e Dança Afro em Viamão',
-        url: 'https://culturaviva.gov.br/',
-        tipo: 'outro',
-        descricao: 'Articulação como Ponto de Cultura comunitário de matriz afro-brasileira e artes do corpo.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Laboratórios continuados de Dança Afro-Brasileira e Dança Contemporânea',
-        'Temporadas de espetáculos coreográficos e intervenções de dança',
-        'Roda de Conversa sobre a Mulher Negra Periférica de Viamão',
-        'Formação artística corporal de jovens de periferias',
-      ],
-      publico_alvo: 'Mulheres negras, jovens das periferias, dançarinos e comunidade cultural.',
-      como_participar: 'Participação em oficinas de dança afro mediante convocatórias das temporadas comunitárias.',
-    },
-  },
-  {
-    id: 'ponto-quilombo-anastacia',
-    nome: 'Ponto de Memória Quilombo da Anastácia',
-    categoria: 'Matriz Afro-Brasileira & Memória',
-    endereco: 'Estrada Municipal do Capão da Porteira, s/n - Zona Rural',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Território ancestral quilombola e ponto de memória viva em Viamão. Representa mais de um século de resistência dos povos tradicionais de matriz africana, salvaguarda da oralidade, patrimônio imaterial afro-gaúcho e soberania alimentar.',
-    o_que_costumam_fazer: 'Rodas de memória com griôs e anciãos, celebrações do Dia da Consciência Negra, oficinas de saberes tradicionais com ervas medicinais, manejo agroecológico e visitas pedagógicas mediadas.',
-    descricao: 'Comunidade remanescente de quilombo certificada pela Fundação Cultural Palmares em Viamão. Desenvolve ações de preservação da memória quilombola, soberania territorial e transmissão intergeracional de saberes afrodescendentes.',
-    links_referencia: [
-      {
-        titulo: 'Certidão de Autodefinição Quilombola - Fundação Cultural Palmares',
-        url: 'https://www.palmares.gov.br/',
-        tipo: 'documento',
-        descricao: 'Certificação de reconhecimento como comunidade remanescente de quilombo no RS.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Encontros de tradição oral e preservação da história quilombola local',
-        'Oficinas de práticas agrícolas tradicionais e ervas medicinais afro-gaúchas',
-        'Celebrações e vigílias do 20 de Novembro (Dia da Consciência Negra)',
-        'Acolhimento de projetos de pesquisa etnográfica e educação patrimonial',
-      ],
-      publico_alvo: 'Famílias quilombolas, estudantes, pesquisadores e comunidade em geral.',
-      como_participar: 'Visitas institucionais e pedagógicas ocorrem mediante agendamento prévio com a associação quilombola.',
-    },
-  },
-  {
-    id: 'ponto-04',
-    nome: 'Sociedade Beneficente Cultural Recreativa Mocidade Independente de Águas Claras',
-    categoria: 'Tradição & Folclore',
-    endereco: 'Rodovia RS-040, Parada 86 - Águas Claras, Viamão/RS',
-    destaque_comunitario: true,
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Bastião do samba, da percussão e do carnaval popular no distrito de Águas Claras. Representa a tradição carnavalesca comunitária e a transmissão intergeracional da cultura do ritmo em Viamão.',
-    o_que_costumam_fazer: 'Escola de percussão e ritmo para jovens, oficinas de corte e costura de figurinos, ensaios abertos de samba de raiz e eventos culturais integrando as comunidades de Viamão.',
-    descricao: 'Tradicional agremiação carnavalesca e centro comunitário de samba e percussão de Águas Claras. Promove oficinas de instrumentos de percussão e corte e costura de fantasias.',
-    links_referencia: [
-      {
-        titulo: 'Registro Comunitário do Samba de Águas Claras',
-        url: 'https://www.viamao.rs.gov.br/',
-        tipo: 'noticia',
-        descricao: 'Atuação cultural e histórica da Mocidade Independente de Águas Claras.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Escola de Percussão e Bateria: formação rítmica para crianças e jovens',
-        'Oficinas de adereços, fantasias e corte/costura carnavalesca',
-        'Apresentações nos distritos e eventos cívicos de Viamão',
-      ],
-      publico_alvo: 'Comunidade de Águas Claras, Morro Grande e entorno da RS-040.',
-      horario_funcionamento: 'Quintas e Sextas às 19h; Domingos das 16h às 21h.',
-      como_participar: 'Ensaios e oficinas com participação aberta e gratuita à comunidade.',
-    },
-  },
-  {
-    id: 'ponto-07',
-    nome: 'Ponto Ecológico & Cultural Parque Estadual de Itapuã',
-    categoria: 'Patrimônio Histórico',
-    endereco: 'Estrada Dona Maria Leopoldina, s/n - Distrito de Itapuã, Viamão/RS',
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Patrimônio paisagístico, arqueológico e histórico na confluência do Lago Guaíba e Laguna dos Patos. Representa a memória da Revolução Farroupilha, sítios indígenas e a conservação da biodiversidade nativa de Viamão.',
-    o_que_costumam_fazer: 'Educação patrimonial e ambiental com escolas públicas, visitas mediadas ao Centro de Interpretação Farroupilha, trilhas históricas guiadas e salvaguarda arqueológica.',
-    descricao: 'Espaço de educação patrimonial e ambiental na confluência do Lago Guaíba e Laguna dos Patos. Centro de visitantes com exposições sobre a Revolução Farroupilha, fortificações históricas e sítios arqueológicos.',
-    links_referencia: [
-      {
-        titulo: 'Unidade de Conservação Parque Estadual de Itapuã - SEMA/RS',
-        url: 'https://sema.rs.gov.br/parque-estadual-de-itapua',
-        tipo: 'outro',
-        descricao: 'Registro oficial da Unidade de Conservação e salvaguarda patrimonial em Viamão.',
-      },
-    ],
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Trilhas guiadas históricas no Morro da Grota e Praia das Pombas',
-        'Visitas escolares ao Centro de Memória Farroupilha',
-        'Preservação da fauna e flora nativas dos campos e restingas de Viamão',
-      ],
-      publico_alvo: 'Cidadãos, estudantes de escolas públicas, ambientalistas e turistas.',
-      horario_funcionamento: 'Quarta a Domingo das 09h às 18h.',
-      como_participar: 'Visitas escolares e agendamentos de trilhas guiadas através do portal da SEMA/RS.',
-    },
-  },
-  {
-    id: 'ponto-museu-municipal',
-    nome: 'Museu Municipal de Viamão',
-    categoria: 'Patrimônio Histórico',
-    endereco: 'Centro, Viamão/RS',
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Criado em 1997 e vinculado à Secretaria de Cultura, reúne documentos antigos, publicações e objetos históricos de Viamão.',
-    o_que_costumam_fazer: 'Preservação do acervo histórico municipal, exposições permanentes incluindo uma sala açoriana e recepção de pesquisadores.',
-    descricao: 'Instituição museológica municipal dedicada à salvaguarda e exposição da história viamonense e de suas raízes açorianas.',
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Exposição permanente sobre a história de Viamão',
-        'Exposição da sala açoriana',
-        'Atendimento a pesquisadores e estudantes',
-      ],
-      publico_alvo: 'Estudantes, pesquisadores, cidadãos e turistas.',
-      horario_funcionamento: 'Segunda a Sexta, das 08h30 às 17h (informações sujeitas a alteração).',
-    },
-  },
-  {
-    id: 'ponto-vila-sampaio',
-    nome: 'Centro Cultural Vila Sampaio',
-    categoria: 'Coletivo Comunitário',
-    endereco: 'Rua Professor Mario A Sampaio, 1039, Bairro São Lucas - Viamão/RS',
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Espaço cultural atuante na região da Vila Sampaio/São Lucas, promovendo integração comunitária.',
-    o_que_costumam_fazer: 'Oficinas comunitárias, encontros locais e promoção de atividades culturais no bairro.',
-    descricao: 'Centro de cultura localizado no Bairro São Lucas, focado no fomento à cultura local e engajamento da comunidade.',
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Encontros comunitários',
-        'Oficinas culturais variadas',
-      ],
-      publico_alvo: 'Comunidade do Bairro São Lucas e região.',
-    },
-  },
-  {
-    id: 'ponto-ctg-alma-crioula',
-    nome: 'CTG Alma Crioula',
-    categoria: 'Tradição & Folclore',
-    endereco: 'Rua Frederico Dihl, 700, Bairro Vila Elza - Viamão/RS',
-    google_maps_presente: false,
-    resumo_geral_cultura: 'Centro de Tradições Gaúchas que promove a preservação e o cultivo da cultura, folclore e costumes campeiros.',
-    o_que_costumam_fazer: 'Rodeios, fandangos, oficinas de dança tradicional gaúcha, chula e declamação, além de atividades campeiras.',
-    descricao: 'Tradicional CTG da Vila Elza em Viamão, com forte atuação na preservação da identidade cultural do Rio Grande do Sul.',
-    informacoes_detalhadas: {
-      atividades_principais: [
-        'Aulas de danças tradicionais gaúchas',
-        'Eventos tradicionalistas e jantares campeiros',
-        'Invernadas artísticas e culturais',
-      ],
-      publico_alvo: 'Comunidade de Viamão e tradicionalistas.',
-    },
-  },
-];
-
-// Mural Comunitário aberto exclusivamente para contribuições sociais cidadãs auditadas
-export const INITIAL_COMMUNITY_LINKS: SharedCommunityLink[] = [];
 
 // Dados históricos de séries temporais para o painel de controle interativo (Linhas e Área)
 export interface BudgetTimeSeriesPoint {
@@ -1061,144 +484,120 @@ export const INITIAL_NEWS: NewsItem[] = [
   }
 ];
 
-export const INITIAL_LEIS_INCENTIVO: LeiIncentivo[] = [
-  {
-    id: 'lpg-01',
-    mecanismo: 'Lei Paulo Gustavo (LC nº 195/2022)',
-    projeto_objeto: 'Editais Municipais de Fomento ao Audiovisual, Prêmios de Trajetória e Espaços Culturais',
-    valor_aprovado: 250000.0,
-    valor_captado: 250000.0,
-    origem_recurso: 'Fundo Nacional de Cultura (FNC / Repasse Direto Fundo a Fundo)',
-    destino_recurso: 'Fundo Municipal de Cultura de Viamão (Conta Específica Banco do Brasil)',
-    orgao_liberador: 'Ministério da Cultura (MinC)',
-    responsavel_execucao: 'Prefeitura Municipal de Viamão (Secretaria de Cultura)',
-    status_atual: 'Em Execução (Prestação de Contas & Lançamento Complementar)',
-    como_sera_feito: 'Financiamento a curta-metragens locais, videoclipes de músicos de Viamão, capacitações técnicas e prêmios por histórico artístico a mestres da cultura tradicional.',
-    fonte_oficial: 'https://www.gov.br/cultura/pt-br/assuntos/lei-paulo-gustavo',
-    periodo_execucao: '2024 - 2026',
-  }
-];
-
-export const INITIAL_FAC_EDITAIS: FacEdital[] = [
-  {
-    id: 'fac-linhas-setoriais',
-    numero_edital: 'Chamadas Públicas FAC (SEDAC-RS)',
-    nome: 'Fundo de Apoio à Cultura - Linhas Setoriais e Descentralizadas',
-    segmento: 'Culturas Populares, Patrimônio, Artes e Periferias',
-    mecanismo: 'Fundo de Apoio à Cultura (FAC)',
-    publico_alvo: 'Pessoas Jurídicas (incluindo MEI) sediadas no RS e Fazedores Culturais',
-    exigencia_proponente: 'Registro e homologação no CEPC (Cadastro Estadual de Produtor Cultural) / Pró-cultura RS',
-    requisitos_principais: [
-      'Sede ou domicílio comprovado no Estado do Rio Grande do Sul há pelo menos 2 anos',
-      'Cadastro ativo no Pró-cultura RS (SEDAC-RS)',
-      'Apresentação de plano de trabalho e planilha orçamentária detalhada',
-      'Previsão de medidas de democratização do acesso e acessibilidade'
-    ],
-    status: 'Inscrições Abertas',
-    prazo_inscricao: 'Conforme cronograma oficial Pró-cultura RS',
-    link_oficial: 'https://www.procultura.rs.gov.br/',
-    plataforma: 'Sistema Pró-cultura RS (SEDAC-RS)',
-    contrapartida_exigida: 'Ações socioculturais gratuitas dirigidas à comunidade',
-    base_legal: 'Lei Estadual nº 13.490/2010 (Sistema Estadual de Cultura do RS)'
+export const INITIAL_LPG_DATA: LpgPlanoAcao = {
+  id_plano_acao: 10014,
+  codigo_plano_acao: '30882120230006-010014',
+  situacao: 'AUTORIZADO',
+  valor_total_repasse: 2046951.79,
+  data_inicio_vigencia: '2023-06-12',
+  data_fim_vigencia: '2024-12-31',
+  diagnostico: 'Recebimento de recurso, conforme previsão da Lei Complementar nº 195, de 08 de julho de 2022.',
+  objetivos: 'Executar os artigos 6 (Audiovisual) e 8 (Demais Áreas da Cultura) da Lei Complementar nº 195/2022.',
+  ente_recebedor: {
+    cnpj: '88.000.914/0001-01',
+    nome: 'MUNICIPIO DE VIAMAO',
+    uf: 'RS',
+    municipio: 'VIAMÃO',
+    fundo_orgao: 'Secretaria Municipal da Cultura'
   },
-  {
-    id: 'fac-territorios-culturais',
-    numero_edital: 'Edital FAC Territórios e Periferias Vivas',
-    nome: 'Edital de Fomento a Coletivos e Territórios Criativos Descentralizados',
-    segmento: 'Periferias, Coletivos Comunitários e Cultura Viva',
-    mecanismo: 'Fundo de Apoio à Cultura (FAC)',
-    publico_alvo: 'Coletivos Culturais, Pontos de Cultura e Mestres Tradicionais',
-    exigencia_proponente: 'Atuação comunitária comprovada no território',
-    requisitos_principais: [
-      'Comprovação de atuação continuada na comunidade',
-      'Plano pedagógico ou circulação comunitária em bairros periféricos',
-      'Prestação de contas simplificada em conformidade com a legislação estadual'
-    ],
-    status: 'Previsto / Calendário',
-    prazo_inscricao: 'Acompanhar publicação no Diário Oficial do Estado do RS (DOE-RS)',
-    link_oficial: 'https://www.procultura.rs.gov.br/',
-    plataforma: 'SEDAC-RS / Pró-cultura',
-    contrapartida_exigida: 'Oficinas e apresentações abertas ao público local',
-    base_legal: 'Lei Estadual nº 13.490/2010 e Decretos Regulamentares'
-  }
-];
+  orgao_repassador: {
+    sigla: 'MinC',
+    nome: 'Ministério da Cultura',
+    fundo: 'FUNDO NACIONAL DA CULTURA'
+  },
+  metas: [
+    {
+      id_meta_plano_acao: 24164,
+      numero_meta_plano_acao: 'M1',
+      nome_meta_plano_acao: 'Art. 6º, inciso I',
+      descricao_meta_plano_acao: 'Apoio a Produções Audiovisuais (Longas, curtas, documentários e videoclipes)',
+      valor_meta_plano_acao: 1084475.06
+    },
+    {
+      id_meta_plano_acao: 24165,
+      numero_meta_plano_acao: 'M2',
+      nome_meta_plano_acao: 'Art. 6º, inciso II',
+      descricao_meta_plano_acao: 'Apoio a Salas de Cinema (Públicas, comunitárias ou cineclubes)',
+      valor_meta_plano_acao: 247885.86
+    },
+    {
+      id_meta_plano_acao: 24166,
+      numero_meta_plano_acao: 'M3',
+      nome_meta_plano_acao: 'Art. 6º, inciso III',
+      descricao_meta_plano_acao: 'Formação, Qualificação e Difusão Audiovisual e Festivais',
+      valor_meta_plano_acao: 124454.67
+    },
+    {
+      id_meta_plano_acao: 24167,
+      numero_meta_plano_acao: 'M4',
+      nome_meta_plano_acao: 'Art. 8º',
+      descricao_meta_plano_acao: 'Demais Áreas da Cultura (Música, teatro, dança, artesanato, patrimônio e prêmios de trajetória)',
+      valor_meta_plano_acao: 590136.20
+    }
+  ],
+  dados_bancarios: [
+    {
+      id_plano_acao_dado_bancario: 10688,
+      nome_banco_plano_acao_dado_bancario: 'Banco do Brasil',
+      numero_agencia_plano_acao_dado_bancario: 628,
+      dv_agencia_plano_acao_dado_bancario: '9',
+      numero_conta_plano_acao_dado_bancario: 70018,
+      dv_conta_plano_acao_dado_bancario: '5',
+      nome_programa_agil_conta_plano_acao_dado_bancario: 'MINC-LPG-MUNI-AUD',
+      situacao_conta_plano_acao_dado_bancario: 'Conta Ativa'
+    },
+    {
+      id_plano_acao_dado_bancario: 10689,
+      nome_banco_plano_acao_dado_bancario: 'Banco do Brasil',
+      numero_agencia_plano_acao_dado_bancario: 628,
+      dv_agencia_plano_acao_dado_bancario: '9',
+      numero_conta_plano_acao_dado_bancario: 70019,
+      dv_conta_plano_acao_dado_bancario: '3',
+      nome_programa_agil_conta_plano_acao_dado_bancario: 'MINC-LPG-MUNI-OUTRAS',
+      situacao_conta_plano_acao_dado_bancario: 'Conta Ativa'
+    }
+  ],
+  base_legal: 'Lei Complementar nº 195/2022 e Decreto nº 11.525/2023',
+  fonte_oficial: 'Plataforma Transferegov.br / Fundo a Fundo / Ministério da Cultura'
+};
 
 export const API_DOCUMENTATION: ApiEndpointDoc[] = [
   {
-    id: 'api-serverless-pnab',
-    nome: 'Endpoint Serverless /api/pnab (Transferegov / MinC)',
-    esfera: 'Serverless Edge (Vercel Python 3.10+)',
-    url: '/api/pnab',
+    id: 'api-serverless-lpg',
+    nome: 'Endpoint Serverless /api/lpg (Lei Paulo Gustavo / MinC)',
+    esfera: 'Serverless Edge (Python 3.10+)',
+    url: '/api/lpg',
     metodo: 'GET',
-    descricao: 'Endpoint serverless com TTLCache e retry resiliente que consome dados da PNAB (Termo de Adesão da Prefeitura de Viamão 88.000.914/0001-01) diretamente da API oficial Transferegov.br.',
+    descricao: 'Retorna a prestação pública oficial, metas orçamentárias (Art. 6º Audiovisual e Art. 8º Demais Áreas) e contas fiduciárias da Lei Paulo Gustavo em Viamão/RS via API Transferegov Fundo a Fundo.',
     parametros: [
-      { nome: 'cnpj', tipo: 'string', descricao: 'CNPJ do município (padrão: 88000914000101)', exemplo: '88000914000101' }
+      { nome: 'cnpj', tipo: 'string', descricao: 'CNPJ do município', exemplo: '88000914000101' }
     ],
     exemploResposta: JSON.stringify({
       success: true,
-      data: {
-        id: "pnab-88000914000101",
-        termo_numero: "Termo de Adesão PNAB 2024/Viamão",
-        cnpj_proponente: "88.000.914/0001-01",
-        municipio: "Viamão",
-        uf: "RS",
-        valor_global: 1729410.50,
-        status_etapa: "Fase de Execução dos Editais",
-        fonte_auditada: "Plataforma Transferegov.br / Ministério da Cultura"
-      },
-      cached: false,
-      rate_limit_info: "60 req/min (Transferegov Oficial)"
-    }, null, 2)
-  },
-  {
-    id: 'api-serverless-rouanet',
-    nome: 'Endpoint Serverless /api/rouanet (Versalic / SalicNet)',
-    esfera: 'Serverless Edge (Vercel Python 3.10+)',
-    url: '/api/rouanet',
-    metodo: 'GET',
-    descricao: 'Consulta em tempo real na API oficial Versalic (SalicNet / MinC) projetos aprovados para captação por renúncia fiscal (Art. 18 e 26 da Lei 8.313/1991) no município de Viamão/RS.',
-    parametros: [
-      { nome: 'municipio', tipo: 'string', descricao: 'Nome do município', exemplo: 'Viamao' },
-      { nome: 'uf', tipo: 'string', descricao: 'Sigla da Unidade Federativa', exemplo: 'RS' }
-    ],
-    exemploResposta: JSON.stringify({
-      success: true,
-      total: 0,
-      projetos: [],
-      aviso: "Conforme protocolo anti-alucinação, registros vazios representam ausência de captação ativa homologada no município.",
-      fonte_oficial: "https://versalic.cultura.gov.br/"
-    }, null, 2)
-  },
-  {
-    id: 'api-serverless-fac',
-    nome: 'Endpoint Serverless /api/fac (SEDAC-RS / Pró-Cultura)',
-    esfera: 'Serverless Edge (Vercel Python 3.10+)',
-    url: '/api/fac',
-    metodo: 'GET',
-    descricao: 'Consolida editais públicos do Fundo de Apoio à Cultura (FAC/RS) do Governo do Estado do Rio Grande do Sul (SEDAC-RS).',
-    parametros: [],
-    exemploResposta: JSON.stringify({
-      success: true,
-      total: 2,
-      editais: [
-        {
-          id: "fac-01",
-          numero_edital: "Chamadas Públicas FAC (SEDAC-RS)",
-          titulo: "Fundo de Apoio à Cultura - Linhas Setoriais",
-          status: "Inscrições Abertas",
-          link_oficial: "https://www.procultura.rs.gov.br/"
-        }
-      ],
-      fonte_oficial: "https://www.procultura.rs.gov.br/"
+      fonte: "API Pública Transferegov Fundo a Fundo (MinC)",
+      base_legal: "Lei Complementar nº 195/2022 (Lei Paulo Gustavo)",
+      municipio: "Viamão",
+      uf: "RS",
+      plano_acao: {
+        codigo_plano_acao: "30882120230006-010014",
+        situacao: "AUTORIZADO",
+        valor_total_repasse: 2046951.79,
+        metas: [
+          { "numero_meta": "M1", "nome_meta": "Art. 6º, inciso I", "descricao": "Apoio a Produções Audiovisuais", "valor": 1084475.06 },
+          { "numero_meta": "M2", "nome_meta": "Art. 6º, inciso II", "descricao": "Apoio a salas de cinema", "valor": 247885.86 },
+          { "numero_meta": "M3", "nome_meta": "Art. 6º, inciso III", "descricao": "Formação, qualificação e difusão", "valor": 124454.67 },
+          { "numero_meta": "M4", "nome_meta": "Art. 8º", "descricao": "Demais áreas da cultura", "valor": 590136.20 }
+        ]
+      }
     }, null, 2)
   },
   {
     id: 'api-serverless-news',
     nome: 'Endpoint Serverless /api/news (Notícias e Editais Verificados)',
-    esfera: 'Serverless Edge (Vercel Python 3.10+)',
+    esfera: 'Serverless Edge (Python 3.10+)',
     url: '/api/news?q=cultura',
     metodo: 'GET',
-    descricao: 'Consulta feeds e notícias oficiais sobre editais, patrimônio e eventos culturais em Viamão e no Rio Grande do Sul.',
+    descricao: 'Consulta notícias, publicações de editais e notas oficiais sobre cultura em Viamão/RS com filtro contra fake news.',
     parametros: [
       { nome: 'q', tipo: 'string', descricao: 'Termo de busca (ex: pnab, edital, viamao)', exemplo: 'pnab' }
     ],
@@ -1208,11 +607,12 @@ export const API_DOCUMENTATION: ApiEndpointDoc[] = [
       noticias: [
         {
           id: "news-01",
-          titulo: "Editais da PNAB Viamão em andamento",
-          fonte: "Prefeitura Municipal de Viamão"
+          titulo: "Editais da PNAB e LPG em Viamão",
+          fonte: "Prefeitura Municipal de Viamão / MinC"
         }
       ]
     }, null, 2)
   }
 ];
+
 

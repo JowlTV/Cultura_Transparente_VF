@@ -286,5 +286,50 @@ class HttpClient:
 
         raise last_exception or RuntimeError(f"Falha ao conectar em {full_url}")
 
+    def fetch_text(
+        self,
+        url: str,
+        params: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None,
+        cache_ttl: Optional[int] = None,
+        cache_key: Optional[str] = None
+    ) -> str:
+        """
+        Executa requisição GET retornando texto bruto (ex: CSV, XML, HTML) com cache opcional.
+        """
+        if params:
+            query_string = urlencode({k: v for k, v in params.items() if v is not None})
+            delimiter = "&" if "?" in url else "?"
+            full_url = f"{url}{delimiter}{query_string}"
+        else:
+            full_url = url
+
+        actual_cache_key = cache_key or f"http:text:{full_url}"
+        if cache_ttl is not None and cache_ttl > 0:
+            cached_data = cache.get(actual_cache_key)
+            if cached_data is not None:
+                return cached_data
+
+        merged_headers = {**self.DEFAULT_HEADERS, **(headers or {})}
+        attempt = 0
+        last_exception = None
+
+        while attempt <= self.max_retries:
+            attempt += 1
+            try:
+                req = Request(full_url, headers=merged_headers)
+                with urlopen(req, timeout=self.timeout) as response:
+                    raw_bytes = response.read()
+                    text = raw_bytes.decode("utf-8", errors="replace")
+                    if cache_ttl is not None and cache_ttl > 0:
+                        cache.set(actual_cache_key, text, ttl_seconds=cache_ttl)
+                    return text
+            except Exception as e:
+                last_exception = e
+                if attempt <= self.max_retries:
+                    time.sleep(self.backoff_factor * attempt)
+                    continue
+                raise last_exception
+
 
 http_client = HttpClient()

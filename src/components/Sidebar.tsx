@@ -4,7 +4,6 @@ import {
   FileSpreadsheet,
   BarChart3,
   Coins,
-  Building2,
   ShieldCheck,
   X,
   Search,
@@ -36,12 +35,9 @@ export const navTabs: NavTabItem[] = [
   { id: 'visao-geral', label: 'Visão Geral & Editais', icon: '🏛️', lucideIcon: <Landmark className="w-4 h-4" /> },
   { id: 'emendas', label: 'Emendas Parlamentares', icon: '📋', lucideIcon: <FileSpreadsheet className="w-4 h-4" /> },
   { id: 'pnab', label: 'PNAB / Auditoria', icon: '💰', lucideIcon: <Coins className="w-4 h-4" /> },
-  { id: 'fac', label: 'Fundo de Apoio à Cultura (FAC)', icon: '🏛️', lucideIcon: <Award className="w-4 h-4" /> },
   { id: 'lpg', label: 'Lei Paulo Gustavo (LPG)', icon: '🎬', lucideIcon: <Film className="w-4 h-4" /> },
-  { id: 'rouanet', label: 'Lei Rouanet (SalicNet)', icon: '✨', lucideIcon: <Sparkles className="w-4 h-4" /> },
   { id: 'auxilio-fazedor', label: 'Auxílio ao Fazedor de Cultura', icon: '✨', lucideIcon: <Sparkles className="w-4 h-4" />, badge: 'Novo' },
-  { id: 'acompanhe-cultura', label: 'Acompanhe a Cultura', icon: '🎭', lucideIcon: <Building2 className="w-4 h-4" /> },
-  { id: 'apis', label: 'APIs & Central de Bots', icon: '⚡', lucideIcon: <Code2 className="w-4 h-4" /> },
+  { id: 'apis', label: 'APIs & Dados Abertos', icon: '⚡', lucideIcon: <Code2 className="w-4 h-4" /> },
   { id: 'controle-social', label: 'Controle Social & LAI', icon: '🛡️', lucideIcon: <ShieldCheck className="w-4 h-4" /> },
 ];
 

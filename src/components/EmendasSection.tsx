@@ -787,13 +787,13 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                         {/* Objeto */}
                         <td className="py-2.5 px-3.5">
                           <div className="font-medium text-slate-200 leading-snug line-clamp-2" title={emenda.subprojeto}>
-                            {emenda.subprojeto}
+                            <span>{emenda.subprojeto}</span>
+                            {emenda.tipo_projeto_cultural && (
+                              <span className="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#2a1120] text-[#FF4500] border border-[#FF4500]/30 whitespace-nowrap ml-1.5 align-middle">
+                                {emenda.tipo_projeto_cultural}
+                              </span>
+                            )}
                           </div>
-                          {emenda.tipo_projeto_cultural && (
-                            <span className="inline-block text-[10px] text-purple-300/70 mt-0.5">
-                              Segmento: <strong className="text-[#FF4500]">{emenda.tipo_projeto_cultural}</strong>
-                            </span>
-                          )}
                         </td>
 
                         {/* Órgão / Secretaria */}

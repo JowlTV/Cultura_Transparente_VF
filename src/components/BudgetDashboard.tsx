@@ -27,19 +27,17 @@ import {
   Sparkles,
   Download,
 } from 'lucide-react';
-import { Emenda, PnabRecord } from '../types/culture';
+import { Emenda } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
 import { BUDGET_CHRONOLOGY } from '../data/initialData';
 
 interface BudgetDashboardProps {
   emendas: Emenda[];
-  pnabList: PnabRecord[];
   onNavigateToPoint?: (pontoId: string) => void;
 }
 
 export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
   emendas,
-  pnabList,
   onNavigateToPoint,
 }) => {
   const [selectedYear, setSelectedYear] = useState<string>('todos');

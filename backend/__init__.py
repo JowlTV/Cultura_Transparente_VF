@@ -1,22 +1,18 @@
 """Cultura Transparente Backend Package"""
 from backend.models import (
     TipoFinanciamento,
-    PNABRecord,
-    FACEdital,
     LPGProject,
-    RouanetProject,
+    LPGMeta,
     EmendaRecord,
     AuditReport
 )
 from backend.utils import TTLCache, HttpClient, setup_logger, cache, http_client
-from backend.apis import TransferegovApi, VersalicRouanetApi, CguTransparenciaApi
+from backend.apis import TransferegovApi, CguTransparenciaApi, PortalTransparenciaRsApi
 
 __all__ = [
     "TipoFinanciamento",
-    "PNABRecord",
-    "FACEdital",
     "LPGProject",
-    "RouanetProject",
+    "LPGMeta",
     "EmendaRecord",
     "AuditReport",
     "TTLCache",
@@ -25,6 +21,6 @@ __all__ = [
     "cache",
     "http_client",
     "TransferegovApi",
-    "VersalicRouanetApi",
-    "CguTransparenciaApi"
+    "CguTransparenciaApi",
+    "PortalTransparenciaRsApi"
 ]
