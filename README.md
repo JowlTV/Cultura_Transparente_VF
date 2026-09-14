@@ -94,7 +94,3 @@ Todos os 12 testes validam:
 
 ---
 
-## 🛡️ Diretriz de Integridade Anti-Alucinação
-
-1. **Zero Dados Fictícios**: É terminantemente vedada a geração de números PRONAC aleatórios, orçamentos simulados ou valores inventados.
-2. **Tratamento de Estado Vazio**: Caso uma busca na base governamental não retorne projetos ativos em Viamão, o sistema exibe transparentemente **"Aguardando sincronização oficial"** ou **"Nenhum projeto encontrado"**, orientando o proponente com links oficiais.
