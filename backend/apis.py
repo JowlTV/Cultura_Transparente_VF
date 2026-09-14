@@ -95,25 +95,12 @@ class TransferegovApi:
                         sincronizacao_pendente=False
                     )
 
-            # Fallback seguro: se a API não listar convênios ativos no momento,
-            # emite registro transparente com aviso
-            logger.info("Nenhum convênio PNAB específico retornado na consulta; aplicando schema oficial auditado.")
-            return PNABRecord(
-                id="pnab-01",
-                termo_numero="Termo de Adesão oficial registrado no Transferegov",
-                cnpj_proponente="88.000.914/0001-01",
-                municipio="Viamão",
-                uf="RS",
-                valor_global=0.0,  # Fica zerado/oculto até validação de repasse
-                data_extrato="09/09/2026",
-                banco_custodia="Conta Fiduciária Vinculada ao Fundo Municipal de Cultura (Transferegov.br)",
-                conta_vinculada="Fundo Municipal de Cultura de Viamão",
-                objeto="Implementação das Ações da Política Nacional Aldir Blanc de Fomento à Cultura - PNAB (Lei nº 14.399/2022)",
-                base_legal="Lei Federal nº 14.399/2022, Decreto Federal nº 11.740/2023 e Portarias MinC nº 80/2023 e nº 84/2023",
-                fonte_auditada="Plataforma Transferegov.br / Ministério da Cultura (MinC)",
-                status_etapa="Fase de Elaboração e Publicação de Editais",
-                sincronizacao_pendente=False
-            )
+            # Nenhum convênio PNAB correspondente foi retornado pela API oficial.
+            # Conforme diretriz anti-alucinação, NÃO inventamos valores, números de
+            # termo ou datas: retornamos None e o front-end exibe o estado vazio
+            # padrão ("Dados não coletados, consultar plataformas oficiais").
+            logger.info("Nenhum convênio PNAB específico retornado na consulta; sem dado oficial para exibir.")
+            return None
 
         except Exception as e:
             logger.error(f"Erro ao consultar Transferegov: {e}")

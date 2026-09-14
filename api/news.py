@@ -12,7 +12,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from backend.scrapers.viamao_scraper import ViamaoCultureScraper
-from backend.utils import setup_logger
+from backend.utils import setup_logger, cache
 
 logger = setup_logger("VercelApiNews")
 
@@ -26,6 +26,8 @@ class handler(BaseHTTPRequestHandler):
             # Sanitização estrita do termo de busca (limite de 60 caracteres, apenas texto seguro)
             termo = "".join(c for c in raw_termo if c.isalnum() or c in " -_").strip()[:60] or "cultura"
 
+            cache_key = f"google_news_viamao:{termo}"
+            was_cached = cache.has(cache_key)
             scraper = ViamaoCultureScraper()
             noticias = scraper.pesquisar_google_noticias_viamao(termo=termo)
 
@@ -34,6 +36,7 @@ class handler(BaseHTTPRequestHandler):
                 "termo_pesquisado": termo,
                 "total": len(noticias),
                 "noticias": noticias,
+                "cached": was_cached,
                 "politica_integridade": "Zero fake news. Fontes estritamente limitadas a imprensa regional confirmada, instituições federais/estaduais e órgãos oficiais de Viamão.",
                 "data_consulta": "11/09/2026"
             }

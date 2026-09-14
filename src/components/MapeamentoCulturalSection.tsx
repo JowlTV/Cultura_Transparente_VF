@@ -255,7 +255,7 @@ export const MapeamentoCulturalSection: React.FC<MapeamentoCulturalSectionProps>
               Acompanhe a Cultura
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Conheça os pontos de cultura, centros e coletivos de Viamão: consulte o resumo de representação cultural, suas atividades recorrentes, localização no Google Maps e acompanhe publicações comunitárias.
+              Conheça os pontos de cultura, centros e coletivos de Viamão: consulte o resumo de representação cultural, suas atividades recorrentes e acompanhe publicações comunitárias.
             </p>
           </div>
 

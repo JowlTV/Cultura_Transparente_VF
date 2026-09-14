@@ -72,6 +72,15 @@ class TTLCache:
     """
     Gerenciador de cache thread-safe em memória com expiração por TTL.
     Permite opcionalmente sincronizar o estado em arquivo JSON para persistência.
+
+    NOTA ARQUITETURAL / LIMITAÇÕES EM AMBIENTES SERVERLESS (ex: Vercel / AWS Lambda):
+    - Em ambientes serverless baseados em funções efêmeras, cada invocação pode ser executada
+      em uma instância isolada. O cache em memória persiste somente durante warm starts
+      da mesma instância de execução e não é compartilhado entre réplicas simultâneas distintas.
+    - Para concorrência distribuída massiva (>1.000 req/s), a primeira linha de defesa
+      é o Edge Cache HTTP (cabeçalho `Cache-Control: public, s-maxage=...`), que intercepta
+      as requisições na CDN antes de invocar a função Python.
+    - Para persistência de estado distribuído compartilhado entre workers, utilize Redis / Upstash KV.
     """
     def __init__(self, default_ttl_seconds: int = 3600, disk_file: Optional[str] = None):
         self._default_ttl = default_ttl_seconds
@@ -100,6 +109,15 @@ class TTLCache:
             
             self._stats["hits"] += 1
             return item["value"]
+
+    def has(self, key: str) -> bool:
+        """Verifica se uma chave existe e ainda é válida pelo TTL sem incrementar stats de hit/miss."""
+        with self._lock:
+            if key not in self._store:
+                return False
+            if time.time() > self._store[key]["expires_at"]:
+                return False
+            return True
 
     def set(self, key: str, value: Any, ttl_seconds: Optional[int] = None) -> None:
         """Armazena um valor com TTL customizado ou padrão."""
@@ -177,10 +195,10 @@ class HttpClient:
         "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8"
     }
 
-    def __init__(self, max_retries: int = 3, backoff_factor: float = 0.5, timeout: float = 8.0):
+    def __init__(self, max_retries: int = 2, backoff_factor: float = 0.4, timeout: float = 4.0):
         self.max_retries = max_retries
         self.backoff_factor = backoff_factor
-        self.timeout = timeout  # Adequado para limite serverless de 10s
+        self.timeout = timeout  # Adequado para limite estrito de 10s do Vercel Serverless (2 retries + timeout 4s)
 
     def fetch_json(
         self,

@@ -137,8 +137,8 @@ export async function sendMessageToAssistant(
         return parseAssistantResponse(rawText);
       }
     }
-  } catch (err) {
-    console.warn('Serviço de API indisponível, utilizando motor inteligente de fallback:', err);
+  } catch {
+    // Graceful fallback to client engine
   }
 
   // Fallback engine if backend is unreachable or under high demand

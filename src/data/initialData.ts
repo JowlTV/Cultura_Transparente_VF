@@ -1,4 +1,4 @@
-import { Emenda, PnabRecord, PontoCultural, NewsItem, SharedCommunityLink } from '../types/culture';
+import { Emenda, PnabRecord, PontoCultural, NewsItem, SharedCommunityLink, LeiIncentivo, FacEdital, ApiEndpointDoc } from '../types/culture';
 import { classificarSetorEmenda } from '../utils/formatters';
 import pnabAuditJson from './pnab_scraped_audit.json';
 
@@ -1058,6 +1058,161 @@ export const INITIAL_NEWS: NewsItem[] = [
       'Acesso público aos sítios e monumentos históricos',
       'Ações pedagógicas nas escolas municipais'
     ]
+  }
+];
+
+export const INITIAL_LEIS_INCENTIVO: LeiIncentivo[] = [
+  {
+    id: 'lpg-01',
+    mecanismo: 'Lei Paulo Gustavo (LC nº 195/2022)',
+    projeto_objeto: 'Editais Municipais de Fomento ao Audiovisual, Prêmios de Trajetória e Espaços Culturais',
+    valor_aprovado: 250000.0,
+    valor_captado: 250000.0,
+    origem_recurso: 'Fundo Nacional de Cultura (FNC / Repasse Direto Fundo a Fundo)',
+    destino_recurso: 'Fundo Municipal de Cultura de Viamão (Conta Específica Banco do Brasil)',
+    orgao_liberador: 'Ministério da Cultura (MinC)',
+    responsavel_execucao: 'Prefeitura Municipal de Viamão (Secretaria de Cultura)',
+    status_atual: 'Em Execução (Prestação de Contas & Lançamento Complementar)',
+    como_sera_feito: 'Financiamento a curta-metragens locais, videoclipes de músicos de Viamão, capacitações técnicas e prêmios por histórico artístico a mestres da cultura tradicional.',
+    fonte_oficial: 'https://www.gov.br/cultura/pt-br/assuntos/lei-paulo-gustavo',
+    periodo_execucao: '2024 - 2026',
+  }
+];
+
+export const INITIAL_FAC_EDITAIS: FacEdital[] = [
+  {
+    id: 'fac-linhas-setoriais',
+    numero_edital: 'Chamadas Públicas FAC (SEDAC-RS)',
+    nome: 'Fundo de Apoio à Cultura - Linhas Setoriais e Descentralizadas',
+    segmento: 'Culturas Populares, Patrimônio, Artes e Periferias',
+    mecanismo: 'Fundo de Apoio à Cultura (FAC)',
+    publico_alvo: 'Pessoas Jurídicas (incluindo MEI) sediadas no RS e Fazedores Culturais',
+    exigencia_proponente: 'Registro e homologação no CEPC (Cadastro Estadual de Produtor Cultural) / Pró-cultura RS',
+    requisitos_principais: [
+      'Sede ou domicílio comprovado no Estado do Rio Grande do Sul há pelo menos 2 anos',
+      'Cadastro ativo no Pró-cultura RS (SEDAC-RS)',
+      'Apresentação de plano de trabalho e planilha orçamentária detalhada',
+      'Previsão de medidas de democratização do acesso e acessibilidade'
+    ],
+    status: 'Inscrições Abertas',
+    prazo_inscricao: 'Conforme cronograma oficial Pró-cultura RS',
+    link_oficial: 'https://www.procultura.rs.gov.br/',
+    plataforma: 'Sistema Pró-cultura RS (SEDAC-RS)',
+    contrapartida_exigida: 'Ações socioculturais gratuitas dirigidas à comunidade',
+    base_legal: 'Lei Estadual nº 13.490/2010 (Sistema Estadual de Cultura do RS)'
+  },
+  {
+    id: 'fac-territorios-culturais',
+    numero_edital: 'Edital FAC Territórios e Periferias Vivas',
+    nome: 'Edital de Fomento a Coletivos e Territórios Criativos Descentralizados',
+    segmento: 'Periferias, Coletivos Comunitários e Cultura Viva',
+    mecanismo: 'Fundo de Apoio à Cultura (FAC)',
+    publico_alvo: 'Coletivos Culturais, Pontos de Cultura e Mestres Tradicionais',
+    exigencia_proponente: 'Atuação comunitária comprovada no território',
+    requisitos_principais: [
+      'Comprovação de atuação continuada na comunidade',
+      'Plano pedagógico ou circulação comunitária em bairros periféricos',
+      'Prestação de contas simplificada em conformidade com a legislação estadual'
+    ],
+    status: 'Previsto / Calendário',
+    prazo_inscricao: 'Acompanhar publicação no Diário Oficial do Estado do RS (DOE-RS)',
+    link_oficial: 'https://www.procultura.rs.gov.br/',
+    plataforma: 'SEDAC-RS / Pró-cultura',
+    contrapartida_exigida: 'Oficinas e apresentações abertas ao público local',
+    base_legal: 'Lei Estadual nº 13.490/2010 e Decretos Regulamentares'
+  }
+];
+
+export const API_DOCUMENTATION: ApiEndpointDoc[] = [
+  {
+    id: 'api-serverless-pnab',
+    nome: 'Endpoint Serverless /api/pnab (Transferegov / MinC)',
+    esfera: 'Serverless Edge (Vercel Python 3.10+)',
+    url: '/api/pnab',
+    metodo: 'GET',
+    descricao: 'Endpoint serverless com TTLCache e retry resiliente que consome dados da PNAB (Termo de Adesão da Prefeitura de Viamão 88.000.914/0001-01) diretamente da API oficial Transferegov.br.',
+    parametros: [
+      { nome: 'cnpj', tipo: 'string', descricao: 'CNPJ do município (padrão: 88000914000101)', exemplo: '88000914000101' }
+    ],
+    exemploResposta: JSON.stringify({
+      success: true,
+      data: {
+        id: "pnab-88000914000101",
+        termo_numero: "Termo de Adesão PNAB 2024/Viamão",
+        cnpj_proponente: "88.000.914/0001-01",
+        municipio: "Viamão",
+        uf: "RS",
+        valor_global: 1729410.50,
+        status_etapa: "Fase de Execução dos Editais",
+        fonte_auditada: "Plataforma Transferegov.br / Ministério da Cultura"
+      },
+      cached: false,
+      rate_limit_info: "60 req/min (Transferegov Oficial)"
+    }, null, 2)
+  },
+  {
+    id: 'api-serverless-rouanet',
+    nome: 'Endpoint Serverless /api/rouanet (Versalic / SalicNet)',
+    esfera: 'Serverless Edge (Vercel Python 3.10+)',
+    url: '/api/rouanet',
+    metodo: 'GET',
+    descricao: 'Consulta em tempo real na API oficial Versalic (SalicNet / MinC) projetos aprovados para captação por renúncia fiscal (Art. 18 e 26 da Lei 8.313/1991) no município de Viamão/RS.',
+    parametros: [
+      { nome: 'municipio', tipo: 'string', descricao: 'Nome do município', exemplo: 'Viamao' },
+      { nome: 'uf', tipo: 'string', descricao: 'Sigla da Unidade Federativa', exemplo: 'RS' }
+    ],
+    exemploResposta: JSON.stringify({
+      success: true,
+      total: 0,
+      projetos: [],
+      aviso: "Conforme protocolo anti-alucinação, registros vazios representam ausência de captação ativa homologada no município.",
+      fonte_oficial: "https://versalic.cultura.gov.br/"
+    }, null, 2)
+  },
+  {
+    id: 'api-serverless-fac',
+    nome: 'Endpoint Serverless /api/fac (SEDAC-RS / Pró-Cultura)',
+    esfera: 'Serverless Edge (Vercel Python 3.10+)',
+    url: '/api/fac',
+    metodo: 'GET',
+    descricao: 'Consolida editais públicos do Fundo de Apoio à Cultura (FAC/RS) do Governo do Estado do Rio Grande do Sul (SEDAC-RS).',
+    parametros: [],
+    exemploResposta: JSON.stringify({
+      success: true,
+      total: 2,
+      editais: [
+        {
+          id: "fac-01",
+          numero_edital: "Chamadas Públicas FAC (SEDAC-RS)",
+          titulo: "Fundo de Apoio à Cultura - Linhas Setoriais",
+          status: "Inscrições Abertas",
+          link_oficial: "https://www.procultura.rs.gov.br/"
+        }
+      ],
+      fonte_oficial: "https://www.procultura.rs.gov.br/"
+    }, null, 2)
+  },
+  {
+    id: 'api-serverless-news',
+    nome: 'Endpoint Serverless /api/news (Notícias e Editais Verificados)',
+    esfera: 'Serverless Edge (Vercel Python 3.10+)',
+    url: '/api/news?q=cultura',
+    metodo: 'GET',
+    descricao: 'Consulta feeds e notícias oficiais sobre editais, patrimônio e eventos culturais em Viamão e no Rio Grande do Sul.',
+    parametros: [
+      { nome: 'q', tipo: 'string', descricao: 'Termo de busca (ex: pnab, edital, viamao)', exemplo: 'pnab' }
+    ],
+    exemploResposta: JSON.stringify({
+      success: true,
+      total: 3,
+      noticias: [
+        {
+          id: "news-01",
+          titulo: "Editais da PNAB Viamão em andamento",
+          fonte: "Prefeitura Municipal de Viamão"
+        }
+      ]
+    }, null, 2)
   }
 ];
 

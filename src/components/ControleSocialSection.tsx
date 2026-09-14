@@ -106,8 +106,8 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
       nome: 'Tribunal de Contas do Estado do RS (TCE-RS)',
       esfera: 'Estadual',
       papel: 'Ouvidoria e fiscalização da conformidade contábil, financeira e orçamentária do município de Viamão. Canal direto: 0800-541 9800 / E-mail: ouvidoria@tce.rs.gov.br.',
-      link: 'https://tce.rs.gov.br/ouvidoria',
-      portalSecundario: 'https://www.tce.rs.gov.br/',
+      link: 'https://portalnovo.tce.rs.gov.br/ouvidoria',
+      portalSecundario: 'https://portalnovo.tce.rs.gov.br/',
       prazo: 'Ouvidoria TCE-RS',
     },
     {

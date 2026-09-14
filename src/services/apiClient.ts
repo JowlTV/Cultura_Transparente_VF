@@ -7,8 +7,8 @@
  * com fallback inteligente para dados estáticos consolidados e métricas de latência.
  */
 
-import { PnabRecord, NewsItem } from '../types/culture';
-import { INITIAL_PNAB, INITIAL_NEWS } from '../data/initialData';
+import { PnabRecord, NewsItem, LeiIncentivo, FacEdital } from '../types/culture';
+import { INITIAL_PNAB, INITIAL_NEWS, INITIAL_LEIS_INCENTIVO, INITIAL_FAC_EDITAIS } from '../data/initialData';
 import { sanitizeUrl, sanitizeInputText } from '../utils/security';
 
 export interface ApiStatusReport {
@@ -260,6 +260,151 @@ class CulturalApiClient {
         },
         total: fallbackData.length,
         queryUsed: query,
+      };
+      this.setCached(cacheKey, result);
+      return result;
+    })();
+
+    this.inFlightRequests.set(cacheKey, promise);
+    try {
+      return await promise;
+    } finally {
+      this.inFlightRequests.delete(cacheKey);
+    }
+  }
+
+  /**
+   * Consulta projetos da Lei Rouanet em /api/rouanet com protocolo anti-alucinação
+   */
+  public async fetchRouanet(): Promise<{ data: LeiIncentivo[]; report: ApiStatusReport }> {
+    const cacheKey = 'rouanet_all';
+    const cached = this.getCached<{ data: LeiIncentivo[]; report: ApiStatusReport }>(cacheKey);
+    if (cached) return cached;
+
+    if (this.inFlightRequests.has(cacheKey)) {
+      return this.inFlightRequests.get(cacheKey);
+    }
+
+    const promise = (async () => {
+      const startTime = performance.now();
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const response = await fetch('/api/rouanet?municipio=Viamao&uf=RS', {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        const latencyMs = Math.round(performance.now() - startTime);
+        if (response.ok) {
+          const payload = await response.json();
+          const projetos = Array.isArray(payload.projetos) ? payload.projetos : [];
+          // Preserve LPG projects from initial data and merge any Rouanet projects found
+          const lpgProjects = INITIAL_LEIS_INCENTIVO.filter(p => !p.mecanismo.toLowerCase().includes('rouanet'));
+          const merged: LeiIncentivo[] = [...lpgProjects, ...projetos];
+
+          const result = {
+            data: merged,
+            report: {
+              endpoint: '/api/rouanet',
+              status: 'online' as const,
+              latencyMs,
+              lastChecked: new Date().toLocaleTimeString('pt-BR'),
+              rateLimitInfo: 'Versalic / SalicNet MinC',
+              totalRecords: projetos.length
+            }
+          };
+          this.setCached(cacheKey, result);
+          return result;
+        }
+      } catch {
+        // Fallback auditado
+      }
+
+      const latencyMs = Math.round(performance.now() - startTime);
+      const result = {
+        data: INITIAL_LEIS_INCENTIVO,
+        report: {
+          endpoint: '/api/rouanet',
+          status: 'cached' as const,
+          latencyMs: Math.max(latencyMs, 10),
+          lastChecked: new Date().toLocaleTimeString('pt-BR'),
+          rateLimitInfo: 'Base Auditada',
+          totalRecords: INITIAL_LEIS_INCENTIVO.filter(p => p.mecanismo.toLowerCase().includes('rouanet')).length
+        }
+      };
+      this.setCached(cacheKey, result);
+      return result;
+    })();
+
+    this.inFlightRequests.set(cacheKey, promise);
+    try {
+      return await promise;
+    } finally {
+      this.inFlightRequests.delete(cacheKey);
+    }
+  }
+
+  /**
+   * Consulta editais do FAC (SEDAC-RS / Pró-cultura) em /api/fac
+   */
+  public async fetchFac(): Promise<{ data: FacEdital[]; report: ApiStatusReport }> {
+    const cacheKey = 'fac_all';
+    const cached = this.getCached<{ data: FacEdital[]; report: ApiStatusReport }>(cacheKey);
+    if (cached) return cached;
+
+    if (this.inFlightRequests.has(cacheKey)) {
+      return this.inFlightRequests.get(cacheKey);
+    }
+
+    const promise = (async () => {
+      const startTime = performance.now();
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const response = await fetch('/api/fac', {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        const latencyMs = Math.round(performance.now() - startTime);
+        if (response.ok) {
+          const payload = await response.json();
+          if (payload.success && Array.isArray(payload.editais) && payload.editais.length > 0) {
+            const result = {
+              data: payload.editais,
+              report: {
+                endpoint: '/api/fac',
+                status: 'online' as const,
+                latencyMs,
+                lastChecked: new Date().toLocaleTimeString('pt-BR'),
+                rateLimitInfo: 'Pró-cultura RS / SEDAC',
+                totalRecords: payload.editais.length
+              }
+            };
+            this.setCached(cacheKey, result);
+            return result;
+          }
+        }
+      } catch {
+        // Fallback auditado
+      }
+
+      const latencyMs = Math.round(performance.now() - startTime);
+      const result = {
+        data: INITIAL_FAC_EDITAIS,
+        report: {
+          endpoint: '/api/fac',
+          status: 'cached' as const,
+          latencyMs: Math.max(latencyMs, 10),
+          lastChecked: new Date().toLocaleTimeString('pt-BR'),
+          rateLimitInfo: 'Base Auditada',
+          totalRecords: INITIAL_FAC_EDITAIS.length
+        }
       };
       this.setCached(cacheKey, result);
       return result;
