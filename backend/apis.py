@@ -98,26 +98,36 @@ class TransferegovApi:
             except Exception as e_banco:
                 logger.warning(f"Erro ao buscar dados bancários LPG: {e_banco}")
 
+        # NOTA DE INTEGRIDADE ANTI-ALUCINAÇÃO:
+        # Substituição de fallbacks: campos não retornados pela API oficial do Transferegov
+        # são preenchidos com valores neutros (None para números/datas e "Não informado pela fonte"
+        # para textos), em vez de valores hardcoded específicos de Viamão. Isso evita que uma alteração
+        # ou falha de campo na API seja mascarada por dados históricos estáticos.
+        # Exceção legítima: campos de metadados institucionais e regulatórios fixos ("base_legal", "fonte_oficial")
+        # identificam as normas do programa em si e permanecem fixos.
+        valor_raw = plano.get("valor_total_repasse_plano_acao") or plano.get("valor_repasse_especifico_plano_acao")
+        valor_total = float(valor_raw) if valor_raw is not None else None
+
         return {
             "id_plano_acao": id_plano,
-            "codigo_plano_acao": plano.get("codigo_plano_acao", "30882120230006-010014"),
-            "situacao": plano.get("situacao_plano_acao", "AUTORIZADO"),
-            "valor_total_repasse": float(plano.get("valor_total_repasse_plano_acao") or plano.get("valor_repasse_especifico_plano_acao") or 2046951.79),
-            "data_inicio_vigencia": plano.get("data_inicio_vigencia_plano_acao", "2023-06-12"),
-            "data_fim_vigencia": plano.get("data_fim_vigencia_plano_acao", "2024-12-31"),
-            "diagnostico": plano.get("diagnostico_plano_acao", ""),
-            "objetivos": plano.get("objetivos_plano_acao", ""),
+            "codigo_plano_acao": plano.get("codigo_plano_acao") or "Não informado pela fonte",
+            "situacao": plano.get("situacao_plano_acao") or "Não informado pela fonte",
+            "valor_total_repasse": valor_total,
+            "data_inicio_vigencia": plano.get("data_inicio_vigencia_plano_acao") or None,
+            "data_fim_vigencia": plano.get("data_fim_vigencia_plano_acao") or None,
+            "diagnostico": plano.get("diagnostico_plano_acao") or "",
+            "objetivos": plano.get("objetivos_plano_acao") or "",
             "ente_recebedor": {
-                "cnpj": "88.000.914/0001-01",
-                "nome": plano.get("nome_ente_recebedor_plano_acao", "MUNICIPIO DE VIAMAO"),
-                "uf": plano.get("uf_ente_recebedor_plano_acao", "RS"),
-                "municipio": plano.get("nome_municipio_ente_recebedor_plano_acao", "VIAMÃO"),
-                "fundo_orgao": plano.get("nome_fundo_recebedor_plano_acao", "Secretaria Municipal da Cultura")
+                "cnpj": plano.get("cnpj_ente_recebedor_plano_acao") or (f"{cnpj_limpo[:2]}.{cnpj_limpo[2:5]}.{cnpj_limpo[5:8]}/{cnpj_limpo[8:12]}-{cnpj_limpo[12:]}" if len(cnpj_limpo) == 14 else cnpj_limpo or "Não informado"),
+                "nome": plano.get("nome_ente_recebedor_plano_acao") or "Não informado pela fonte",
+                "uf": plano.get("uf_ente_recebedor_plano_acao") or "Não informado",
+                "municipio": plano.get("nome_municipio_ente_recebedor_plano_acao") or "Não informado pela fonte",
+                "fundo_orgao": plano.get("nome_fundo_recebedor_plano_acao") or "Não informado pela fonte"
             },
             "orgao_repassador": {
-                "sigla": plano.get("sigla_orgao_repassador_plano_acao", "MinC"),
-                "nome": plano.get("nome_orgao_repassador_plano_acao", "Ministério da Cultura"),
-                "fundo": plano.get("nome_fundo_repassador_plano_acao", "FUNDO NACIONAL DA CULTURA")
+                "sigla": plano.get("sigla_orgao_repassador_plano_acao") or "Não informado",
+                "nome": plano.get("nome_orgao_repassador_plano_acao") or "Não informado pela fonte",
+                "fundo": plano.get("nome_fundo_repassador_plano_acao") or "Não informado pela fonte"
             },
             "metas": metas,
             "dados_bancarios": dados_bancarios,

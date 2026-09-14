@@ -71,6 +71,7 @@ export interface LpgPlanoAcao {
   dados_bancarios: LpgDadoBancario[];
   base_legal: string;
   fonte_oficial: string;
+  fonte_dado?: 'api_real' | 'fallback_estatico';
 }
 
 export interface NewsItem {

@@ -70,6 +70,32 @@ class TestApis(unittest.TestCase):
         self.assertEqual(len(lpg_res["metas"]), 2)
         self.assertEqual(len(lpg_res["dados_bancarios"]), 1)
 
+    def test_transferegov_lpg_neutral_fallbacks(self):
+        """Verifica que campos ausentes na API do Transferegov retornam valores neutros (None / Não informado) e não dados hardcoded de Viamão."""
+        mock_client = MagicMock()
+        mock_client.fetch_json.side_effect = [
+            [
+                {
+                    "id_plano_acao": 9999,
+                    # Omitidos propositalmente: codigo_plano_acao, situacao_plano_acao, valor_total_repasse_plano_acao, vigência, ente, orgao
+                }
+            ],
+            [],
+            []
+        ]
+
+        api = TransferegovApi(client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
+        lpg_res = api.buscar_plano_acao_lpg("12345678000199")
+
+        self.assertIsNotNone(lpg_res)
+        self.assertEqual(lpg_res["codigo_plano_acao"], "Não informado pela fonte")
+        self.assertEqual(lpg_res["situacao"], "Não informado pela fonte")
+        self.assertIsNone(lpg_res["valor_total_repasse"])
+        self.assertIsNone(lpg_res["data_inicio_vigencia"])
+        self.assertIsNone(lpg_res["data_fim_vigencia"])
+        self.assertEqual(lpg_res["ente_recebedor"]["nome"], "Não informado pela fonte")
+        self.assertEqual(lpg_res["orgao_repassador"]["nome"], "Não informado pela fonte")
+
     def test_cgu_transparencia_api_sem_chave(self):
         """Verifica que sem chave configurada, a API da CGU retorna lista vazia sem lançar exceção."""
         mock_client = MagicMock()

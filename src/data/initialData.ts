@@ -564,7 +564,8 @@ export const INITIAL_LPG_DATA: LpgPlanoAcao = {
     }
   ],
   base_legal: 'Lei Complementar nº 195/2022 e Decreto nº 11.525/2023',
-  fonte_oficial: 'Plataforma Transferegov.br / Fundo a Fundo / Ministério da Cultura'
+  fonte_oficial: 'Plataforma Transferegov.br / Fundo a Fundo / Ministério da Cultura',
+  fonte_dado: 'fallback_estatico'
 };
 
 export const API_DOCUMENTATION: ApiEndpointDoc[] = [

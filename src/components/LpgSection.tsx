@@ -36,6 +36,20 @@ export const LpgSection: React.FC<LpgSectionProps> = ({ lpgData, isLoading }) =>
 
   return (
     <div className="space-y-6">
+      {lpgData.fonte_dado === 'fallback_estatico' && (
+        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-900 text-xs flex items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2.5">
+            <Info className="w-4 h-4 text-amber-600 shrink-0" />
+            <div>
+              <strong className="font-bold">Aviso de Exibição (Dados de Referência / Fallback):</strong> A consulta ao vivo à API do Transferegov Fundo a Fundo não pôde ser concluída no momento. O sistema está exibindo o plano de ação oficial homologado de Viamão para fins de consulta e transparência.
+            </div>
+          </div>
+          <span className="px-2 py-0.5 bg-amber-200/60 text-amber-900 font-bold text-[10px] rounded shrink-0 border border-amber-300">
+            Fallback Estático
+          </span>
+        </div>
+      )}
+
       {/* Header Banner - Lei Paulo Gustavo */}
       <div className="bg-gradient-to-r from-violet-950 via-purple-900 to-slate-900 rounded-2xl p-6 sm:p-7 text-white shadow-lg relative overflow-hidden">
         <div className="absolute right-0 top-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -181,6 +195,14 @@ export const LpgSection: React.FC<LpgSectionProps> = ({ lpgData, isLoading }) =>
           <div className="bg-white rounded-2xl border border-purple-200 p-8 text-center space-y-3">
             <RefreshCw className="w-8 h-8 text-purple-600 animate-spin mx-auto" />
             <p className="text-xs text-slate-600 font-semibold">Atualizando dados da Lei Paulo Gustavo via Transferegov...</p>
+          </div>
+        )}
+
+        {!isLoading && metasFiltradas.length === 0 && (
+          <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500 space-y-2">
+            <Target className="w-8 h-8 text-slate-400 mx-auto" />
+            <p className="text-xs font-semibold text-slate-700">Nenhuma meta detalhada disponível na fonte no momento da consulta.</p>
+            <p className="text-[11px] text-slate-400">A API respondeu com sucesso, mas não retornou itens de metas para este plano.</p>
           </div>
         )}
 

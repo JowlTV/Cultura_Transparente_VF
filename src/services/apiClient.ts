@@ -99,30 +99,32 @@ class CulturalApiClient {
           if (json.success && json.plano_acao) {
             const p = json.plano_acao;
             const lpgData: LpgPlanoAcao = {
-              id_plano_acao: p.id_plano_acao || 10014,
-              codigo_plano_acao: sanitizeInputText(p.codigo_plano_acao || '30882120230006-010014', 50),
-              situacao: sanitizeInputText(p.situacao || 'AUTORIZADO', 40),
-              valor_total_repasse: typeof p.valor_total_repasse === 'number' ? p.valor_total_repasse : 2046951.79,
-              data_inicio_vigencia: sanitizeInputText(p.data_inicio_vigencia || '2023-06-12', 30),
-              data_fim_vigencia: sanitizeInputText(p.data_fim_vigencia || '2024-12-31', 30),
+              id_plano_acao: p.id_plano_acao,
+              codigo_plano_acao: sanitizeInputText(p.codigo_plano_acao || 'Não informado pela fonte', 50),
+              situacao: sanitizeInputText(p.situacao || 'Não informado pela fonte', 40),
+              valor_total_repasse: typeof p.valor_total_repasse === 'number' ? p.valor_total_repasse : 0,
+              data_inicio_vigencia: sanitizeInputText(p.data_inicio_vigencia || 'Não informada', 30),
+              data_fim_vigencia: sanitizeInputText(p.data_fim_vigencia || 'Não informada', 30),
               diagnostico: sanitizeInputText(p.diagnostico || '', 500),
               objetivos: sanitizeInputText(p.objetivos || '', 500),
               ente_recebedor: {
-                cnpj: '88.000.914/0001-01',
-                nome: sanitizeInputText(p.ente_recebedor?.nome || 'MUNICIPIO DE VIAMAO', 100),
+                cnpj: sanitizeInputText(p.ente_recebedor?.cnpj || '88.000.914/0001-01', 30),
+                nome: sanitizeInputText(p.ente_recebedor?.nome || 'Não informado pela fonte', 100),
                 uf: sanitizeInputText(p.ente_recebedor?.uf || 'RS', 10),
-                municipio: sanitizeInputText(p.ente_recebedor?.municipio || 'VIAMÃO', 50),
-                fundo_orgao: sanitizeInputText(p.ente_recebedor?.fundo_orgao || 'Secretaria Municipal da Cultura', 100),
+                municipio: sanitizeInputText(p.ente_recebedor?.municipio || 'Não informado pela fonte', 50),
+                fundo_orgao: sanitizeInputText(p.ente_recebedor?.fundo_orgao || 'Não informado pela fonte', 100),
               },
               orgao_repassador: {
                 sigla: sanitizeInputText(p.orgao_repassador?.sigla || 'MinC', 20),
-                nome: sanitizeInputText(p.orgao_repassador?.nome || 'Ministério da Cultura', 100),
-                fundo: sanitizeInputText(p.orgao_repassador?.fundo || 'FUNDO NACIONAL DA CULTURA', 100),
+                nome: sanitizeInputText(p.orgao_repassador?.nome || 'Não informado pela fonte', 100),
+                fundo: sanitizeInputText(p.orgao_repassador?.fundo || 'Não informado pela fonte', 100),
               },
-              metas: Array.isArray(p.metas) && p.metas.length > 0 ? p.metas : INITIAL_LPG_DATA.metas,
-              dados_bancarios: Array.isArray(p.dados_bancarios) && p.dados_bancarios.length > 0 ? p.dados_bancarios : INITIAL_LPG_DATA.dados_bancarios,
+              // Resposta bem-sucedida com lista vazia propaga [] legitimamente
+              metas: Array.isArray(p.metas) ? p.metas : [],
+              dados_bancarios: Array.isArray(p.dados_bancarios) ? p.dados_bancarios : [],
               base_legal: sanitizeInputText(p.base_legal || 'Lei Complementar nº 195/2022', 100),
               fonte_oficial: sanitizeInputText(p.fonte_oficial || 'Plataforma Transferegov.br / Fundo a Fundo / MinC', 150),
+              fonte_dado: 'api_real',
             };
 
             const result = {
@@ -141,19 +143,23 @@ class CulturalApiClient {
           }
         }
       } catch (_) {
-        // Fallback para base auditada
+        // Fallback apenas em caso de falha real de rede ou HTTP não-200
       }
 
       const latencyMs = Math.round(performance.now() - startTime);
+      const fallbackData: LpgPlanoAcao = {
+        ...INITIAL_LPG_DATA,
+        fonte_dado: 'fallback_estatico'
+      };
       const result = {
-        data: INITIAL_LPG_DATA,
+        data: fallbackData,
         report: {
           endpoint: '/api/lpg',
           status: 'cached' as const,
           latencyMs: Math.max(latencyMs, 5),
           lastChecked: new Date().toLocaleTimeString('pt-BR'),
           rateLimitInfo: 'Buffer Oficial Transferegov Fundo a Fundo',
-          totalRecords: INITIAL_LPG_DATA.metas.length,
+          totalRecords: fallbackData.metas.length,
         },
       };
       this.setCached(cacheKey, result);
