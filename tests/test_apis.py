@@ -5,10 +5,12 @@ Módulo: tests/test_apis.py
 """
 
 import unittest
+from datetime import datetime
 from unittest.mock import MagicMock
 
 from backend.apis import TransferegovApi, CguTransparenciaApi, PortalTransparenciaRsApi, classificar_tipo_cultural, normalizar_texto
 from backend.models import LPGProject, EmendaRecord
+from backend.utils import TTLCache, SingleFlightCache
 
 
 class TestApis(unittest.TestCase):
@@ -59,7 +61,7 @@ class TestApis(unittest.TestCase):
             ]
         ]
 
-        api = TransferegovApi(client=mock_client)
+        api = TransferegovApi(client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
         lpg_res = api.buscar_plano_acao_lpg("88000914000101")
         
         self.assertIsNotNone(lpg_res)
@@ -71,7 +73,7 @@ class TestApis(unittest.TestCase):
     def test_cgu_transparencia_api_sem_chave(self):
         """Verifica que sem chave configurada, a API da CGU retorna lista vazia sem lançar exceção."""
         mock_client = MagicMock()
-        api = CguTransparenciaApi(api_key="", client=mock_client)
+        api = CguTransparenciaApi(api_key="", client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
         emendas = api.buscar_emendas(anos=[2024, 2025])
         self.assertEqual(emendas, [])
         mock_client.fetch_json.assert_not_called()
@@ -82,6 +84,7 @@ class TestApis(unittest.TestCase):
         mock_client.fetch_json.return_value = [
             {
                 "codigoEmenda": "2024810001",
+                "ano": 2024,
                 "nomeAutor": "Deputado Federal da Cultura",
                 "partido": "PT",
                 "tipoEmenda": "Individual",
@@ -94,7 +97,7 @@ class TestApis(unittest.TestCase):
             }
         ]
 
-        api = CguTransparenciaApi(api_key="teste-chave-cgu", client=mock_client)
+        api = CguTransparenciaApi(api_key="teste-chave-cgu", client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
         emendas = api.buscar_emendas(ano=2024)
 
         self.assertEqual(len(emendas), 1)
@@ -105,6 +108,112 @@ class TestApis(unittest.TestCase):
         self.assertTrue(emenda.is_cultura)
         self.assertEqual(emenda.tipo_projeto_cultural, "Hip-Hop & Cultura Urbana")
         self.assertEqual(emenda.esfera, "Federal (API CGU)")
+
+    def test_cgu_transparencia_api_multi_anos_default(self):
+        """Verifica que buscar_emendas() sem argumento de anos consulta a janela deslizante de 3 anos."""
+        mock_client = MagicMock()
+        chamados = []
+
+        def side_effect(url, params=None, headers=None, cache_ttl=None):
+            ano = params.get("ano") if params else None
+            chamados.append(ano)
+            return [
+                {
+                    "codigoEmenda": f"{ano}0001",
+                    "ano": ano,
+                    "nomeAutor": f"Deputado do Ano {ano}",
+                    "partido": "MDB",
+                    "orgaoSuperior": {"nome": "Ministério da Cultura"},
+                    "localidadeDoGasto": f"Projeto Cultural {ano}",
+                    "valorEmpenhado": 100000.0,
+                    "valorPago": 50000.0
+                }
+            ]
+
+        mock_client.fetch_json.side_effect = side_effect
+        api = CguTransparenciaApi(api_key="teste-chave-cgu", client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
+        emendas = api.buscar_emendas()
+
+        ano_atual = datetime.now().year
+        esperados = [ano_atual, ano_atual - 1, ano_atual - 2]
+        for esp in esperados:
+            self.assertIn(esp, chamados, f"O ano {esp} deveria ter sido consultado na janela padrão")
+        self.assertEqual(len(emendas), 3, "Deveriam ser retornadas 3 emendas correspondentes aos 3 anos")
+
+    def test_cgu_transparencia_api_tolerancia_falha_parcial(self):
+        """Verifica que se um ano falhar (exceção de rede), os demais anos continuam sendo retornados."""
+        mock_client = MagicMock()
+
+        def side_effect(url, params=None, headers=None, cache_ttl=None):
+            ano = params.get("ano") if params else None
+            if ano == 2024:
+                raise RuntimeError("Timeout simulado na API da CGU para 2024")
+            return [
+                {
+                    "codigoEmenda": f"{ano}9999",
+                    "ano": ano,
+                    "nomeAutor": f"Deputado {ano}",
+                    "partido": "PL",
+                    "orgaoSuperior": {"nome": "Ministério do Turismo"},
+                    "localidadeDoGasto": f"Festa Tradicional {ano}",
+                    "valorEmpenhado": 80000.0,
+                    "valorPago": 80000.0
+                }
+            ]
+
+        mock_client.fetch_json.side_effect = side_effect
+        api = CguTransparenciaApi(api_key="teste-chave-cgu", client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
+        emendas = api.buscar_emendas(anos=[2024, 2025, 2026])
+
+        # 2024 falhou, mas 2025 e 2026 devem ser retornados com sucesso
+        self.assertEqual(len(emendas), 2)
+        anos_retornados = [e.ano for e in emendas]
+        self.assertIn(2025, anos_retornados)
+        self.assertIn(2026, anos_retornados)
+        self.assertNotIn(2024, anos_retornados)
+
+    def test_cgu_transparencia_api_deduplicacao(self):
+        """Verifica que a mesma emenda retornada em múltiplos anos é deduplicada e atualizada com maior valor pago."""
+        mock_client = MagicMock()
+
+        def side_effect(url, params=None, headers=None, cache_ttl=None):
+            ano = params.get("ano") if params else None
+            if ano == 2024:
+                return [
+                    {
+                        "codigoEmenda": "999888",
+                        "ano": 2024,
+                        "nomeAutor": "Deputado Reeleito",
+                        "partido": "PT",
+                        "orgaoSuperior": {"nome": "Ministério da Cultura"},
+                        "localidadeDoGasto": "Teatro Municipal Viamão",
+                        "valorEmpenhado": 200000.0,
+                        "valorPago": 50000.0,
+                        "situacao": "Em Execução"
+                    }
+                ]
+            else:
+                return [
+                    {
+                        "codigoEmenda": "999888",
+                        "ano": 2024,
+                        "nomeAutor": "Deputado Reeleito",
+                        "partido": "PT",
+                        "orgaoSuperior": {"nome": "Ministério da Cultura"},
+                        "localidadeDoGasto": "Teatro Municipal Viamão",
+                        "valorEmpenhado": 200000.0,
+                        "valorPago": 200000.0,
+                        "situacao": "Concluída"
+                    }
+                ]
+
+        mock_client.fetch_json.side_effect = side_effect
+        api = CguTransparenciaApi(api_key="teste-chave-cgu", client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
+        emendas = api.buscar_emendas(anos=[2024, 2025])
+
+        self.assertEqual(len(emendas), 1, "Emenda com mesmo código deve ser deduplicada")
+        self.assertEqual(emendas[0].pago, 200000.0, "Valor pago deve ser atualizado para o valor consolidado mais alto")
+        self.assertEqual(emendas[0].status, "Concluída")
 
     def test_portal_transparencia_rs_api_sucesso(self):
         """Verifica a busca e normalização de emendas estaduais do RS com filtragem territorial."""
@@ -129,7 +238,7 @@ class TestApis(unittest.TestCase):
             }
         ]
 
-        api = PortalTransparenciaRsApi(client=mock_client)
+        api = PortalTransparenciaRsApi(client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
         emendas = api.buscar_emendas_estaduais(municipio="Viamão", anos=[2024])
 
         # Deve filtrar e retornar apenas a emenda destinada a Viamão

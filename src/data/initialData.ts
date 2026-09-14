@@ -355,6 +355,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     link: 'https://diariogaucho.clicrbs.com.br/',
     etiqueta: 'Música & Hip-Hop',
     jurisdicao: 'Municipal (Viamão)',
+    imagem: 'https://gzh.rbsdirect.com.br/static-core/dist/assets/favicon/favicon.ico',
     elegibilidade: 'Artistas, coletivos comunitários e fazedores de cultura de Viamão',
     prazo: 'Programação Ativa 2026',
     plataforma: 'Diário Gaúcho / Coletivos Culturais de Viamão',
@@ -378,6 +379,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     link: 'https://www.jornaldocomercio.com/',
     etiqueta: 'Qualificação & Fomento',
     jurisdicao: 'Municipal (Viamão)',
+    imagem: 'https://www.jornaldocomercio.com/favicon.ico',
     elegibilidade: 'Artistas e trabalhadores da cultura residentes em Viamão',
     prazo: 'Inscrições em Fluxo Contínuo',
     plataforma: 'Jornal do Comércio / Viamão em Rede',
@@ -401,6 +403,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     link: 'https://viamao.ifrs.edu.br/',
     etiqueta: 'Sarau & Literatura',
     jurisdicao: 'Municipal (Viamão)',
+    imagem: 'https://ifrs.edu.br/viamao/wp-content/themes/ifrs-portal-theme/favicons/favicon.ico',
     elegibilidade: 'Comunidade local, estudantes, poetas e artistas de Viamão',
     prazo: 'Evento Periódico Institucional',
     plataforma: 'Portal Oficial IFRS Campus Viamão',
@@ -424,6 +427,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     link: 'https://www.procultura.rs.gov.br/',
     etiqueta: 'Editais FAC / Pró-Cultura',
     jurisdicao: 'Estadual (RS)',
+    imagem: 'https://cultura.rs.gov.br/favicon.ico',
     elegibilidade: 'Pessoas Jurídicas e Produtores Culturais com cadastro no Pró-cultura RS',
     prazo: 'Conforme calendário oficial SEDAC-RS',
     plataforma: 'Sistema Unificado Pró-cultura RS (www.procultura.rs.gov.br)',
@@ -447,6 +451,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     link: 'https://www.transferegov.sistema.gov.br/',
     etiqueta: 'Editais PNAB Viamão',
     jurisdicao: 'Municipal (Viamão)',
+    imagem: 'https://www.gov.br/cultura/pt-br/favicon.ico',
     elegibilidade: 'Fazedores de cultura, coletivos e espaços culturais de Viamão',
     prazo: 'Ciclo Vigente PNAB 2024-2027',
     plataforma: 'Plataforma Transferegov.br / MinC',
@@ -470,6 +475,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     link: 'https://www.correiodopovo.com.br/',
     etiqueta: 'Patrimônio Histórico',
     jurisdicao: 'Municipal (Viamão)',
+    imagem: 'https://www.correiodopovo.com.br/favicon.ico',
     elegibilidade: 'Patrimônio público e controle social de preservação',
     prazo: 'Ações Contínuas de Salvaguarda',
     plataforma: 'Correio do Povo / IPHAN / IPHAE',
@@ -597,20 +603,32 @@ export const API_DOCUMENTATION: ApiEndpointDoc[] = [
     esfera: 'Serverless Edge (Python 3.10+)',
     url: '/api/news?q=cultura',
     metodo: 'GET',
-    descricao: 'Consulta notícias, publicações de editais e notas oficiais sobre cultura em Viamão/RS com filtro contra fake news.',
+    descricao: 'Consulta notícias, publicações de editais e notas oficiais sobre cultura em Viamão/RS via portais municipais, imprensa regional e órgãos oficiais com filtro contra desinformação.',
     parametros: [
       { nome: 'q', tipo: 'string', descricao: 'Termo de busca (ex: pnab, edital, viamao)', exemplo: 'pnab' }
     ],
     exemploResposta: JSON.stringify({
       success: true,
-      total: 3,
+      termo_pesquisado: "cultura",
+      total: 4,
       noticias: [
         {
-          id: "news-01",
-          titulo: "Editais da PNAB e LPG em Viamão",
-          fonte: "Prefeitura Municipal de Viamão / MinC"
+          id: "noticia-viamao-pnab-prorrogada",
+          titulo: "Prefeitura de Viamão prorroga Editais da PNAB (Literatura, Artesanato e Pareceristas)",
+          resumo: "Inscrições prorrogadas para fazedores de cultura locais através da Secretaria Municipal de Cultura com recursos federais descentralizados.",
+          link: "https://www.viamao.rs.gov.br/noticia/detalhe/80942",
+          origem: "Municipal (Viamão)",
+          veiculo_imprensa: "Secretaria Municipal da Cultura de Viamão",
+          categoria_filtro: "editais",
+          etiqueta: "Editais PNAB Viamão",
+          data: "08/09/2026",
+          imagem: "https://www.viamao.rs.gov.br/favicon.ico",
+          jurisdicao: "Municipal (Viamão)",
+          fonte_confiavel: true
         }
-      ]
+      ],
+      politica_integridade: "Zero fake news. Fontes estritamente limitadas a órgãos oficiais de Viamão, IFRS, SEDAC-RS e imprensa regional verificada.",
+      data_consulta: "14/09/2026"
     }, null, 2)
   }
 ];

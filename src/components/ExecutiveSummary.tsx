@@ -553,13 +553,29 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                 </div>
               </div>
 
-              <div>
-                <h4 className="text-xl sm:text-2xl font-black font-['Outfit'] text-white group-hover:text-purple-200 transition-colors leading-snug">
-                  {manchete.titulo}
-                </h4>
-                <p className="mt-2 text-xs sm:text-sm text-slate-200 leading-relaxed max-w-4xl">
-                  {manchete.resumo}
-                </p>
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                {manchete.imagem && (
+                  <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white/10 p-2 border border-purple-500/30 flex items-center justify-center shadow-inner overflow-hidden">
+                    <img
+                      src={manchete.imagem}
+                      alt={manchete.veiculo_imprensa || manchete.origem || 'Fonte'}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.currentTarget.parentElement as HTMLElement)?.classList.add('hidden');
+                      }}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h4 className="text-xl sm:text-2xl font-black font-['Outfit'] text-white group-hover:text-purple-200 transition-colors leading-snug">
+                    {manchete.titulo}
+                  </h4>
+                  <p className="mt-2 text-xs sm:text-sm text-slate-200 leading-relaxed max-w-4xl">
+                    {manchete.resumo}
+                  </p>
+                </div>
               </div>
 
               <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
@@ -635,9 +651,24 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                       : 'bg-[#230f30] border-orange-900/40 text-orange-200'
                   }`}>
                     <div className="flex items-center justify-between gap-2 text-xs">
-                      <div className="flex items-center gap-1.5 font-bold">
-                        <Building className="w-3.5 h-3.5" />
-                        <span>{item.origem}</span>
+                      <div className="flex items-center gap-2 font-bold min-w-0">
+                        {item.imagem ? (
+                          <div className="w-5 h-5 rounded-md bg-white/10 p-0.5 border border-white/15 flex items-center justify-center shrink-0 overflow-hidden">
+                            <img
+                              src={item.imagem}
+                              alt={item.origem}
+                              loading="lazy"
+                              referrerPolicy="no-referrer"
+                              onError={(e) => {
+                                (e.currentTarget.parentElement as HTMLElement)?.classList.add('hidden');
+                              }}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        ) : (
+                          <Building className="w-3.5 h-3.5 shrink-0" />
+                        )}
+                        <span className="truncate">{item.origem}</span>
                       </div>
                       <div className="flex items-center gap-1 text-[11px] opacity-80">
                         <Calendar className="w-3 h-3" />

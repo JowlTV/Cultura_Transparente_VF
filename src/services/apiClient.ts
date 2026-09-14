@@ -216,11 +216,16 @@ class CulturalApiClient {
               titulo: sanitizeInputText(n.titulo || '', 200),
               resumo: sanitizeInputText(n.resumo || '', 600),
               data: sanitizeInputText(n.data || '', 40),
-              fonte: sanitizeInputText(n.fonte || '', 100),
-              categoria_filtro: n.categoria_filtro === 'viamao' || n.categoria_filtro === 'pnab' || n.categoria_filtro === 'sedac-rs' || n.categoria_filtro === 'editais' ? n.categoria_filtro : 'viamao',
+              fonte: sanitizeInputText(n.fonte || n.orgao || n.veiculo_imprensa || '', 100),
+              categoria_filtro: n.categoria_filtro === 'viamao' || n.categoria_filtro === 'pnab' || n.categoria_filtro === 'sedac-rs' || n.categoria_filtro === 'editais' || n.categoria_filtro === 'ministerio-publico' || n.categoria_filtro === 'governo-federal' ? n.categoria_filtro : 'viamao',
               origem: sanitizeInputText(n.origem || 'Municipal (Viamão)', 60),
               etiqueta: sanitizeInputText(n.etiqueta || '', 60),
               link: sanitizeUrl(n.link),
+              imagem: n.imagem ? sanitizeUrl(n.imagem) : undefined,
+              veiculo_imprensa: n.veiculo_imprensa ? sanitizeInputText(n.veiculo_imprensa, 80) : undefined,
+              fonte_confiavel: Boolean(n.fonte_confiavel ?? true),
+              jurisdicao: n.jurisdicao ? sanitizeInputText(n.jurisdicao, 60) : undefined,
+              url_pesquisa_google: n.url_pesquisa_google ? sanitizeUrl(n.url_pesquisa_google) : undefined,
             }));
             let filtradas = sanitizedNoticias;
             if (filtro && filtro !== 'todas') {

@@ -32,16 +32,19 @@ class handler(BaseHTTPRequestHandler):
             codigo_ibge = query_params.get("ibge", ["4323002"])[0]
             apenas_cultura = query_params.get("apenas_cultura", ["false"])[0].lower() in ("1", "true", "sim")
             
-            # Anos fiscais solicitados
-            raw_anos = query_params.get("anos", query_params.get("ano", ["2024,2025,2026"]))[0]
-            try:
-                anos_list = [int(a.strip()) for a in raw_anos.split(",") if a.strip().isdigit()]
-                if not anos_list:
-                    anos_list = [2024, 2025, 2026]
-            except Exception:
-                anos_list = [2024, 2025, 2026]
+            # Anos fiscais solicitados (opcional, padrão: últimos 3 anos)
+            raw_anos = query_params.get("anos", query_params.get("ano", [None]))[0]
+            anos_list: Optional[List[int]] = None
+            if raw_anos:
+                try:
+                    parsed = [int(a.strip()) for a in raw_anos.split(",") if a.strip().isdigit()]
+                    if parsed:
+                        anos_list = parsed
+                except Exception:
+                    anos_list = None
 
-            cache_key = f"api:emendas:{esfera}:{codigo_ibge}:{','.join(map(str, sorted(anos_list)))}:{apenas_cultura}"
+            anos_tag = ','.join(map(str, sorted(anos_list))) if anos_list else "default_3y"
+            cache_key = f"api:emendas:{esfera}:{codigo_ibge}:{anos_tag}:{apenas_cultura}"
             was_cached = cache.has(cache_key)
 
             emendas_result: List[Dict[str, Any]] = []

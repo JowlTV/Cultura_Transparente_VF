@@ -235,13 +235,13 @@ class CguTransparenciaApi:
     ) -> List[EmendaRecord]:
         """
         Busca emendas parlamentares federais destinadas ao município de Viamão
-        com proteção de single-flight contra sobrecarga em cold cache.
+        consolidando resultados de múltiplos exercícios financeiros com proteção single-flight.
         
-        :param anos: Lista de anos fiscais para consulta (ex: [2024, 2025, 2026])
+        :param anos: Lista de anos fiscais para consulta (se None, usa os últimos 3 anos: corrente e 2 anteriores)
         :param ano: Ano único (caso fornecido, sobrepõe 'anos')
         :param codigo_ibge: Código IBGE do município (padrão Viamão: 4323002)
         :param use_cache: Ativa cache com TTL de 24h
-        :return: Lista de objetos EmendaRecord normalizados
+        :return: Lista de objetos EmendaRecord normalizados e deduplicados
         """
         if not self.api_key:
             logger.warning(
@@ -251,8 +251,15 @@ class CguTransparenciaApi:
             )
             return []
 
-        anos_consulta = [ano] if ano else (anos or [2024, 2025, 2026])
-        emendas_totais: List[EmendaRecord] = []
+        if ano is not None:
+            anos_consulta = [ano]
+        elif anos is not None:
+            anos_consulta = list(anos)
+        else:
+            ano_atual = datetime.now().year
+            anos_consulta = [ano_atual, ano_atual - 1, ano_atual - 2]
+
+        emendas_map: Dict[str, EmendaRecord] = {}
         headers = {"chave-api-dados": self.api_key}
 
         for ano_exercicio in anos_consulta:
@@ -272,7 +279,7 @@ class CguTransparenciaApi:
                 logger.info(f"CGU Emendas {ano_exercicio} (IBGE {codigo_ibge}): {len(registros)} registros retornados.")
 
                 for r in registros:
-                    codigo_emenda = str(r.get("codigoEmenda") or len(emendas_totais) + 1)
+                    codigo_emenda = str(r.get("codigoEmenda") or len(emendas_map) + 1)
                     autor = r.get("nomeAutor") or r.get("autor") or "Não Identificado"
                     partido = r.get("partido") or r.get("siglaPartido") or "S/P"
                     tipo_emenda = r.get("tipoEmenda") or "Individual"
@@ -295,17 +302,33 @@ class CguTransparenciaApi:
                     )
                     
                     tipo_cultural = classificar_tipo_cultural(f"{objeto} {orgao_nome}") if is_cultura else None
+                    ano_origem = int(r.get("ano") or ano_exercicio)
+                    valor_empenhado = float(r.get("valorEmpenhado") or r.get("valorProposta") or 0.0)
+                    valor_pago = float(r.get("valorPago") or r.get("valorLiquidado") or 0.0)
+                    emenda_id = f"em-fed-{ano_origem}-{codigo_emenda}"
+
+                    # Chave de deduplicação (pelo código único da emenda)
+                    dedup_key = f"fed-{codigo_emenda}"
+
+                    if dedup_key in emendas_map:
+                        existente = emendas_map[dedup_key]
+                        if valor_pago > existente.pago:
+                            existente.pago = valor_pago
+                            existente.status = r.get("situacao") or existente.status
+                        if f"Orçamento Geral da União {ano_exercicio}" not in existente.fontes_cruzadas:
+                            existente.fontes_cruzadas.append(f"Orçamento Geral da União {ano_exercicio}")
+                        continue
 
                     emenda = EmendaRecord(
-                        id=f"em-fed-{ano_exercicio}-{codigo_emenda}",
+                        id=emenda_id,
                         autor=autor,
                         partido=partido,
                         tipo=tipo_emenda,
-                        ano=ano_exercicio,
+                        ano=ano_origem,
                         orgao=orgao_nome,
                         objeto=objeto,
-                        valor=float(r.get("valorEmpenhado") or r.get("valorProposta") or 0.0),
-                        pago=float(r.get("valorPago") or r.get("valorLiquidado") or 0.0),
+                        valor=valor_empenhado,
+                        pago=valor_pago,
                         status=r.get("situacao") or "Em Execução / Vigente",
                         is_cultura=is_cultura,
                         area_atuacao="Cultura & Turismo" if is_cultura else (r.get("funcao") or "Demais Áreas"),
@@ -318,13 +341,13 @@ class CguTransparenciaApi:
                         subprojeto=objeto,
                         tipo_projeto_cultural=tipo_cultural
                     )
-                    emendas_totais.append(emenda)
+                    emendas_map[dedup_key] = emenda
 
             except Exception as e:
                 logger.warning(f"Falha ao consultar API da CGU para o ano {ano_exercicio}: {e}")
                 continue
 
-        return emendas_totais
+        return list(emendas_map.values())
 
 
 # =============================================================================
@@ -379,7 +402,11 @@ class PortalTransparenciaRsApi:
         :return: Lista de EmendaRecord normalizados
         """
         municipio_norm = normalizar_texto(municipio)
-        anos_consulta = anos or [2024, 2025, 2026]
+        if anos is not None:
+            anos_consulta = list(anos)
+        else:
+            ano_atual = datetime.now().year
+            anos_consulta = [ano_atual, ano_atual - 1, ano_atual - 2]
         emendas: List[EmendaRecord] = []
 
         try:

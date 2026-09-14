@@ -79,10 +79,13 @@ Para rodar a suíte completa de testes unitários do backend Python:
 PYTHONPATH=. python3 -m unittest discover -s tests -p "test_*.py"
 ```
 
-Todos os 15 testes validam:
+Todos os 18 testes validam:
 - Formatos e dígitos verificadores de CNPJ.
 - Integração e parsing da API Transferegov Fundo a Fundo (LPG).
 - API da CGU (Emendas Federais) com e sem chave configurada.
+- Consulta de emendas federais em janela móvel de 3 anos (exercício corrente + 2 anos anteriores).
+- Tolerância a falha parcial na API da CGU (se 1 ano falhar, os demais anos são preservados).
+- Deduplicação e consolidação de emendas que transitam entre múltiplos anos fiscais.
 - Portal da Transparência RS (Emendas Estaduais CAGE) com filtragem territorial estrita.
 - Normalização e classificação setorial de projetos culturais.
 - Coalescência de requisições (`SingleFlightCache`) e proteção sob concorrência multithread.
@@ -95,16 +98,15 @@ Todos os 15 testes validam:
 
 | API Governamental | Endpoint Base | Limite Oficial / Estimado | Estratégia de Cache e Proteção |
 |---|---|---|---|
-| **Portal da Transparência CGU** | `api.portaldatransparencia.gov.br/api-de-dados/` | 400 req/min (dia) / 700 req/min (madrugada) / 180 req/min (restritas) | Single-Flight Backend + Cache TTL 24h (`s-maxage=86400`) |
+| **Portal da Transparência CGU** | `api.portaldatransparencia.gov.br/api-de-dados/` | 400 req/min (dia) / 700 req/min (madrugada) / 180 req/min (restritas) | Janela móvel de 3 anos (até 3 reqs/sync) + Single-Flight por ano + Cache TTL 24h (`s-maxage=86400`) |
 | **Portal da Transparência RS (CAGE)** | `transparencia.rs.gov.br/` | Dados Abertos Governamentais | Single-Flight Backend + Cache TTL 24h (`s-maxage=86400`) |
 | **Transferegov / SICONV** | `api.convenios.gov.br/siconv/v1/` | ~60 req/min | Single-Flight Backend + Cache TTL 1h (`s-maxage=3600`) |
 | **Google News RSS Viamão** | `news.google.com/rss/search` | ~30 req/min | Cache TTL 1h (`s-maxage=3600`) |
 
-### 🛡️ Proteção por Coalescência de Requisições (Single-Flight)
-O sistema conta com proteção de **dupla camada contra sobrecarga de requisições**:
-1. **Frontend (`inFlightRequests` em `src/services/apiClient.ts`):** Deduplica chamadas disparadas no mesmo navegador / aba enquanto uma requisição está em trânsito.
-2. **Backend Serverless (`SingleFlightCache` em `backend/utils.py`):** Utiliza locks granulados por chave para que, caso múltiplos usuários cheguem simultaneamente com o cache frio (*cold cache*), apenas **uma única requisição real** seja disparada à API da CGU ou do Estado do RS. Todas as demais threads aguardam e compartilham o mesmo resultado consolidado, mitigando tempestades de requisições (*thundering herd problem*).
-> **Nota técnica:** Essa arquitetura tem como objetivo proteger a infraestrutura e evitar rajadas desnecessárias sobre as APIs públicas, complementando o Edge Cache (`Cache-Control: s-maxage=...`) da CDN do Vercel, sem a necessidade de replicar localmente os tetos de 400 req/min da CGU.
+### 🛡️ Janela Móvel e Proteção por Coalescência de Requisições
+1. **Janela Móvel Multi-Ano de Emendas:** O endpoint `/api/emendas` e a classe `CguTransparenciaApi` consultam os últimos 3 exercícios orçamentários (ex: 2024, 2025 e 2026). Isso resulta em até 3 requisições à CGU por sincronização com cache frio — cada ano possui sua própria chave de cache de 24h e proteção *Single-Flight* independente. Emendas com mesmo identificador são automaticamente deduplicadas e consolidadas com o maior valor pago/liquidado.
+2. **Frontend (`inFlightRequests` em `src/services/apiClient.ts`):** Deduplica chamadas disparadas no mesmo navegador / aba enquanto uma requisição está em trânsito.
+3. **Backend Serverless (`SingleFlightCache` em `backend/utils.py`):** Utiliza locks granulados por chave para que, caso múltiplos usuários cheguem simultaneamente com o cache frio (*cold cache*), apenas **uma única requisição real** seja disparada para cada ano à API da CGU ou do Estado do RS. Todas as demais threads aguardam e compartilham o mesmo resultado consolidado, mitigando tempestades de requisições (*thundering herd problem*).
 
 ---
 
