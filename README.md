@@ -79,25 +79,32 @@ Para rodar a suíte completa de testes unitários do backend Python:
 PYTHONPATH=. python3 -m unittest discover -s tests -p "test_*.py"
 ```
 
-Todos os 13 testes validam:
+Todos os 15 testes validam:
 - Formatos e dígitos verificadores de CNPJ.
 - Integração e parsing da API Transferegov Fundo a Fundo (LPG).
 - API da CGU (Emendas Federais) com e sem chave configurada.
 - Portal da Transparência RS (Emendas Estaduais CAGE) com filtragem territorial estrita.
 - Normalização e classificação setorial de projetos culturais.
-- Cache TTL (expiração, hit/miss, invalidação).
+- Coalescência de requisições (`SingleFlightCache`) e proteção sob concorrência multithread.
+- Fast path de cache TTL (expiração, hit/miss, invalidação).
 - Resiliência de requisições HTTP e tolerância a falhas de rede.
 
 ---
 
-## 🔌 Documentação de Rate Limits das APIs Oficiais
+## 🔌 Documentação de Rate Limits e Coalescência de Requisições
 
-| API Governamental | Endpoint Base | Limite Estimado | Estratégia de Cache |
+| API Governamental | Endpoint Base | Limite Oficial / Estimado | Estratégia de Cache e Proteção |
 |---|---|---|---|
-| **Transferegov / SICONV** | `api.convenios.gov.br/siconv/v1/` | ~60 req/min | Cache TTL 1h (`s-maxage=3600`) |
-| **Portal da Transparência CGU** | `api.portaldatransparencia.gov.br/api-de-dados/` | 120 req/min (com chave) | Cache TTL 24h (`s-maxage=86400`) |
-| **Portal da Transparência RS (CAGE)** | `transparencia.rs.gov.br/` | Dados Abertos | Cache TTL 24h (`s-maxage=86400`) |
+| **Portal da Transparência CGU** | `api.portaldatransparencia.gov.br/api-de-dados/` | 400 req/min (dia) / 700 req/min (madrugada) / 180 req/min (restritas) | Single-Flight Backend + Cache TTL 24h (`s-maxage=86400`) |
+| **Portal da Transparência RS (CAGE)** | `transparencia.rs.gov.br/` | Dados Abertos Governamentais | Single-Flight Backend + Cache TTL 24h (`s-maxage=86400`) |
+| **Transferegov / SICONV** | `api.convenios.gov.br/siconv/v1/` | ~60 req/min | Single-Flight Backend + Cache TTL 1h (`s-maxage=3600`) |
 | **Google News RSS Viamão** | `news.google.com/rss/search` | ~30 req/min | Cache TTL 1h (`s-maxage=3600`) |
+
+### 🛡️ Proteção por Coalescência de Requisições (Single-Flight)
+O sistema conta com proteção de **dupla camada contra sobrecarga de requisições**:
+1. **Frontend (`inFlightRequests` em `src/services/apiClient.ts`):** Deduplica chamadas disparadas no mesmo navegador / aba enquanto uma requisição está em trânsito.
+2. **Backend Serverless (`SingleFlightCache` em `backend/utils.py`):** Utiliza locks granulados por chave para que, caso múltiplos usuários cheguem simultaneamente com o cache frio (*cold cache*), apenas **uma única requisição real** seja disparada à API da CGU ou do Estado do RS. Todas as demais threads aguardam e compartilham o mesmo resultado consolidado, mitigando tempestades de requisições (*thundering herd problem*).
+> **Nota técnica:** Essa arquitetura tem como objetivo proteger a infraestrutura e evitar rajadas desnecessárias sobre as APIs públicas, complementando o Edge Cache (`Cache-Control: s-maxage=...`) da CDN do Vercel, sem a necessidade de replicar localmente os tetos de 400 req/min da CGU.
 
 ---
 

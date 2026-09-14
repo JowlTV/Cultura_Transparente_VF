@@ -181,7 +181,70 @@ cache = TTLCache(default_ttl_seconds=3600)
 
 
 # =============================================================================
-# 3. CLIENTE HTTP RESILIENTE COM RETRY EXPONENCIAL
+# 3. SINGLE-FLIGHT / COALESCING DE REQUISIÇÕES CONCORRENTES
+# =============================================================================
+
+class SingleFlightCache:
+    """
+    Garante que, para uma mesma chave, apenas uma chamada de função
+    'cara' (ex: requisição HTTP externa) seja executada por vez,
+    mesmo sob concorrência. Requisições concorrentes para a mesma
+    chave aguardam o resultado da chamada em andamento em vez de
+    disparar chamadas duplicadas à fonte externa (coalescência / single-flight).
+
+    NOTA ARQUITETURAL SOBRE AMBIENTE SERVERLESS (ex: Vercel / AWS Lambda):
+    - Este mecanismo protege requisições concorrentes processadas dentro da mesma
+      instância/processo da função serverless (durante warm start e execução multithread).
+    - Ele não substitui o Edge Cache HTTP (cabeçalhos `Cache-Control: public, s-maxage=...`),
+      que é a proteção primária e global contra chamadas repetidas entre réplicas e regiões distintas da CDN.
+    - O objetivo deste mecanismo não é impor um limitador de taxa (rate limiter), mas sim garantir
+      que múltiplos acessos simultâneos a um cache frio (cache-miss) disparem apenas uma única
+      requisição externa real por chave.
+    """
+    def __init__(self, cache_instance: Optional[TTLCache] = None):
+        self._cache = cache_instance if cache_instance is not None else cache
+        self._locks: Dict[str, threading.Lock] = {}
+        self._locks_guard = threading.Lock()
+
+    def _get_lock(self, key: str) -> threading.Lock:
+        with self._locks_guard:
+            if key not in self._locks:
+                self._locks[key] = threading.Lock()
+            return self._locks[key]
+
+    def get_or_fetch(self, key: str, fetch_fn: Callable[[], Any], ttl_seconds: Optional[int] = None) -> Any:
+        """
+        Executa a busca com coalescência:
+        1. Fast path: Se a chave já estiver em cache, retorna imediatamente sem adquirir lock da chave.
+        2. Slow path: Adquire lock por chave, re-checa o cache (coalescing) e executa fetch_fn apenas uma vez.
+        """
+        # Fast path: já está em cache válido
+        cached = self._cache.get(key)
+        if cached is not None:
+            return cached
+
+        # Slow path: adquire lock específico desta chave
+        lock = self._get_lock(key)
+        with lock:
+            # Re-checa o cache: outra requisição concorrente pode ter preenchido
+            # enquanto esperávamos o lock (coalescing de fato)
+            cached = self._cache.get(key)
+            if cached is not None:
+                return cached
+
+            # Só a primeira requisição a chegar aqui executa fetch_fn
+            result = fetch_fn()
+            if result is not None:
+                self._cache.set(key, result, ttl_seconds)
+            return result
+
+
+# Instância global compartilhada de SingleFlightCache
+single_flight = SingleFlightCache(cache_instance=cache)
+
+
+# =============================================================================
+# 4. CLIENTE HTTP RESILIENTE COM RETRY EXPONENCIAL
 # =============================================================================
 
 class HttpClient:

@@ -16,7 +16,7 @@ from backend.models import (
     EmendaRecord,
     validar_cnpj
 )
-from backend.utils import http_client, setup_logger
+from backend.utils import http_client, setup_logger, single_flight, SingleFlightCache
 
 logger = setup_logger("PublicApis")
 
@@ -33,13 +33,97 @@ class TransferegovApi:
     - Limite estimado: 60 requisições por minuto por IP.
     - Estratégia recomendada: Cache TTL de 3600 segundos (1 hora).
     - Status 429: Tratado com retentativa exponencial automática pelo HttpClient.
+    - Coalescência: Protegido por SingleFlightCache para evitar chamadas duplicadas sob concorrência.
     """
     FUNDO_A_FUNDO_URL = "https://api.transferegov.gestao.gov.br/fundoafundo"
     CNPJ_VIAMAO_DEFAULT = "88000914000101"
     PROGRAMA_LPG_ID = 47   # MINC - LEI PAULO GUSTAVO - MUNICIPIOS
 
-    def __init__(self, client=None):
+    def __init__(self, client=None, single_flight_cache: Optional[SingleFlightCache] = None):
         self.client = client or http_client
+        self.single_flight = single_flight_cache or single_flight
+
+    def _fetch_plano_acao_lpg_raw(self, cnpj_limpo: str) -> Optional[Dict[str, Any]]:
+        """Executa a busca real de dados na API Transferegov Fundo a Fundo."""
+        logger.info(f"Consultando Transferegov Fundo a Fundo para LPG (CNPJ {cnpj_limpo})...")
+        
+        # 1. Busca plano de ação
+        endpoint_plano = f"{self.FUNDO_A_FUNDO_URL}/plano_acao"
+        params_plano = {
+            "id_programa": f"eq.{self.PROGRAMA_LPG_ID}",
+            "cnpj_ente_recebedor_plano_acao": f"eq.{cnpj_limpo}"
+        }
+        planos = self.client.fetch_json(
+            endpoint_plano,
+            params=params_plano,
+            cache_ttl=None
+        )
+
+        if not isinstance(planos, list) or len(planos) == 0:
+            logger.warning(f"Nenhum plano de ação LPG encontrado para CNPJ {cnpj_limpo}.")
+            return None
+
+        plano = planos[0]
+        id_plano = plano.get("id_plano_acao")
+
+        # 2. Busca metas do plano de ação
+        metas: List[Dict[str, Any]] = []
+        if id_plano:
+            try:
+                endpoint_metas = f"{self.FUNDO_A_FUNDO_URL}/plano_acao_meta"
+                params_metas = {"id_plano_acao": f"eq.{id_plano}"}
+                metas_res = self.client.fetch_json(
+                    endpoint_metas,
+                    params=params_metas,
+                    cache_ttl=None
+                )
+                if isinstance(metas_res, list):
+                    metas = metas_res
+            except Exception as e_meta:
+                logger.warning(f"Erro ao buscar metas LPG: {e_meta}")
+
+        # 3. Busca dados bancários das contas vinculadas
+        dados_bancarios: List[Dict[str, Any]] = []
+        if id_plano:
+            try:
+                endpoint_bancos = f"{self.FUNDO_A_FUNDO_URL}/plano_acao_dado_bancario"
+                params_bancos = {"id_plano_acao": f"eq.{id_plano}"}
+                bancos_res = self.client.fetch_json(
+                    endpoint_bancos,
+                    params=params_bancos,
+                    cache_ttl=None
+                )
+                if isinstance(bancos_res, list):
+                    dados_bancarios = bancos_res
+            except Exception as e_banco:
+                logger.warning(f"Erro ao buscar dados bancários LPG: {e_banco}")
+
+        return {
+            "id_plano_acao": id_plano,
+            "codigo_plano_acao": plano.get("codigo_plano_acao", "30882120230006-010014"),
+            "situacao": plano.get("situacao_plano_acao", "AUTORIZADO"),
+            "valor_total_repasse": float(plano.get("valor_total_repasse_plano_acao") or plano.get("valor_repasse_especifico_plano_acao") or 2046951.79),
+            "data_inicio_vigencia": plano.get("data_inicio_vigencia_plano_acao", "2023-06-12"),
+            "data_fim_vigencia": plano.get("data_fim_vigencia_plano_acao", "2024-12-31"),
+            "diagnostico": plano.get("diagnostico_plano_acao", ""),
+            "objetivos": plano.get("objetivos_plano_acao", ""),
+            "ente_recebedor": {
+                "cnpj": "88.000.914/0001-01",
+                "nome": plano.get("nome_ente_recebedor_plano_acao", "MUNICIPIO DE VIAMAO"),
+                "uf": plano.get("uf_ente_recebedor_plano_acao", "RS"),
+                "municipio": plano.get("nome_municipio_ente_recebedor_plano_acao", "VIAMÃO"),
+                "fundo_orgao": plano.get("nome_fundo_recebedor_plano_acao", "Secretaria Municipal da Cultura")
+            },
+            "orgao_repassador": {
+                "sigla": plano.get("sigla_orgao_repassador_plano_acao", "MinC"),
+                "nome": plano.get("nome_orgao_repassador_plano_acao", "Ministério da Cultura"),
+                "fundo": plano.get("nome_fundo_repassador_plano_acao", "FUNDO NACIONAL DA CULTURA")
+            },
+            "metas": metas,
+            "dados_bancarios": dados_bancarios,
+            "base_legal": "Lei Complementar nº 195/2022 (Lei Paulo Gustavo)",
+            "fonte_oficial": "Plataforma Transferegov.br / Fundo a Fundo / Ministério da Cultura"
+        }
 
     def buscar_plano_acao_lpg(
         self,
@@ -47,97 +131,19 @@ class TransferegovApi:
         use_cache: bool = True
     ) -> Optional[Dict[str, Any]]:
         """
-        Consulta o Plano de Ação, Metas e Dados Bancários da Lei Paulo Gustavo (LC 195/2022).
-        
-        :param cnpj: CNPJ do ente recebedor sem pontuação
-        :param use_cache: Ativa cache com TTL de 2 horas
-        :return: Dicionário com plano de ação, metas detalhadas e contas fiduciárias
+        Consulta o Plano de Ação, Metas e Dados Bancários da Lei Paulo Gustavo (LC 195/2022)
+        com proteção de single-flight para mitigar thundering herds.
         """
         cnpj_limpo = re.sub(r"\D", "", cnpj)
         try:
-            logger.info(f"Consultando Transferegov Fundo a Fundo para LPG (CNPJ {cnpj_limpo})...")
-            
-            # 1. Busca plano de ação
-            endpoint_plano = f"{self.FUNDO_A_FUNDO_URL}/plano_acao"
-            params_plano = {
-                "id_programa": f"eq.{self.PROGRAMA_LPG_ID}",
-                "cnpj_ente_recebedor_plano_acao": f"eq.{cnpj_limpo}"
-            }
-            planos = self.client.fetch_json(
-                endpoint_plano,
-                params=params_plano,
-                cache_ttl=7200 if use_cache else None,
-                cache_key=f"transferegov:lpg:plano:{cnpj_limpo}"
-            )
-
-            if not isinstance(planos, list) or len(planos) == 0:
-                logger.warning(f"Nenhum plano de ação LPG encontrado para CNPJ {cnpj_limpo}.")
-                return None
-
-            plano = planos[0]
-            id_plano = plano.get("id_plano_acao")
-
-            # 2. Busca metas do plano de ação
-            metas: List[Dict[str, Any]] = []
-            if id_plano:
-                try:
-                    endpoint_metas = f"{self.FUNDO_A_FUNDO_URL}/plano_acao_meta"
-                    params_metas = {"id_plano_acao": f"eq.{id_plano}"}
-                    metas_res = self.client.fetch_json(
-                        endpoint_metas,
-                        params=params_metas,
-                        cache_ttl=7200 if use_cache else None,
-                        cache_key=f"transferegov:lpg:metas:{id_plano}"
-                    )
-                    if isinstance(metas_res, list):
-                        metas = metas_res
-                except Exception as e_meta:
-                    logger.warning(f"Erro ao buscar metas LPG: {e_meta}")
-
-            # 3. Busca dados bancários das contas vinculadas
-            dados_bancarios: List[Dict[str, Any]] = []
-            if id_plano:
-                try:
-                    endpoint_bancos = f"{self.FUNDO_A_FUNDO_URL}/plano_acao_dado_bancario"
-                    params_bancos = {"id_plano_acao": f"eq.{id_plano}"}
-                    bancos_res = self.client.fetch_json(
-                        endpoint_bancos,
-                        params=params_bancos,
-                        cache_ttl=7200 if use_cache else None,
-                        cache_key=f"transferegov:lpg:bancos:{id_plano}"
-                    )
-                    if isinstance(bancos_res, list):
-                        dados_bancarios = bancos_res
-                except Exception as e_banco:
-                    logger.warning(f"Erro ao buscar dados bancários LPG: {e_banco}")
-
-            return {
-                "id_plano_acao": id_plano,
-                "codigo_plano_acao": plano.get("codigo_plano_acao", "30882120230006-010014"),
-                "situacao": plano.get("situacao_plano_acao", "AUTORIZADO"),
-                "valor_total_repasse": float(plano.get("valor_total_repasse_plano_acao") or plano.get("valor_repasse_especifico_plano_acao") or 2046951.79),
-                "data_inicio_vigencia": plano.get("data_inicio_vigencia_plano_acao", "2023-06-12"),
-                "data_fim_vigencia": plano.get("data_fim_vigencia_plano_acao", "2024-12-31"),
-                "diagnostico": plano.get("diagnostico_plano_acao", ""),
-                "objetivos": plano.get("objetivos_plano_acao", ""),
-                "ente_recebedor": {
-                    "cnpj": "88.000.914/0001-01",
-                    "nome": plano.get("nome_ente_recebedor_plano_acao", "MUNICIPIO DE VIAMAO"),
-                    "uf": plano.get("uf_ente_recebedor_plano_acao", "RS"),
-                    "municipio": plano.get("nome_municipio_ente_recebedor_plano_acao", "VIAMÃO"),
-                    "fundo_orgao": plano.get("nome_fundo_recebedor_plano_acao", "Secretaria Municipal da Cultura")
-                },
-                "orgao_repassador": {
-                    "sigla": plano.get("sigla_orgao_repassador_plano_acao", "MinC"),
-                    "nome": plano.get("nome_orgao_repassador_plano_acao", "Ministério da Cultura"),
-                    "fundo": plano.get("nome_fundo_repassador_plano_acao", "FUNDO NACIONAL DA CULTURA")
-                },
-                "metas": metas,
-                "dados_bancarios": dados_bancarios,
-                "base_legal": "Lei Complementar nº 195/2022 (Lei Paulo Gustavo)",
-                "fonte_oficial": "Plataforma Transferegov.br / Fundo a Fundo / Ministério da Cultura"
-            }
-
+            cache_key = f"transferegov:lpg:full:{cnpj_limpo}"
+            if use_cache:
+                return self.single_flight.get_or_fetch(
+                    cache_key,
+                    fetch_fn=lambda: self._fetch_plano_acao_lpg_raw(cnpj_limpo),
+                    ttl_seconds=7200
+                )
+            return self._fetch_plano_acao_lpg_raw(cnpj_limpo)
         except Exception as e:
             logger.error(f"Erro ao consultar LPG no Transferegov Fundo a Fundo: {e}")
             raise
@@ -187,16 +193,38 @@ class CguTransparenciaApi:
     DOCUMENTAÇÃO DE RATE LIMIT E AUTENTICAÇÃO:
     - Requer cabeçalho 'chave-api-dados' em produção (PORTAL_TRANSPARENCIA_API_KEY).
     - Obtenção gratuita: Cadastro em https://portaldatransparencia.gov.br/api-de-dados/cadastrar
-    - Limite oficial: 120 requisições por minuto por chave.
+    - Limites oficiais CGU: 400 req/min (dia) / 700 req/min (madrugada) / 180 req/min (rotas restritas).
+    - Coalescência: Protegido por SingleFlightCache para garantir que múltiplos acessos
+      simultâneos com cache frio executem apenas 1 requisição real à API da CGU.
     - Estratégia de Fallback: Se não houver chave configurada, emite log estruturado
       e retorna lista vazia de registros sem gerar falhas 500 no endpoint serverless.
     """
     BASE_URL = "https://api.portaldatransparencia.gov.br/api-de-dados/emendas-parlamentares"
     CODIGO_IBGE_VIAMAO = "4323002"
 
-    def __init__(self, api_key: Optional[str] = None, client=None):
-        self.api_key = api_key or os.getenv("PORTAL_TRANSPARENCIA_API_KEY") or os.getenv("CGU_API_KEY")
+    def __init__(self, api_key: Optional[str] = None, client=None, single_flight_cache: Optional[SingleFlightCache] = None):
+        if api_key is not None:
+            self.api_key = api_key.strip() if api_key.strip() else None
+        else:
+            env_key = os.getenv("PORTAL_TRANSPARENCIA_API_KEY") or os.getenv("CGU_API_KEY")
+            self.api_key = env_key.strip() if env_key else None
         self.client = client or http_client
+        self.single_flight = single_flight_cache or single_flight
+
+    def _fetch_cgu_registros_raw(self, codigo_ibge: str, ano_exercicio: int, headers: Dict[str, str]) -> List[Dict[str, Any]]:
+        """Executa a requisição real à API da CGU."""
+        params = {
+            "codigoIbge": codigo_ibge,
+            "ano": ano_exercicio,
+            "pagina": 1
+        }
+        data = self.client.fetch_json(
+            self.BASE_URL,
+            params=params,
+            headers=headers,
+            cache_ttl=None
+        )
+        return data if isinstance(data, list) else []
 
     def buscar_emendas(
         self,
@@ -206,7 +234,8 @@ class CguTransparenciaApi:
         use_cache: bool = True
     ) -> List[EmendaRecord]:
         """
-        Busca emendas parlamentares federais destinadas ao município de Viamão.
+        Busca emendas parlamentares federais destinadas ao município de Viamão
+        com proteção de single-flight contra sobrecarga em cold cache.
         
         :param anos: Lista de anos fiscais para consulta (ex: [2024, 2025, 2026])
         :param ano: Ano único (caso fornecido, sobrepõe 'anos')
@@ -227,22 +256,19 @@ class CguTransparenciaApi:
         headers = {"chave-api-dados": self.api_key}
 
         for ano_exercicio in anos_consulta:
-            params = {
-                "codigoIbge": codigo_ibge,
-                "ano": ano_exercicio,
-                "pagina": 1
-            }
+            cache_key = f"cgu:emendas:{codigo_ibge}:{ano_exercicio}"
 
             try:
-                data = self.client.fetch_json(
-                    self.BASE_URL,
-                    params=params,
-                    headers=headers,
-                    cache_ttl=86400 if use_cache else None,
-                    cache_key=f"cgu:emendas:{codigo_ibge}:{ano_exercicio}"
-                )
+                if use_cache:
+                    registros = self.single_flight.get_or_fetch(
+                        cache_key,
+                        fetch_fn=lambda a=ano_exercicio: self._fetch_cgu_registros_raw(codigo_ibge, a, headers),
+                        ttl_seconds=86400
+                    )
+                else:
+                    registros = self._fetch_cgu_registros_raw(codigo_ibge, ano_exercicio, headers)
                 
-                registros = data if isinstance(data, list) else []
+                registros = registros if isinstance(registros, list) else []
                 logger.info(f"CGU Emendas {ano_exercicio} (IBGE {codigo_ibge}): {len(registros)} registros retornados.")
 
                 for r in registros:
@@ -316,13 +342,26 @@ class PortalTransparenciaRsApi:
       1. https://transparencia.rs.gov.br/emendas-parlamentares/emendas-parlamentares-estaduais/dados
       2. https://transparencia.rs.gov.br/dados-abertos
     - Rate Limit: Sem autenticação obrigatória, com recomendação de cache de 24 horas (86400s).
+    - Coalescência: Protegido por SingleFlightCache para evitar tempestade de requisições sob concorrência.
     - Tratamento resiliente: Retorna lista vazia em caso de indisponibilidade ou ausência de emendas.
     """
     BASE_URL = "https://transparencia.rs.gov.br/emendas-parlamentares/emendas-parlamentares-estaduais/dados"
     DADOS_ABERTOS_URL = "https://transparencia.rs.gov.br/dados-abertos"
 
-    def __init__(self, client=None):
+    def __init__(self, client=None, single_flight_cache: Optional[SingleFlightCache] = None):
         self.client = client or http_client
+        self.single_flight = single_flight_cache or single_flight
+
+    def _fetch_rs_payload_raw(self, ano: int) -> Any:
+        """Executa a requisição real aos dados abertos do Portal RS."""
+        try:
+            return self.client.fetch_json(
+                f"{self.BASE_URL}?exercicio={ano}",
+                cache_ttl=None
+            )
+        except Exception as e_req:
+            logger.warning(f"Consulta direta ao Portal RS ({ano}) retornou: {e_req}. Tentando dataset de dados abertos.")
+            return []
 
     def buscar_emendas_estaduais(
         self,
@@ -331,7 +370,8 @@ class PortalTransparenciaRsApi:
         use_cache: bool = True
     ) -> List[EmendaRecord]:
         """
-        Busca emendas parlamentares estaduais destinadas a Viamão/RS.
+        Busca emendas parlamentares estaduais destinadas a Viamão/RS
+        com proteção de single-flight contra requisições concorrentes duplicadas.
         
         :param municipio: Nome do município (filtragem case-insensitive e tolerante a acentos)
         :param anos: Lista de anos para consulta
@@ -346,18 +386,16 @@ class PortalTransparenciaRsApi:
             logger.info(f"Consultando Portal da Transparência RS (CAGE) para emendas em '{municipio}'...")
             
             for ano in anos_consulta:
-                cache_key = f"transparencia_rs:emendas:{municipio_norm}:{ano}"
+                cache_key = f"transparencia_rs:emendas_raw:{ano}"
                 
-                try:
-                    # Consulta endpoint de dados abertos do portal RS
-                    payload = self.client.fetch_json(
-                        f"{self.BASE_URL}?exercicio={ano}",
-                        cache_ttl=86400 if use_cache else None,
-                        cache_key=cache_key
+                if use_cache:
+                    payload = self.single_flight.get_or_fetch(
+                        cache_key,
+                        fetch_fn=lambda a=ano: self._fetch_rs_payload_raw(a),
+                        ttl_seconds=86400
                     )
-                except Exception as e_req:
-                    logger.warning(f"Consulta direta ao Portal RS ({ano}) retornou: {e_req}. Tentando dataset de dados abertos.")
-                    payload = None
+                else:
+                    payload = self._fetch_rs_payload_raw(ano)
 
                 if isinstance(payload, list):
                     registros = payload

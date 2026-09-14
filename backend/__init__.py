@@ -6,7 +6,7 @@ from backend.models import (
     EmendaRecord,
     AuditReport
 )
-from backend.utils import TTLCache, HttpClient, setup_logger, cache, http_client
+from backend.utils import TTLCache, SingleFlightCache, HttpClient, setup_logger, cache, single_flight, http_client
 from backend.apis import TransferegovApi, CguTransparenciaApi, PortalTransparenciaRsApi
 
 __all__ = [
@@ -16,9 +16,11 @@ __all__ = [
     "EmendaRecord",
     "AuditReport",
     "TTLCache",
+    "SingleFlightCache",
     "HttpClient",
     "setup_logger",
     "cache",
+    "single_flight",
     "http_client",
     "TransferegovApi",
     "CguTransparenciaApi",

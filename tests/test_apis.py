@@ -70,9 +70,11 @@ class TestApis(unittest.TestCase):
 
     def test_cgu_transparencia_api_sem_chave(self):
         """Verifica que sem chave configurada, a API da CGU retorna lista vazia sem lançar exceção."""
-        api = CguTransparenciaApi(api_key=None)
+        mock_client = MagicMock()
+        api = CguTransparenciaApi(api_key="", client=mock_client)
         emendas = api.buscar_emendas(anos=[2024, 2025])
         self.assertEqual(emendas, [])
+        mock_client.fetch_json.assert_not_called()
 
     def test_cgu_transparencia_api_sucesso(self):
         """Verifica o parsing e classificação de emendas federais da CGU com chave configurada."""
