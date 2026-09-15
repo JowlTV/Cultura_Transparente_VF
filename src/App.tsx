@@ -60,8 +60,7 @@ export default function App() {
         if (newsRes.status === 'fulfilled' && newsRes.value.data && newsRes.value.data.length > 0) {
           setNoticias(newsRes.value.data);
         }
-        if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data)) {
-          // Trata array retornado (mesmo que vazio []) como resultado sincronizado válido, distinto de falha/exceção
+        if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data) && emendasRes.value.data.length > 0) {
           setEmendas(emendasRes.value.data);
         }
 
@@ -106,8 +105,7 @@ export default function App() {
       if (newsRes.status === 'fulfilled' && newsRes.value.data && newsRes.value.data.length > 0) {
         setNoticias(newsRes.value.data);
       }
-      if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data)) {
-        // Trata array retornado (mesmo que vazio []) como resultado sincronizado válido, distinto de falha/exceção
+      if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data) && emendasRes.value.data.length > 0) {
         setEmendas(emendasRes.value.data);
       }
 
@@ -132,15 +130,15 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#0c0714] text-slate-100 font-['Plus_Jakarta_Sans']">
+    <div className="min-h-screen flex bg-[#F5EAD8] text-[#2D0652] font-['Figtree',sans-serif]">
       {/* Global Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 text-xs">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span className="font-medium">{toastMessage}</span>
+        <div className="fixed bottom-6 right-6 z-50 bg-[#2D0652] text-white px-4 py-3 rounded-xl shadow-2xl border border-purple-400/40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 text-xs">
+          <CheckCircle2 className="w-4 h-4 text-[#FF4500] shrink-0" />
+          <span className="font-semibold">{toastMessage}</span>
           <button
             onClick={() => setToastMessage(null)}
-            className="text-slate-400 hover:text-white ml-2 text-sm font-bold"
+            className="text-purple-300 hover:text-white ml-2 text-sm font-bold"
           >
             ✕
           </button>

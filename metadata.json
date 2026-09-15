@@ -1,6 +1,6 @@
 {
-  "name": "Cultura Transparente - Viamão",
-  "description": "Painel de controle social, transparência orçamentária e rastreamento de verbas culturais no município de Viamão/RS.",
+  "name": "Cult Circuito Viamão · Cultura Transparente",
+  "description": "Plataforma oficial de controle social, transparência orçamentária, editais e fomento cultural no município de Viamão/RS.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

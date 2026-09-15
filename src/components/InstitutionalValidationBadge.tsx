@@ -27,23 +27,23 @@ export const InstitutionalValidationBadge: React.FC<InstitutionalValidationBadge
     return (
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-300 text-amber-900 rounded-lg text-xs font-semibold shadow-2xs">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#FFE8E0] border border-[#FFC2B2] text-[#FF4500] rounded-full text-xs font-bold shadow-2xs">
+            <AlertTriangle className="w-3.5 h-3.5 text-[#FF4500] shrink-0" />
             <span>Dado inconsistente ou pendente de retificação</span>
           </div>
 
-          <span className="text-xs font-mono text-slate-500 line-through">
+          <span className="text-xs font-mono text-[#2D0652]/50 line-through">
             {result.raw || 'Dado não informado'}
           </span>
 
-          <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+          <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
             {result.displayValue}
           </span>
 
           <button
             type="button"
             onClick={() => setExpanded(!expanded)}
-            className="text-xs text-amber-800 hover:text-amber-950 underline font-medium flex items-center gap-0.5"
+            className="text-xs text-[#FF4500] hover:text-[#E03D00] underline font-bold flex items-center gap-0.5 cursor-pointer"
           >
             {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             {expanded ? 'Ocultar auditoria' : 'Ver alerta de inconsistência'}
@@ -51,35 +51,35 @@ export const InstitutionalValidationBadge: React.FC<InstitutionalValidationBadge
         </div>
 
         {expanded && (
-          <div className="p-3.5 bg-amber-50/90 border-l-4 border-l-amber-600 border border-amber-200 rounded-xl text-xs text-amber-950 space-y-2">
+          <div className="p-4 bg-white border border-[#FFC2B2] rounded-2xl text-xs text-[#2D0652] space-y-2 shadow-xs">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-[#FF4500] shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-amber-900">
+                <p className="font-bold text-[#FF4500]">
                   Aviso Crítico de Auditoria Cadastral (Receita Federal)
                 </p>
-                <p className="text-amber-800 text-[11px] mt-0.5 leading-relaxed">
+                <p className="text-[#2D0652]/80 text-xs mt-0.5 leading-relaxed font-medium">
                   {result.inconsistencyReason || 'Identificador matematicamente incorreto perante o algoritmo de dígitos verificadores (Módulo 11).'}{' '}
                   O sistema tem a proibição estrita de veicular dados divergentes ou inconsistentes de fontes públicas como se fossem verídicos.
                 </p>
               </div>
             </div>
 
-            <div className="bg-white p-2.5 rounded-lg border border-amber-200 flex flex-wrap items-center justify-between gap-2">
+            <div className="bg-[#FAF4EB] p-3 rounded-xl border border-[#E2D2BC] flex flex-wrap items-center justify-between gap-2">
               <div>
-                <span className="text-[11px] text-slate-500 block font-medium">
+                <span className="text-xs text-[#2D0652]/70 block font-medium">
                   CNPJ Oficial e Homologado do {enteNome}:
                 </span>
-                <span className="font-mono font-bold text-slate-900 text-xs">
+                <span className="font-mono font-bold text-[#2D0652] text-xs">
                   {OFFICIAL_VIAMAO_CNPJ}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => handleCopy(OFFICIAL_VIAMAO_CNPJ)}
-                className="flex items-center gap-1 px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded font-semibold text-[11px] transition-colors"
+                className="flex items-center gap-1 px-3 py-1 bg-[#FF4500] hover:bg-[#E03D00] text-white rounded-full font-bold text-xs transition-colors cursor-pointer"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3 h-3 text-white" /> : <Copy className="w-3 h-3" />}
                 <span>{copied ? 'Copiado!' : 'Copiar CNPJ Oficial'}</span>
               </button>
             </div>
@@ -91,22 +91,22 @@ export const InstitutionalValidationBadge: React.FC<InstitutionalValidationBadge
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-lg text-xs font-semibold shadow-2xs">
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#E3F7E8] border border-[#B7ECC3] text-[#166534] rounded-full text-xs font-bold shadow-2xs">
+        <ShieldCheck className="w-3.5 h-3.5 text-[#166534] shrink-0" />
         <span className="font-mono">{result.formatted}</span>
       </div>
 
-      <span className="text-[11px] font-medium text-emerald-800 bg-emerald-100/60 px-2 py-0.5 rounded border border-emerald-200">
+      <span className="text-xs font-bold text-[#166534] bg-[#E3F7E8] px-2.5 py-0.5 rounded-full border border-[#B7ECC3]">
         ✓ Validado na Receita Federal
       </span>
 
       <button
         type="button"
         onClick={() => handleCopy(result.formatted)}
-        className="flex items-center gap-1 px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-medium transition-colors"
+        className="flex items-center gap-1 px-2.5 py-0.5 bg-white hover:bg-[#FAF4EB] text-[#2D0652] rounded-full text-xs font-bold border border-[#E2D2BC] transition-colors cursor-pointer"
         title="Copiar CNPJ"
       >
-        {copied ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
+        {copied ? <Check className="w-3 h-3 text-[#166534]" /> : <Copy className="w-3 h-3" />}
         <span>{copied ? 'Copiado' : 'Copiar'}</span>
       </button>
     </div>

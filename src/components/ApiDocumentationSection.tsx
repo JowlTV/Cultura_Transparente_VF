@@ -1,23 +1,14 @@
 import React, { useState } from 'react';
 import {
-  Code2,
   Terminal,
   Play,
-  CheckCircle2,
-  ExternalLink,
   Copy,
   Check,
   Server,
-  Activity,
-  Globe,
   Database,
   Cpu,
-  RefreshCw,
   Download,
   ShieldCheck,
-  FileJson,
-  Zap,
-  Clock
 } from 'lucide-react';
 import { API_DOCUMENTATION } from '../data/initialData';
 import { ApiEndpointDoc } from '../types/culture';
@@ -35,7 +26,6 @@ export const ApiDocumentationSection: React.FC = () => {
     setSimulatedStatus(null);
     const start = performance.now();
 
-    // Executa fetch real no endpoint serverless
     if (selectedApi.url.startsWith('/api/')) {
       try {
         const res = await fetch(selectedApi.url, { headers: { Accept: 'application/json' } });
@@ -48,7 +38,7 @@ export const ApiDocumentationSection: React.FC = () => {
           return;
         }
       } catch (_) {
-        // Fallback para payload demonstrativo
+        // Fallback
       }
     }
 
@@ -68,7 +58,7 @@ export const ApiDocumentationSection: React.FC = () => {
 
   const handleExportFullReport = () => {
     const report = {
-      portal: 'Cultura Transparente Viamão / RS',
+      portal: 'Cult Circuito Viamão / RS',
       data_geracao: new Date().toISOString(),
       versao_arquitetura: 'Vercel Serverless Python 3.10+ & React 19',
       protocolo_anti_alucinacao: 'Ativo (Zero Dados Fictícios)',
@@ -117,7 +107,7 @@ export const ApiDocumentationSection: React.FC = () => {
       alvo: 'Google News RSS & Diário Oficial de Viamão',
       frequencia: 'A cada 1 hora (TTL Cache)',
       status: 'Ativo com Filtro de Integridade',
-      objeto: 'Varredura de chamadas públicas e publicações oficiais com filtro estrito contra fake news e desinformação.',
+      objeto: 'Varredura de chamadas públicas e publicações oficiais com filtro estrito contra desinformação.',
       modulo: 'backend/scrapers/viamao_scraper.py',
     },
   ];
@@ -125,29 +115,29 @@ export const ApiDocumentationSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 rounded-2xl p-6 sm:p-7 text-white shadow-lg relative overflow-hidden">
-        <div className="max-w-3xl relative z-10">
-          <div className="inline-flex items-center gap-2 bg-blue-800/60 border border-blue-400/30 px-3 py-1 rounded-full text-xs font-semibold text-blue-200 mb-3">
-            <Server className="w-3.5 h-3.5 text-blue-300" />
+      <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs">
+        <div className="max-w-3xl space-y-3">
+          <div className="inline-flex items-center gap-2 bg-[#EFE6FD] border border-[#DCC7FB] px-3.5 py-1 rounded-full text-xs font-bold text-[#6A0DAD]">
+            <Server className="w-3.5 h-3.5 text-[#FF4500]" />
             Arquitetura de Dados Abertos & Vercel Serverless
           </div>
-          <h2 className="text-xl sm:text-3xl font-bold font-['Outfit'] tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
             Central de APIs & Catálogo de Dados Abertos
           </h2>
-          <p className="mt-2 text-xs sm:text-sm text-slate-200 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#2D0652]/80 leading-relaxed font-medium">
             Em conformidade com a <strong>Lei de Acesso à Informação (Lei nº 12.527/2011)</strong>, o sistema disponibiliza endpoints governamentais públicos e funções serverless integradas para que cidadãos, conselheiros municipais e pesquisadores possam auditar todos os dados em tempo real.
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
               onClick={handleExportFullReport}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-xl text-xs font-bold transition-all shadow-xs"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF4500] hover:bg-[#E03D00] text-white rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Exportar Dossiê de Auditoria (JSON)</span>
             </button>
-            <div className="flex items-center gap-2 text-[11px] text-blue-200 bg-blue-900/40 px-3 py-1.5 rounded-xl border border-blue-800/50">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-2 text-xs font-bold text-[#6A0DAD] bg-[#EFE6FD] px-3.5 py-2 rounded-full border border-[#DCC7FB]">
+              <ShieldCheck className="w-4 h-4 text-[#FF4500]" />
               <span>Protocolo Anti-Alucinação Ativo</span>
             </div>
           </div>
@@ -155,16 +145,16 @@ export const ApiDocumentationSection: React.FC = () => {
       </div>
 
       {/* Data Pipelines Monitor */}
-      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
+      <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-7 border border-[#E2D2BC] shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-emerald-700" />
-            <h3 className="text-base font-bold text-slate-900 font-['Outfit']">
+            <Cpu className="w-4 h-4 text-[#FF4500]" />
+            <h3 className="text-base font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
               Monitor de Pipelines de Dados Públicos & Serverless
             </h3>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5">
+            <span className="text-xs font-bold text-[#166534] bg-[#E3F7E8] px-3 py-1 rounded-full border border-[#B7ECC3] flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Pipelines Saudáveis • Vercel Ready (&lt;10s)
             </span>
@@ -173,18 +163,18 @@ export const ApiDocumentationSection: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {scrapingPipelines.map((pipe, idx) => (
-            <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5 text-xs">
+            <div key={idx} className="p-5 rounded-2xl border border-[#E2D2BC] bg-white space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-900 text-xs">{pipe.nome}</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                <span className="font-bold text-[#2D0652] text-xs">{pipe.nome}</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E3F7E8] text-[#166534] border border-[#B7ECC3]">
                   {pipe.status}
                 </span>
               </div>
-              <p className="text-slate-600 text-[11px] leading-relaxed">{pipe.objeto}</p>
-              <div className="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500 space-y-1">
-                <div>Alvo: <strong className="text-slate-700 font-mono text-[10px]">{pipe.alvo}</strong></div>
-                <div>Módulo Python: <span className="font-mono text-[10px] text-[#1e40af]">{pipe.modulo}</span></div>
-                <div>Frequência: <strong className="text-slate-700">{pipe.frequencia}</strong></div>
+              <p className="text-[#2D0652]/75 text-xs leading-relaxed font-medium">{pipe.objeto}</p>
+              <div className="pt-2 border-t border-[#E2D2BC] text-xs text-[#2D0652]/70 space-y-1">
+                <div>Alvo: <strong className="text-[#2D0652] font-mono text-[11px]">{pipe.alvo}</strong></div>
+                <div>Módulo Python: <span className="font-mono text-[11px] text-[#6A0DAD] font-bold">{pipe.modulo}</span></div>
+                <div>Frequência: <strong className="text-[#2D0652]">{pipe.frequencia}</strong></div>
               </div>
             </div>
           ))}
@@ -194,12 +184,12 @@ export const ApiDocumentationSection: React.FC = () => {
       {/* API Endpoints Catalog & Interactive Sandbox */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Endpoint Selector */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3">
-          <h3 className="font-bold text-slate-900 text-sm font-['Outfit'] flex items-center gap-1.5">
-            <Database className="w-4 h-4 text-blue-700" />
+        <div className="bg-[#FAF4EB] rounded-3xl p-5 border border-[#E2D2BC] shadow-xs space-y-3">
+          <h3 className="font-bold text-[#2D0652] text-sm flex items-center gap-1.5" style={{ fontFamily: 'var(--font-display)' }}>
+            <Database className="w-4 h-4 text-[#FF4500]" />
             Endpoints Catalogados
           </h3>
-          <p className="text-xs text-slate-500">Selecione para inspecionar parâmetros, headers e testar a resposta:</p>
+          <p className="text-xs text-[#2D0652]/70 font-medium">Selecione para inspecionar parâmetros, headers e testar a resposta:</p>
 
           <div className="space-y-2 pt-1 max-h-[520px] overflow-y-auto pr-1">
             {API_DOCUMENTATION.map(api => {
@@ -213,27 +203,27 @@ export const ApiDocumentationSection: React.FC = () => {
                     setSimulationResult(null);
                     setSimulatedStatus(null);
                   }}
-                  className={`w-full text-left p-3 rounded-xl border text-xs transition-all ${
+                  className={`w-full text-left p-3.5 rounded-2xl border text-xs transition-all cursor-pointer ${
                     isSelected
-                      ? 'border-blue-700 bg-blue-50/80 text-blue-950 font-bold shadow-2xs'
-                      : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+                      ? 'border-[#6A0DAD] bg-[#EFE6FD] text-[#2D0652] font-bold ring-2 ring-[#6A0DAD]'
+                      : 'border-[#E2D2BC] bg-white hover:bg-[#FAF4EB] text-[#2D0652]'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-200 text-blue-900">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB]">
                         {api.metodo}
                       </span>
                       {isServerless && (
-                        <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FFE8E0] text-[#FF4500] border border-[#FFC2B2]">
                           SERVERLESS
                         </span>
                       )}
                     </div>
-                    <span className="text-[10px] text-slate-500">{api.esfera}</span>
+                    <span className="text-[10px] text-[#2D0652]/60 font-semibold">{api.esfera}</span>
                   </div>
-                  <div className="font-bold text-slate-900 leading-snug">{api.nome}</div>
-                  <div className="text-[11px] text-slate-500 truncate mt-1 font-mono">{api.url}</div>
+                  <div className="font-bold text-[#2D0652] leading-snug">{api.nome}</div>
+                  <div className="text-[11px] text-[#2D0652]/60 truncate mt-1 font-mono">{api.url}</div>
                 </button>
               );
             })}
@@ -241,24 +231,24 @@ export const ApiDocumentationSection: React.FC = () => {
         </div>
 
         {/* Endpoint Detail & Sandbox */}
-        <div className="lg:col-span-2 bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+        <div className="lg:col-span-2 bg-[#FAF4EB] rounded-3xl p-6 sm:p-7 border border-[#E2D2BC] shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E2D2BC]">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-mono">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#EFE6FD] text-[#6A0DAD] font-mono border border-[#DCC7FB]">
                   {selectedApi.metodo}
                 </span>
-                <h4 className="text-base font-bold text-slate-900 font-['Outfit']">
+                <h4 className="text-base font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
                   {selectedApi.nome}
                 </h4>
               </div>
-              <p className="text-xs text-slate-500 mt-1">{selectedApi.descricao}</p>
+              <p className="text-xs text-[#2D0652]/70 mt-1 font-medium">{selectedApi.descricao}</p>
             </div>
 
             <button
               onClick={handleTestEndpoint}
               disabled={isSimulating}
-              className="flex items-center gap-1.5 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs disabled:opacity-50 shrink-0"
+              className="flex items-center gap-1.5 px-5 py-2.5 bg-[#6A0DAD] hover:bg-[#580B91] text-white rounded-full text-xs font-bold transition-all shadow-xs disabled:opacity-50 shrink-0 cursor-pointer"
             >
               <Play className={`w-3.5 h-3.5 ${isSimulating ? 'animate-spin' : ''}`} />
               <span>{isSimulating ? 'Consultando API...' : 'Executar Chamada em Tempo Real'}</span>
@@ -267,12 +257,12 @@ export const ApiDocumentationSection: React.FC = () => {
 
           {/* URL Box */}
           <div className="space-y-1.5">
-            <span className="text-xs font-semibold text-slate-700">Endpoint Base URL:</span>
-            <div className="p-3 bg-slate-900 text-blue-300 rounded-xl font-mono text-xs flex items-center justify-between overflow-x-auto">
-              <span>{selectedApi.url}</span>
+            <span className="text-xs font-bold text-[#2D0652]">Endpoint Base URL:</span>
+            <div className="p-3.5 bg-white border border-[#E2D2BC] text-[#6A0DAD] rounded-2xl font-mono text-xs flex items-center justify-between overflow-x-auto">
+              <span className="font-bold">{selectedApi.url}</span>
               <button
                 onClick={() => handleCopyCode(selectedApi.url)}
-                className="text-slate-400 hover:text-white p-1 ml-2"
+                className="text-[#2D0652]/60 hover:text-[#2D0652] p-1 ml-2 cursor-pointer"
                 title="Copiar URL"
               >
                 <Copy className="w-3.5 h-3.5" />
@@ -282,24 +272,24 @@ export const ApiDocumentationSection: React.FC = () => {
 
           {/* Query Parameters Table */}
           <div className="space-y-2">
-            <span className="text-xs font-semibold text-slate-700">Parâmetros de Consulta (Query Params):</span>
-            <div className="border border-slate-200 rounded-xl overflow-hidden text-xs">
+            <span className="text-xs font-bold text-[#2D0652]">Parâmetros de Consulta (Query Params):</span>
+            <div className="border border-[#E2D2BC] rounded-2xl overflow-hidden text-xs bg-white">
               <table className="w-full text-left">
-                <thead className="bg-slate-100 text-slate-700 text-[11px] font-bold">
+                <thead className="bg-[#FAF4EB] text-[#2D0652] text-[11px] font-bold border-b border-[#E2D2BC]">
                   <tr>
-                    <th className="p-2.5">Parâmetro</th>
-                    <th className="p-2.5">Tipo</th>
-                    <th className="p-2.5">Descrição</th>
-                    <th className="p-2.5">Exemplo (Viamão)</th>
+                    <th className="p-3">Parâmetro</th>
+                    <th className="p-3">Tipo</th>
+                    <th className="p-3">Descrição</th>
+                    <th className="p-3">Exemplo (Viamão)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#E2D2BC]">
                   {selectedApi.parametros.map(param => (
-                    <tr key={param.nome} className="hover:bg-slate-50">
-                      <td className="p-2.5 font-mono font-bold text-blue-950">{param.nome}</td>
-                      <td className="p-2.5 text-slate-500">{param.tipo}</td>
-                      <td className="p-2.5 text-slate-700">{param.descricao}</td>
-                      <td className="p-2.5 font-mono text-emerald-800 font-semibold">{param.exemplo}</td>
+                    <tr key={param.nome} className="hover:bg-[#FAF4EB]/50">
+                      <td className="p-3 font-mono font-bold text-[#6A0DAD]">{param.nome}</td>
+                      <td className="p-3 text-[#2D0652]/60">{param.tipo}</td>
+                      <td className="p-3 text-[#2D0652]/80">{param.descricao}</td>
+                      <td className="p-3 font-mono text-[#166534] font-bold">{param.exemplo}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -310,26 +300,26 @@ export const ApiDocumentationSection: React.FC = () => {
           {/* Response Inspector */}
           <div className="space-y-2 pt-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-                <Terminal className="w-3.5 h-3.5 text-slate-500" />
+              <span className="text-xs font-bold text-[#2D0652] flex items-center gap-1.5">
+                <Terminal className="w-3.5 h-3.5 text-[#FF4500]" />
                 Payload de Resposta (JSON / REST API):
               </span>
               {simulatedStatus && (
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                <span className="text-[11px] font-bold text-[#166534] bg-[#E3F7E8] px-2.5 py-0.5 rounded-full border border-[#B7ECC3]">
                   {simulatedStatus}
                 </span>
               )}
             </div>
 
             <div className="relative">
-              <pre className="bg-slate-950 text-emerald-400 p-4 rounded-xl text-xs font-mono overflow-x-auto max-h-64 scrollbar-thin">
+              <pre className="bg-[#2D0652] text-purple-100 p-4 rounded-2xl text-xs font-mono overflow-x-auto max-h-64 border border-purple-900">
                 {simulationResult || selectedApi.exemploResposta}
               </pre>
               <button
                 onClick={() => handleCopyCode(simulationResult || selectedApi.exemploResposta)}
-                className="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-md text-xs flex items-center gap-1"
+                className="absolute top-3 right-3 text-purple-200 hover:text-white bg-[#6A0DAD] px-2.5 py-1 rounded-full text-xs flex items-center gap-1 cursor-pointer"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
                 <span>{copied ? 'Copiado!' : 'Copiar JSON'}</span>
               </button>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Pause, Play, ExternalLink, Sparkles, Bell } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play, ExternalLink } from 'lucide-react';
 
 export interface MincNewsItem {
   id: string;
@@ -109,16 +109,16 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
 
   return (
     <>
-      {/* Ticker Bar Container */}
+      {/* Ticker Bar Container in Roxo Profundo */}
       <div
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
-        className="w-full bg-[#18052E] text-slate-100 border-b border-purple-950/80 px-3 sm:px-4 py-2 text-xs flex items-center justify-between gap-3 shadow-inner relative overflow-hidden"
+        className="w-full bg-[#2D0652] text-white border-b border-[#3D0B6D] px-3 sm:px-4 py-2 text-xs flex items-center justify-between gap-3 shadow-inner relative overflow-hidden"
       >
         {/* Left Badge: Informativos Oficiais */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#6A0DAD] to-[#FF4500] text-white px-2.5 py-1 rounded-md font-bold text-[11px] shadow-xs border border-purple-400/30">
-            <span className="tracking-wide uppercase font-['Outfit']">Informativos Oficiais</span>
+          <div className="flex items-center gap-1.5 bg-[#FF4500] text-white px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wide uppercase shadow-xs">
+            <span>Informativos MinC</span>
           </div>
         </div>
 
@@ -128,31 +128,31 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
           className="flex-1 min-w-0 flex items-center gap-2 cursor-pointer group py-0.5"
           title="Clique para ler o informativo completo do Ministério da Cultura"
         >
-          <span className="hidden lg:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-900/60 text-purple-200 border border-purple-700/50 shrink-0">
+          <span className="hidden lg:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#3D0B6D] text-purple-200 border border-purple-400/30 shrink-0">
             {currentNews.categoria}
           </span>
 
-          <span className="font-medium text-slate-200 group-hover:text-[#FF4500] transition-colors truncate text-xs">
+          <span className="font-medium text-purple-100 group-hover:text-[#FF4500] transition-colors truncate text-xs">
             {currentNews.titulo}
           </span>
 
-          <span className="hidden xl:inline-block text-[10px] text-slate-400 shrink-0">
+          <span className="hidden xl:inline-block text-[10px] text-purple-300/80 shrink-0">
             ({currentNews.data})
           </span>
 
-          <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-[#FF4500] shrink-0 opacity-80" />
+          <ExternalLink className="w-3 h-3 text-purple-300 group-hover:text-[#FF4500] shrink-0 opacity-80" />
         </div>
 
         {/* Right Navigation & Status Controls */}
-        <div className="flex items-center gap-1.5 shrink-0 text-slate-400">
-          <span className="text-[10px] font-mono text-slate-300 hidden sm:inline">
+        <div className="flex items-center gap-1.5 shrink-0 text-purple-200">
+          <span className="text-[10px] font-mono text-purple-300 hidden sm:inline">
             {currentIndex + 1}/{MINC_NOTICIAS_OFICIAIS.length}
           </span>
 
           <button
             onClick={handlePrev}
             aria-label="Notícia anterior do MinC"
-            className="p-1 hover:bg-slate-800 hover:text-white rounded transition-colors text-slate-300"
+            className="p-1 hover:bg-white/10 hover:text-white rounded transition-colors text-purple-200"
             title="Anterior"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
@@ -161,7 +161,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
           <button
             onClick={() => setIsPaused(!isPaused)}
             aria-label={isPaused ? 'Continuar rotação' : 'Pausar rotação'}
-            className="p-1 hover:bg-slate-800 hover:text-amber-300 rounded transition-colors text-slate-300"
+            className="p-1 hover:bg-white/10 hover:text-[#FF4500] rounded transition-colors text-purple-200"
             title={isPaused ? 'Retomar rotação automática' : 'Pausar rotação'}
           >
             {isPaused ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
@@ -170,7 +170,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
           <button
             onClick={handleNext}
             aria-label="Próxima notícia do MinC"
-            className="p-1 hover:bg-slate-800 hover:text-white rounded transition-colors text-slate-300"
+            className="p-1 hover:bg-white/10 hover:text-white rounded transition-colors text-purple-200"
             title="Próxima"
           >
             <ChevronRight className="w-3.5 h-3.5" />
@@ -181,49 +181,49 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
       {/* Modal with Full MinC Announcement Details */}
       {selectedModalNews && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
           onClick={() => setSelectedModalNews(null)}
         >
           <div
-            className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4 text-slate-900"
+            className="bg-[#FAF4EB] rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-[#E2D2BC] space-y-4 text-[#2D0652]"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
+            <div className="flex items-start justify-between gap-4 border-b border-[#E2D2BC] pb-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-100 text-[#6A0DAD] border border-purple-200">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB]">
                     {selectedModalNews.categoria}
                   </span>
-                  <span className="text-xs text-slate-500 font-medium">
+                  <span className="text-xs text-[#2D0652]/70 font-semibold">
                     {selectedModalNews.data}
                   </span>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 font-['Outfit'] leading-snug">
+                <h3 className="text-base sm:text-lg font-bold text-[#2D0652] leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
                   {selectedModalNews.titulo}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedModalNews(null)}
-                className="text-slate-400 hover:text-slate-700 font-bold p-1 text-lg leading-none"
+                className="text-[#2D0652]/60 hover:text-[#2D0652] font-bold p-1 text-lg leading-none"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 font-medium text-slate-800">
+            <div className="space-y-3 text-xs sm:text-sm text-[#2D0652]/80 leading-relaxed">
+              <div className="p-3 bg-white rounded-xl border border-[#E2D2BC] font-medium text-[#2D0652]">
                 Órgão Emissor: <strong>{selectedModalNews.orgao}</strong>
               </div>
               <p>{selectedModalNews.resumo}</p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#2D0652]/70">
                 Esta publicação integra o monitoramento de transparência pública ativa do município de Viamão para acompanhamento de diretrizes federais de investimento e repasses orçamentários culturais.
               </p>
             </div>
 
-            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#E2D2BC]">
               <button
                 onClick={() => setSelectedModalNews(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                className="px-4 py-2 bg-white hover:bg-[#F5EAD8] text-[#2D0652] text-xs font-semibold rounded-full border border-[#E2D2BC] transition-colors"
               >
                 Fechar
               </button>
@@ -232,7 +232,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
                 href={selectedModalNews.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#6A0DAD] hover:bg-[#580b91] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#6A0DAD] hover:bg-[#580B91] text-white text-xs font-bold rounded-full transition-colors shadow-xs"
               >
                 <span>Acessar no Portal do MinC</span>
                 <ExternalLink className="w-3.5 h-3.5" />

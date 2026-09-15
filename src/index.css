@@ -1,19 +1,55 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "ITC Avant Garde Gothic", "ITCAvantGardeStd-Bk", "Avant Garde Gothic", "Avant Garde", "Century Gothic", "Apple Gothic", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: "ITC Avant Garde Gothic", "ITCAvantGardeStd-Demi", "ITCAvantGardeStd-Bold", "Avant Garde Gothic", "Avant Garde", "Century Gothic", "Outfit", "Plus Jakarta Sans", sans-serif;
-  --font-avant: "ITC Avant Garde Gothic", "ITCAvantGardeStd-Bk", "Avant Garde Gothic", "Avant Garde", "Century Gothic", "Apple Gothic", sans-serif;
+  --color-roxo-cult: #6A0DAD;
+  --color-roxo-profundo: #2D0652;
+  --color-laranja-circuito: #FF4500;
+  --color-areia: #F5EAD8;
+  --color-areia-claro: #FDFBF7;
+  --color-areia-card: #FAF4EB;
+  --color-areia-borda: #E2D2BC;
+
+  --font-display: "Caprasimo", "Georgia", serif;
+  --font-sans: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Figtree", ui-monospace, "SF Mono", "Roboto Mono", monospace;
 }
 
 @layer base {
   html, body {
-    font-family: "ITC Avant Garde Gothic", "ITCAvantGardeStd-Bk", "Avant Garde Gothic", "Avant Garde", "Century Gothic", "Apple Gothic", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #F5EAD8;
+    color: #2D0652;
+    font-family: var(--font-sans);
     letter-spacing: -0.01em;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: "ITC Avant Garde Gothic", "ITCAvantGardeStd-Demi", "ITCAvantGardeStd-Bold", "Avant Garde Gothic", "Avant Garde", "Century Gothic", "Outfit", sans-serif;
-    letter-spacing: -0.02em;
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    color: #2D0652;
   }
+
+  h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    color: #2D0652;
+  }
+}
+
+/* Custom Scrollbar for Sand/Purple theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EFE4D2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4C3AC;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6A0DAD;
 }

@@ -110,39 +110,39 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-start justify-center pt-16 sm:pt-24 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl border border-stone-200 overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-[#2D0652]/60 backdrop-blur-xs flex items-start justify-center pt-16 sm:pt-24 p-4 animate-in fade-in duration-200">
+      <div className="bg-[#FAF4EB] rounded-3xl w-full max-w-2xl shadow-2xl border border-[#E2D2BC] overflow-hidden">
         {/* Search Header Input */}
-        <div className="p-4 border-b border-stone-200 flex items-center gap-3">
-          <Search className="w-5 h-5 text-stone-400 shrink-0" />
+        <div className="p-4 sm:p-5 border-b border-[#E2D2BC] flex items-center gap-3 bg-white">
+          <Search className="w-5 h-5 text-[#FF4500] shrink-0" />
           <input
             type="text"
             autoFocus
             placeholder="Pesquise por Hip-Hop, Ep 1692, edital FAC, deputado ou entidade cultural..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="w-full text-sm sm:text-base text-stone-900 placeholder:text-stone-400 focus:outline-hidden"
+            className="w-full text-sm sm:text-base text-[#2D0652] placeholder-[#2D0652]/40 focus:outline-hidden font-medium"
           />
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-stone-600 rounded-lg hover:bg-stone-100"
+            className="p-1.5 text-[#2D0652]/60 hover:text-[#2D0652] rounded-full hover:bg-[#FAF4EB] cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Results List */}
-        <div className="max-h-96 overflow-y-auto p-3 divide-y divide-stone-100 text-xs">
+        <div className="max-h-96 overflow-y-auto p-3 divide-y divide-[#E2D2BC] text-xs">
           {query.trim().length < 2 ? (
-            <div className="text-center py-10 text-stone-400">
-              <Search className="w-8 h-8 mx-auto mb-2 opacity-40" />
-              <p className="font-medium">Digite pelo menos 2 caracteres para pesquisar em toda a base de dados de Viamão.</p>
+            <div className="text-center py-10 text-[#2D0652]/60">
+              <Search className="w-8 h-8 mx-auto mb-2 text-[#6A0DAD]/40" />
+              <p className="font-semibold text-[#2D0652]">Digite pelo menos 2 caracteres para pesquisar em toda a base de dados de Viamão.</p>
               <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
                 {['Hip-Hop', 'Ep 1692', 'FAC / SEDAC', 'Pró-cultura', 'Bonatto', 'Matriz', 'PNAB'].map(tag => (
                   <button
                     key={tag}
                     onClick={() => setQuery(tag)}
-                    className="px-2 py-1 rounded-md bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-amber-900 text-[11px] font-semibold transition-colors"
+                    className="px-3 py-1 rounded-full bg-white hover:bg-[#EFE6FD] text-[#2D0652] hover:text-[#6A0DAD] text-xs font-bold border border-[#E2D2BC] transition-colors cursor-pointer"
                   >
                     {tag}
                   </button>
@@ -150,9 +150,9 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
               </div>
             </div>
           ) : resultados.length === 0 ? (
-            <div className="text-center py-10 text-stone-400">
-              <p className="font-semibold text-stone-600">Nenhum registro encontrado para "{query}".</p>
-              <p className="text-[11px] mt-1">Tente pesquisar termos como "Hip-hop", "Bonatto", "Igreja Matriz", "Aldir Blanc" ou "FAC".</p>
+            <div className="text-center py-10 text-[#2D0652]/60">
+              <p className="font-bold text-[#2D0652]">Nenhum registro encontrado para "{query}".</p>
+              <p className="text-xs mt-1">Tente pesquisar termos como "Hip-hop", "Bonatto", "Igreja Matriz", "Aldir Blanc" ou "FAC".</p>
             </div>
           ) : (
             resultados.map((res, i) => (
@@ -162,24 +162,24 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
                   onSelectResult(res.tab);
                   onClose();
                 }}
-                className="p-3 hover:bg-amber-50/70 rounded-xl cursor-pointer transition-colors flex items-center justify-between gap-3"
+                className="p-3.5 hover:bg-[#F5EAD8] rounded-2xl cursor-pointer transition-colors flex items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-xl shrink-0">{res.icon}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-stone-100 text-stone-700">
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB]">
                         {res.tipo}
                       </span>
-                      <span className="font-bold text-stone-900 truncate text-xs">{res.titulo}</span>
+                      <span className="font-bold text-[#2D0652] truncate text-xs">{res.titulo}</span>
                     </div>
-                    <div className="text-stone-500 truncate text-[11px] mt-0.5">{res.subtitulo}</div>
+                    <div className="text-[#2D0652]/70 truncate text-xs mt-0.5 font-medium">{res.subtitulo}</div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="font-bold text-[#c2410c]">{res.valor}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-stone-400" />
+                  <span className="font-bold text-[#FF4500]">{res.valor}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#6A0DAD]" />
                 </div>
               </div>
             ))
@@ -187,9 +187,9 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-3 bg-stone-50 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+        <div className="p-3.5 bg-white border-t border-[#E2D2BC] flex items-center justify-between text-xs text-[#2D0652]/70 font-medium">
           <span>Pressione ESC para fechar</span>
-          <span>Base oficial: Viamão / RS (ALRS, CGU, DOM)</span>
+          <span className="font-bold text-[#2D0652]">Base oficial: Viamão / RS (ALRS, CGU, DOM)</span>
         </div>
       </div>
     </div>

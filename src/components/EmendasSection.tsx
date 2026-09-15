@@ -15,7 +15,6 @@ import {
 } from 'recharts';
 import {
   Search,
-  Filter,
   Download,
   Copy,
   Check,
@@ -28,13 +27,7 @@ import {
   BarChart3,
   PieChart as PieIcon,
   TrendingUp,
-  SlidersHorizontal,
-  Eye,
-  EyeOff,
-  Sparkles,
-  Layers,
   Building2,
-  DollarSign,
   Info
 } from 'lucide-react';
 import { Emenda } from '../types/culture';
@@ -88,33 +81,20 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
     ).sort();
   }, [emendas]);
 
-  // Filtering (strictly Cultural & Patrimônio)
+  // Filtering (strictly Cultural & Viamão)
   const emendasFiltradas = useMemo(() => {
     const list = emendas.filter(item => {
-      // Escopo focado em cultura
       if (!item.is_cultura) return false;
-
-      // Filtro Ano
       if (filtroAno !== 'todos' && item.ano !== Number(filtroAno)) return false;
-
-      // Filtro Esfera
       if (filtroEsfera !== 'todas' && item.esfera !== filtroEsfera) return false;
-
-      // Filtro Status
       if (filtroStatus !== 'todos' && item.status !== filtroStatus) return false;
-
-      // Filtro Partido
       if (filtroPartido !== 'todos') {
         const p = (item.partido_sigla || item.partido || '').toLowerCase();
         if (!p.includes(filtroPartido.toLowerCase())) return false;
       }
-
-      // Filtro Segmento Cultural
       if (filtroSegmento !== 'todos' && item.tipo_projeto_cultural !== filtroSegmento) {
         return false;
       }
-
-      // Busca textual
       if (busca.trim()) {
         const q = busca.toLowerCase();
         const matchParlamentar = item.parlamentar.toLowerCase().includes(q);
@@ -194,7 +174,7 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
   const taxaExecucaoNum = totalAlocado > 0 ? (totalGasto / totalAlocado) * 100 : 0;
   const percentualGeral = taxaExecucaoNum.toFixed(1);
 
-  // 1. Summarized Chart Data: Alocado vs Liquidado por Órgão/Esfera
+  // Chart 1: Alocado vs Liquidado por Órgão
   const barDataResumido = useMemo(() => {
     const map: Record<string, { nome: string; alocado: number; gasto: number }> = {};
 
@@ -203,7 +183,7 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
       if (e.esfera.includes('Estadual') || e.secretaria?.includes('SEDAC')) {
         label = 'SEDAC / RS';
       } else if (e.esfera.includes('Federal') || e.secretaria?.includes('MinC')) {
-        label = 'MinC / Federal';
+        label = 'MinC / Fed';
       } else if (e.esfera.includes('Municipal')) {
         label = 'Municipal';
       } else {
@@ -220,7 +200,7 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
     return Object.values(map).sort((a, b) => b.alocado - a.alocado);
   }, [emendasFiltradas]);
 
-  // 2. Summarized Chart Data: Distribuição por Segmento Cultural
+  // Chart 2: Distribuição por Segmento Cultural
   const pieDataResumido = useMemo(() => {
     const map: Record<string, number> = {};
 
@@ -232,11 +212,11 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
     const colorsMap: Record<string, string> = {
       'Hip-Hop & Cultura Urbana': '#6A0DAD',
       'Audiovisual & Cinema': '#FF4500',
-      'Patrimônio & Restauro': '#8b24d6',
-      'Tradição & Folclore': '#ea580c',
-      'Música & Artes Cênicas': '#a855f7',
-      'Literatura & Leitura': '#fb923c',
-      'Outras Ações Culturais': '#c084fc',
+      'Patrimônio & Restauro': '#2D0652',
+      'Tradição & Folclore': '#D33600',
+      'Música & Artes Cênicas': '#9333EA',
+      'Literatura & Leitura': '#E03D00',
+      'Outras Ações Culturais': '#7E22CE',
     };
 
     return Object.entries(map).map(([name, value]) => ({
@@ -246,7 +226,7 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
     })).sort((a, b) => b.value - a.value);
   }, [emendasFiltradas]);
 
-  // 3. Summarized Chronology Chart Data
+  // Chart 3: Chronology Chart Data
   const areaDataResumido = useMemo(() => {
     if (filtroAno === 'todos') {
       return BUDGET_CHRONOLOGY;
@@ -280,7 +260,7 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
 
   const handleCopyFicha = (emenda: Emenda, e: React.MouseEvent) => {
     e.stopPropagation();
-    const texto = `[AUDITORIA ORÇAMENTÁRIA - VIAMÃO/RS]
+    const texto = `[AUDITORIA ORÇAMENTÁRIA - CULT CIRCUITO VIAMÃO]
 Código: ${emenda.numeroEmenda || emenda.id} (${emenda.ano})
 Esfera: ${emenda.esfera}
 Proponente: ${emenda.parlamentar} [${emenda.partido_sigla || emenda.partido}]
@@ -299,45 +279,43 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
   };
 
   return (
-    <div className="space-y-5">
-      {/* Spreadsheet & Dashboard Unified Header */}
-      <div className="bg-[#150b24] rounded-2xl p-5 border border-purple-900/40 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-purple-900/30">
+    <div className="space-y-6">
+      {/* Spreadsheet & Dashboard Header */}
+      <div className="bg-[#FAF4EB] rounded-3xl p-5 sm:p-6 border border-[#E2D2BC] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#E2D2BC]">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-[#FF4500]"></span>
-              <h2 className="text-xl font-bold text-white font-['Outfit'] flex items-center gap-2">
-                <span>Planilha & Painel Orçamentário de Emendas</span>
-                <span className="text-xs bg-[#6A0DAD]/30 text-purple-200 border border-purple-700/50 font-bold px-2.5 py-0.5 rounded-full">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+                <span>Planilha & Painel de Emendas Parlamentares</span>
+                <span className="text-xs bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB] font-bold px-2.5 py-0.5 rounded-full">
                   {emendasFiltradas.length} emendas
                 </span>
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1">
-              Painel integrado com análise orçamentária resumida e registro detalhado das dotações destinadas à cultura de Viamão.
+            <p className="text-xs sm:text-sm text-[#2D0652]/75 mt-1 font-medium">
+              Painel integrado com auditoria contábil, detalhamento das notas de empenho e prestação de contas dos recursos destinados a Viamão.
             </p>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setShowBudgetSummary(!showBudgetSummary)}
-              className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl border transition-all shadow-xs ${
+              className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full border transition-all shadow-xs cursor-pointer ${
                 showBudgetSummary
-                  ? 'bg-[#6A0DAD] text-white border-purple-500 hover:bg-[#7c11cb]'
-                  : 'bg-gradient-to-r from-purple-900/70 to-[#1e1037] text-white border-purple-600/70 hover:border-purple-400 hover:bg-purple-900/90 shadow-purple-950/40'
+                  ? 'bg-[#6A0DAD] text-white border-[#6A0DAD] hover:bg-[#580B91]'
+                  : 'bg-white text-[#6A0DAD] border-2 border-[#6A0DAD] hover:bg-[#EFE6FD]'
               }`}
-              title={showBudgetSummary ? 'Ocultar resumo gráfico e indicadores' : 'Exibir painel orçamentário resumido com gráficos e indicadores'}
+              title={showBudgetSummary ? 'Ocultar resumo gráfico e indicadores' : 'Exibir painel orçamentário resumido'}
             >
-              <BarChart3 className={`w-4 h-4 shrink-0 ${showBudgetSummary ? 'text-white' : 'text-[#FF4500]'}`} />
-              <strong className="font-extrabold tracking-tight">
-                {showBudgetSummary ? 'Ocultar Painel Resumido' : 'Ver Painel Resumido (Gráficos & Indicadores)'}
-              </strong>
+              <BarChart3 className="w-4 h-4 shrink-0" />
+              <span>{showBudgetSummary ? 'Ocultar Gráficos' : 'Ver Gráficos & Indicadores'}</span>
             </button>
 
             <button
               onClick={onSimulateApiFetch}
               disabled={isFetchingApi}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-purple-200 bg-[#1e1037] hover:bg-purple-900/40 border border-purple-800/40 rounded-xl transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#6A0DAD] bg-white hover:bg-[#EFE6FD] border-2 border-[#6A0DAD] rounded-full transition-colors disabled:opacity-50 cursor-pointer"
               title="Consultar API Federal da CGU e ALRS"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isFetchingApi ? 'animate-spin' : ''}`} />
@@ -346,7 +324,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
             <button
               onClick={() => exportEmendasToCSV(emendasFiltradas)}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-[#FF4500] hover:bg-[#e03d00] rounded-xl transition-colors shadow-xs"
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#FF4500] hover:bg-[#E03D00] rounded-full transition-colors shadow-xs cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-white" />
               <span>Exportar (CSV)</span>
@@ -355,16 +333,16 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
         </div>
 
         {/* Search & Dynamic Filter Controls */}
-        <div className="mt-4 pt-4 border-t border-purple-900/30 space-y-3">
+        <div className="mt-4 pt-4 border-t border-[#E2D2BC] space-y-3">
           {/* Search Input */}
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#2D0652]/50" />
             <input
               type="text"
-              placeholder="Filtrar por parlamentar, número da emenda (ex: Ep 1692), beneficiário, órgão ou subprojeto..."
+              placeholder="Filtrar por parlamentar, número da emenda, beneficiário, órgão ou subprojeto..."
               value={busca}
               onChange={e => setBusca(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-[#130722] border border-purple-900/40 rounded-xl text-xs text-slate-100 placeholder-purple-300/40 focus:outline-hidden focus:border-[#6A0DAD] transition-colors"
+              className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#E2D2BC] rounded-full text-xs text-[#2D0652] placeholder-[#2D0652]/40 focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD] transition-colors"
             />
           </div>
 
@@ -372,11 +350,11 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
             {/* Year */}
             <div>
-              <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Exercício / Ano:</label>
+              <label className="text-[11px] text-[#2D0652]/70 block mb-0.5 font-bold">Exercício / Ano:</label>
               <select
                 value={filtroAno}
                 onChange={e => setFiltroAno(e.target.value)}
-                className="w-full bg-[#130722] border border-purple-900/40 rounded-lg p-2 text-xs text-slate-200 focus:outline-hidden focus:border-[#6A0DAD]"
+                className="w-full bg-white border border-[#E2D2BC] rounded-xl p-2 text-xs text-[#2D0652] focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
               >
                 <option value="todos">Todos os Anos</option>
                 {anosDisponiveis.map(ano => (
@@ -387,11 +365,11 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
             {/* Esfera */}
             <div>
-              <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Esfera:</label>
+              <label className="text-[11px] text-[#2D0652]/70 block mb-0.5 font-bold">Esfera:</label>
               <select
                 value={filtroEsfera}
                 onChange={e => setFiltroEsfera(e.target.value)}
-                className="w-full bg-[#130722] border border-purple-900/40 rounded-lg p-2 text-xs text-slate-200 focus:outline-hidden focus:border-[#6A0DAD]"
+                className="w-full bg-white border border-[#E2D2BC] rounded-xl p-2 text-xs text-[#2D0652] focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
               >
                 <option value="todas">Todas as Esferas</option>
                 {esferasDisponiveis.map(esf => (
@@ -402,11 +380,11 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
             {/* Segmento Cultural */}
             <div>
-              <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Segmento Cultural:</label>
+              <label className="text-[11px] text-[#2D0652]/70 block mb-0.5 font-bold">Segmento Cultural:</label>
               <select
                 value={filtroSegmento}
                 onChange={e => setFiltroSegmento(e.target.value)}
-                className="w-full bg-[#130722] border border-purple-900/40 rounded-lg p-2 text-xs text-slate-200 focus:outline-hidden focus:border-[#6A0DAD]"
+                className="w-full bg-white border border-[#E2D2BC] rounded-xl p-2 text-xs text-[#2D0652] focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
               >
                 <option value="todos">Todos os Segmentos</option>
                 {segmentosDisponiveis.map(seg => (
@@ -418,14 +396,14 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
             {/* Partido */}
             <div>
               <div className="flex items-center justify-between mb-0.5">
-                <label htmlFor="filtro-partido-select" className="text-[11px] text-purple-300/70 font-medium">
+                <label htmlFor="filtro-partido-select" className="text-[11px] text-[#2D0652]/70 font-bold">
                   Partido Político:
                 </label>
                 <div className="group relative flex items-center">
-                  <Info className="w-3.5 h-3.5 text-purple-400/60 hover:text-purple-300 cursor-help transition-colors" />
-                  <div className="absolute right-0 bottom-full mb-1.5 hidden group-hover:block z-40 w-64 p-2.5 bg-slate-900/95 border border-purple-900/70 rounded-lg text-[11px] leading-relaxed text-slate-200 shadow-2xl backdrop-blur-md">
-                    <span className="font-semibold text-purple-300 block mb-0.5">Base Dinâmica:</span>
-                    Esta lista reflete apenas os partidos presentes nas emendas atualmente cadastradas e sincronizadas. Parlamentares de outras legendas sem registros no acervo são integrados progressivamente conforme novas fontes públicas são auditadas.
+                  <Info className="w-3.5 h-3.5 text-[#6A0DAD] cursor-help" />
+                  <div className="absolute right-0 bottom-full mb-1.5 hidden group-hover:block z-40 w-64 p-2.5 bg-[#2D0652] border border-purple-400/40 rounded-xl text-[11px] leading-relaxed text-white shadow-2xl">
+                    <span className="font-bold text-white block mb-0.5">Base Dinâmica:</span>
+                    Esta lista reflete apenas os partidos com emendas ativas e sincronizadas no acervo auditado.
                   </div>
                 </div>
               </div>
@@ -433,25 +411,22 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                 id="filtro-partido-select"
                 value={filtroPartido}
                 onChange={e => setFiltroPartido(e.target.value)}
-                className="w-full bg-[#130722] border border-purple-900/40 rounded-lg p-2 text-xs text-slate-200 focus:outline-hidden focus:border-[#6A0DAD]"
+                className="w-full bg-white border border-[#E2D2BC] rounded-xl p-2 text-xs text-[#2D0652] focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
               >
                 <option value="todos">Todos os Partidos</option>
                 {partidosDisponiveis.map(p => (
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>
-              <p className="text-[10px] text-purple-300/60 mt-1 leading-snug">
-                * Partidos presentes nos dados sincronizados (base dinâmica progressiva).
-              </p>
             </div>
 
             {/* Situação */}
             <div>
-              <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Situação / Execução:</label>
+              <label className="text-[11px] text-[#2D0652]/70 block mb-0.5 font-bold">Situação / Execução:</label>
               <select
                 value={filtroStatus}
                 onChange={e => setFiltroStatus(e.target.value)}
-                className="w-full bg-[#130722] border border-purple-900/40 rounded-lg p-2 text-xs text-slate-200 focus:outline-hidden focus:border-[#6A0DAD]"
+                className="w-full bg-white border border-[#E2D2BC] rounded-xl p-2 text-xs text-[#2D0652] focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
               >
                 <option value="todos">Todas as Situações</option>
                 <option value="Em Execução / Vigente">Em Execução / Vigente</option>
@@ -463,11 +438,11 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
           {/* Active Filter Clear Helper */}
           {hasActiveFilters && (
-            <div className="flex items-center justify-between pt-2 text-xs text-purple-300/80">
-              <span>Filtros aplicados ({emendasFiltradas.length} de {emendas.filter(e => e.is_cultura).length} emendas culturais listadas)</span>
+            <div className="flex items-center justify-between pt-2 text-xs text-[#2D0652]/80 font-medium">
+              <span>Filtros aplicados ({emendasFiltradas.length} de {emendas.filter(e => e.is_cultura).length} emendas culturais)</span>
               <button
                 onClick={resetFilters}
-                className="text-[11px] text-[#FF4500] hover:underline font-semibold"
+                className="text-[11px] text-[#FF4500] hover:underline font-bold cursor-pointer"
               >
                 Limpar todos os filtros
               </button>
@@ -476,62 +451,62 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
         </div>
       </div>
 
-      {/* PAINEL ORÇAMENTÁRIO RESUMIDO (Compact Budget Dashboard) */}
+      {/* PAINEL ORÇAMENTÁRIO RESUMIDO (Charts) */}
       {showBudgetSummary && (
-        <div className="bg-[#12071f] rounded-2xl p-4 sm:p-5 border border-purple-800/40 shadow-md space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-purple-900/40">
+        <div className="bg-[#FAF4EB] rounded-3xl p-5 sm:p-6 border border-[#E2D2BC] shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-[#E2D2BC]">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-[#FF4500]" />
-              <h3 className="text-sm font-bold text-white font-['Outfit']">
+              <h3 className="text-sm font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
                 Painel Orçamentário Resumido
               </h3>
-              <span className="text-[10px] bg-purple-900/50 text-purple-200 px-2 py-0.5 rounded-full border border-purple-700/30">
+              <span className="text-[10px] bg-[#EFE6FD] text-[#6A0DAD] font-bold px-2.5 py-0.5 rounded-full border border-[#DCC7FB]">
                 Visão Executiva
               </span>
             </div>
-            <div className="text-[11px] text-purple-300/70">
-              Taxa Geral de Execução: <strong className="text-[#FF4500]">{percentualGeral}%</strong>
+            <div className="text-xs text-[#2D0652]/70 font-semibold">
+              Taxa de Execução Geral: <strong className="text-[#FF4500]">{percentualGeral}%</strong>
             </div>
           </div>
 
           {/* 4 Compact KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Total Alocado */}
-            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40">
-              <span className="text-[10px] text-purple-300/70 uppercase tracking-wider font-semibold block">Dotação Total Alocada</span>
-              <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-[#c084fc] block mt-0.5">
+            <div className="bg-white p-4 rounded-2xl border border-[#E2D2BC]">
+              <span className="text-[10px] text-[#2D0652]/70 uppercase tracking-wider font-bold block">Dotação Total Alocada</span>
+              <span className="text-lg sm:text-xl font-bold text-[#6A0DAD] block mt-0.5" style={{ fontFamily: 'var(--font-display)' }}>
                 {formatBRL(totalAlocado)}
               </span>
-              <span className="text-[10px] text-slate-400 mt-1 block">{emendasFiltradas.length} emendas culturais</span>
+              <span className="text-[10px] text-[#2D0652]/60 mt-1 block">{emendasFiltradas.length} emendas culturais</span>
             </div>
 
             {/* Total Liquidado */}
-            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40">
-              <span className="text-[10px] text-purple-300/70 uppercase tracking-wider font-semibold block">Total Liquidado (Pago)</span>
-              <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-[#FF4500] block mt-0.5">
+            <div className="bg-white p-4 rounded-2xl border border-[#E2D2BC]">
+              <span className="text-[10px] text-[#2D0652]/70 uppercase tracking-wider font-bold block">Total Liquidado (Pago)</span>
+              <span className="text-lg sm:text-xl font-bold text-[#FF4500] block mt-0.5" style={{ fontFamily: 'var(--font-display)' }}>
                 {formatBRL(totalGasto)}
               </span>
-              <span className="text-[10px] text-slate-400 mt-1 block">Recursos já repassados</span>
+              <span className="text-[10px] text-[#2D0652]/60 mt-1 block">Recursos repassados</span>
             </div>
 
             {/* Saldo Pendente */}
-            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40">
-              <span className="text-[10px] text-purple-300/70 uppercase tracking-wider font-semibold block">Saldo a Executar</span>
-              <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-amber-300 block mt-0.5">
+            <div className="bg-white p-4 rounded-2xl border border-[#E2D2BC]">
+              <span className="text-[10px] text-[#2D0652]/70 uppercase tracking-wider font-bold block">Saldo a Executar</span>
+              <span className="text-lg sm:text-xl font-bold text-[#2D0652] block mt-0.5" style={{ fontFamily: 'var(--font-display)' }}>
                 {formatBRL(saldoPendente)}
               </span>
-              <span className="text-[10px] text-slate-400 mt-1 block">Em tramitação contábil</span>
+              <span className="text-[10px] text-[#2D0652]/60 mt-1 block">Em tramitação contábil</span>
             </div>
 
-            {/* Taxa & Barra de Execução */}
-            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40 flex flex-col justify-between">
+            {/* Taxa de Execução */}
+            <div className="bg-white p-4 rounded-2xl border border-[#E2D2BC] flex flex-col justify-between">
               <div>
-                <span className="text-[10px] text-purple-300/70 uppercase tracking-wider font-semibold block">Ritmo de Liquidação</span>
-                <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-emerald-400 block mt-0.5">
-                  {percentualGeral}% <span className="text-[11px] font-normal text-slate-300">executado</span>
+                <span className="text-[10px] text-[#2D0652]/70 uppercase tracking-wider font-bold block">Ritmo de Liquidação</span>
+                <span className="text-lg sm:text-xl font-bold text-[#166534] block mt-0.5" style={{ fontFamily: 'var(--font-display)' }}>
+                  {percentualGeral}% <span className="text-[11px] font-normal text-[#2D0652]/70">executado</span>
                 </span>
               </div>
-              <div className="w-full bg-[#11051c] h-2 rounded-full overflow-hidden border border-purple-900/40 mt-2">
+              <div className="w-full bg-[#FAF4EB] h-2 rounded-full overflow-hidden border border-[#E2D2BC] mt-2">
                 <div
                   className="h-full bg-gradient-to-r from-[#6A0DAD] to-[#FF4500] rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, Math.max(0, taxaExecucaoNum))}%` }}
@@ -540,32 +515,32 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
             </div>
           </div>
 
-          {/* 3 Compact Analytical Charts */}
+          {/* Analytical Charts */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-            {/* Chart 1: Alocado vs Liquidado por Órgão */}
-            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40 flex flex-col">
+            {/* Chart 1 */}
+            <div className="bg-white p-4 rounded-2xl border border-[#E2D2BC] flex flex-col">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-white font-['Outfit'] flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-[#c084fc]" />
+                <span className="text-xs font-bold text-[#2D0652] flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-[#6A0DAD]" />
                   Por Órgão / Esfera
                 </span>
-                <span className="text-[10px] text-purple-300/70">Alocado vs Pago</span>
+                <span className="text-[10px] text-[#2D0652]/60 font-semibold">Alocado vs Pago</span>
               </div>
               <div className="h-[150px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={barDataResumido} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#2c114d" vertical={false} />
-                    <XAxis dataKey="nome" stroke="#a78bfa" fontSize={10} tickLine={false} />
-                    <YAxis stroke="#a78bfa" fontSize={10} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2D2BC" vertical={false} />
+                    <XAxis dataKey="nome" stroke="#6A0DAD" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#6A0DAD" fontSize={10} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
                     <Tooltip
                       content={({ active, payload }) => {
                         if (active && payload && payload.length) {
                           const data = payload[0].payload;
                           return (
-                            <div className="bg-[#0e061b] text-slate-100 p-2.5 rounded-lg text-xs border border-purple-800/60 shadow-xl space-y-1">
-                              <p className="font-bold text-[#FF4500] border-b border-purple-900/50 pb-1">{data.nome}</p>
-                              <div className="text-[#c084fc]">Alocado: <strong>{formatBRL(data.alocado)}</strong></div>
-                              <div className="text-[#FF4500]">Liquidado: <strong>{formatBRL(data.gasto)}</strong></div>
+                            <div className="bg-[#2D0652] text-white p-2.5 rounded-xl text-xs border border-purple-400/40 shadow-xl space-y-1">
+                              <p className="font-bold text-[#FF4500] border-b border-purple-400/30 pb-1">{data.nome}</p>
+                              <div>Alocado: <strong>{formatBRL(data.alocado)}</strong></div>
+                              <div>Liquidado: <strong>{formatBRL(data.gasto)}</strong></div>
                             </div>
                           );
                         }
@@ -579,14 +554,14 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
               </div>
             </div>
 
-            {/* Chart 2: Distribuição por Segmento (Donut) */}
-            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40 flex flex-col">
+            {/* Chart 2 */}
+            <div className="bg-white p-4 rounded-2xl border border-[#E2D2BC] flex flex-col">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-white font-['Outfit'] flex items-center gap-1.5">
+                <span className="text-xs font-bold text-[#2D0652] flex items-center gap-1.5">
                   <PieIcon className="w-3.5 h-3.5 text-[#FF4500]" />
                   Segmentos Culturais
                 </span>
-                <span className="text-[10px] text-purple-300/70">{pieDataResumido.length} áreas</span>
+                <span className="text-[10px] text-[#2D0652]/60 font-semibold">{pieDataResumido.length} áreas</span>
               </div>
               <div className="h-[150px] w-full flex items-center">
                 <ResponsiveContainer width="100%" height="100%">
@@ -610,10 +585,10 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                           const item = payload[0];
                           const pct = totalAlocado > 0 ? ((Number(item.value) / totalAlocado) * 100).toFixed(1) : 0;
                           return (
-                            <div className="bg-[#0e061b] text-slate-100 p-2.5 rounded-lg text-xs border border-purple-800/60 shadow-xl space-y-0.5">
+                            <div className="bg-[#2D0652] text-white p-2.5 rounded-xl text-xs border border-purple-400/40 shadow-xl space-y-0.5">
                               <p className="font-bold text-white">{item.name}</p>
-                              <p className="text-[#FF4500] font-mono">{formatBRL(Number(item.value))}</p>
-                              <p className="text-[10px] text-purple-300/80">{pct}% do total alocado</p>
+                              <p className="text-[#FF4500] font-bold">{formatBRL(Number(item.value))}</p>
+                              <p className="text-[10px] text-purple-200">{pct}% do total alocado</p>
                             </div>
                           );
                         }
@@ -625,46 +600,46 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
               </div>
             </div>
 
-            {/* Chart 3: Evolução Histórica (Área) */}
-            <div className="bg-[#180b2a] p-3.5 rounded-xl border border-purple-900/40 flex flex-col">
+            {/* Chart 3 */}
+            <div className="bg-white p-4 rounded-2xl border border-[#E2D2BC] flex flex-col">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-white font-['Outfit'] flex items-center gap-1.5">
-                  <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-xs font-bold text-[#2D0652] flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
                   Evolução Temporal
                 </span>
-                <span className="text-[10px] text-purple-300/70">2024 - 2026</span>
+                <span className="text-[10px] text-[#2D0652]/60 font-semibold">2024 - 2026</span>
               </div>
               <div className="h-[150px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={areaDataResumido} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorAlocadoRes" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6A0DAD" stopOpacity={0.8}/>
+                        <stop offset="5%" stopColor="#6A0DAD" stopOpacity={0.4}/>
                         <stop offset="95%" stopColor="#6A0DAD" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="colorGastoRes" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FF4500" stopOpacity={0.8}/>
+                        <stop offset="5%" stopColor="#FF4500" stopOpacity={0.4}/>
                         <stop offset="95%" stopColor="#FF4500" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#2c114d" vertical={false} />
-                    <XAxis dataKey="mes" stroke="#a78bfa" fontSize={10} tickLine={false} />
-                    <YAxis stroke="#a78bfa" fontSize={10} tickFormatter={v => `R$${(v / 1000000).toFixed(1)}M`} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2D2BC" vertical={false} />
+                    <XAxis dataKey="mes" stroke="#6A0DAD" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#6A0DAD" fontSize={10} tickFormatter={v => `R$${(v / 1000000).toFixed(1)}M`} />
                     <Tooltip
                       content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           return (
-                            <div className="bg-[#0e061b] text-slate-100 p-2.5 rounded-lg text-xs border border-purple-800/60 shadow-xl space-y-1">
-                              <p className="font-bold text-[#FF4500] border-b border-purple-900/50 pb-1">{label}</p>
-                              <div className="text-[#c084fc]">Alocado Acum.: <strong>{formatBRL(payload[0]?.value as number || 0)}</strong></div>
-                              <div className="text-[#FF4500]">Pago Acum.: <strong>{formatBRL(payload[1]?.value as number || 0)}</strong></div>
+                            <div className="bg-[#2D0652] text-white p-2.5 rounded-xl text-xs border border-purple-400/40 shadow-xl space-y-1">
+                              <p className="font-bold text-[#FF4500] border-b border-purple-400/30 pb-1">{label}</p>
+                              <div>Alocado: <strong>{formatBRL(payload[0]?.value as number || 0)}</strong></div>
+                              <div>Pago: <strong>{formatBRL(payload[1]?.value as number || 0)}</strong></div>
                             </div>
                           );
                         }
                         return null;
                       }}
                     />
-                    <Area type="monotone" dataKey="alocado_acumulado" stroke="#c084fc" strokeWidth={2} fillOpacity={1} fill="url(#colorAlocadoRes)" />
+                    <Area type="monotone" dataKey="alocado_acumulado" stroke="#6A0DAD" strokeWidth={2} fillOpacity={1} fill="url(#colorAlocadoRes)" />
                     <Area type="monotone" dataKey="gasto_acumulado" stroke="#FF4500" strokeWidth={2} fillOpacity={1} fill="url(#colorGastoRes)" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -674,42 +649,42 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
         </div>
       )}
 
-      {/* Spreadsheet Table View ("Cara de Planilha") */}
-      <div className="bg-[#150b24] rounded-2xl border border-purple-900/40 shadow-xs overflow-hidden">
-        <div className="px-4 py-3 bg-[#1b0d2f] border-b border-purple-900/40 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2 font-semibold text-slate-200">
+      {/* Spreadsheet Table View */}
+      <div className="bg-white rounded-3xl border border-[#E2D2BC] shadow-xs overflow-hidden">
+        <div className="px-5 py-3.5 bg-[#FAF4EB] border-b border-[#E2D2BC] flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 font-bold text-[#2D0652]">
             <TableIcon className="w-4 h-4 text-[#FF4500]" />
-            <span>Grade de Dados da Planilha de Emendas</span>
-            <span className="text-[11px] font-normal text-purple-300/70 hidden sm:inline">
-              (Clique em qualquer linha para abrir a auditoria técnica do empenho e processo)
+            <span>Grade de Registros de Emendas</span>
+            <span className="text-xs font-normal text-[#2D0652]/70 hidden sm:inline">
+              (Clique em qualquer linha para ver os dados de empenho e processo)
             </span>
           </div>
-          <div className="text-[11px] text-purple-300/70">
-            Ordenado por: <strong className="text-white capitalize">{sortField} ({sortOrder.toUpperCase()})</strong>
+          <div className="text-xs text-[#2D0652]/70 font-semibold">
+            Ordenação: <strong className="text-[#6A0DAD] capitalize">{sortField} ({sortOrder.toUpperCase()})</strong>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-[#1e0e37] text-purple-200 font-semibold border-b border-purple-900/40 select-none">
+              <tr className="bg-[#F5EAD8] text-[#2D0652] font-bold border-b border-[#E2D2BC] select-none">
                 <th
                   onClick={() => handleSort('ano')}
-                  className="py-3 px-3.5 cursor-pointer hover:bg-purple-900/30 transition-colors whitespace-nowrap"
+                  className="py-3 px-3.5 cursor-pointer hover:bg-[#EAE0CD] transition-colors whitespace-nowrap"
                 >
                   <div className="flex items-center gap-1">
                     <span>Código / Ano</span>
-                    <ArrowUpDown className="w-3 h-3 text-purple-400" />
+                    <ArrowUpDown className="w-3 h-3 text-[#6A0DAD]" />
                   </div>
                 </th>
                 <th className="py-3 px-3 whitespace-nowrap">Esfera</th>
                 <th
                   onClick={() => handleSort('parlamentar')}
-                  className="py-3 px-3.5 cursor-pointer hover:bg-purple-900/30 transition-colors whitespace-nowrap"
+                  className="py-3 px-3.5 cursor-pointer hover:bg-[#EAE0CD] transition-colors whitespace-nowrap"
                 >
                   <div className="flex items-center gap-1">
                     <span>Proponente / Autor</span>
-                    <ArrowUpDown className="w-3 h-3 text-purple-400" />
+                    <ArrowUpDown className="w-3 h-3 text-[#6A0DAD]" />
                   </div>
                 </th>
                 <th className="py-3 px-2.5 whitespace-nowrap text-center">Partido</th>
@@ -717,32 +692,32 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                 <th className="py-3 px-3 whitespace-nowrap">Órgão / Secretaria</th>
                 <th
                   onClick={() => handleSort('valor')}
-                  className="py-3 px-3.5 text-right cursor-pointer hover:bg-purple-900/30 transition-colors whitespace-nowrap"
+                  className="py-3 px-3.5 text-right cursor-pointer hover:bg-[#EAE0CD] transition-colors whitespace-nowrap"
                 >
                   <div className="flex items-center justify-end gap-1">
                     <span>Dotação (R$)</span>
-                    <ArrowUpDown className="w-3 h-3 text-purple-400" />
+                    <ArrowUpDown className="w-3 h-3 text-[#6A0DAD]" />
                   </div>
                 </th>
                 <th
                   onClick={() => handleSort('valor_gasto')}
-                  className="py-3 px-3.5 text-right cursor-pointer hover:bg-purple-900/30 transition-colors whitespace-nowrap"
+                  className="py-3 px-3.5 text-right cursor-pointer hover:bg-[#EAE0CD] transition-colors whitespace-nowrap"
                 >
                   <div className="flex items-center justify-end gap-1">
                     <span>Liquidado (R$)</span>
-                    <ArrowUpDown className="w-3 h-3 text-purple-400" />
+                    <ArrowUpDown className="w-3 h-3 text-[#6A0DAD]" />
                   </div>
                 </th>
                 <th className="py-3 px-3.5 whitespace-nowrap text-center">Situação</th>
                 <th className="py-3 px-3 text-center whitespace-nowrap">Ficha</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-purple-900/30">
+            <tbody className="divide-y divide-[#E2D2BC]">
               {emendasFiltradas.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="py-12 text-center text-slate-400">
-                    <p className="font-semibold text-white">Nenhum registro localizado para os filtros atuais.</p>
-                    <p className="text-xs mt-1 text-slate-400">Altere o termo de busca ou redefina os parâmetros da planilha.</p>
+                  <td colSpan={10} className="py-12 text-center text-[#2D0652]/70">
+                    <p className="font-bold text-[#2D0652] text-sm">Nenhum registro localizado para os filtros atuais.</p>
+                    <p className="text-xs mt-1">Altere o termo de busca ou redefina os parâmetros da planilha.</p>
                   </td>
                 </tr>
               ) : (
@@ -756,26 +731,26 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                         onClick={() => toggleExpand(emenda.id)}
                         className={`cursor-pointer transition-colors ${
                           isExpanded
-                            ? 'bg-[#251040] border-l-4 border-l-[#FF4500]'
+                            ? 'bg-[#EFE6FD] border-l-4 border-l-[#FF4500]'
                             : idx % 2 === 0
-                            ? 'bg-[#150b24] hover:bg-[#1f0d38]'
-                            : 'bg-[#180d2a] hover:bg-[#1f0d38]'
+                            ? 'bg-white hover:bg-[#FAF4EB]'
+                            : 'bg-[#FAF4EB] hover:bg-[#F5EAD8]'
                         }`}
                       >
                         {/* Código / Ano */}
                         <td className="py-2.5 px-3.5 whitespace-nowrap font-mono">
-                          <div className="font-bold text-white">
+                          <div className="font-bold text-[#2D0652]">
                             {emenda.numeroEmenda || 'Emenda Direta'}
                           </div>
-                          <div className="text-[10px] text-purple-300/70 font-sans">{emenda.ano}</div>
+                          <div className="text-[10px] text-[#2D0652]/60 font-sans font-medium">{emenda.ano}</div>
                         </td>
 
                         {/* Esfera */}
                         <td className="py-2.5 px-3 whitespace-nowrap">
-                          <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded ${
+                          <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                             emenda.esfera.includes('Estadual')
-                              ? 'bg-purple-950/80 text-purple-200 border border-purple-800/40'
-                              : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/40'
+                              ? 'bg-[#EFE6FD] text-[#6A0DAD] border-[#DCC7FB]'
+                              : 'bg-[#E3F7E8] text-[#166534] border-[#B7ECC3]'
                           }`}>
                             {emenda.esfera.replace(/\(.*?\)/g, '').trim()}
                           </span>
@@ -783,11 +758,11 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
                         {/* Proponente / Parlamentar */}
                         <td className="py-2.5 px-3.5 whitespace-nowrap">
-                          <div className="font-semibold text-slate-100 leading-tight">
+                          <div className="font-bold text-[#2D0652] leading-tight">
                             {emenda.parlamentar}
                           </div>
                           {emenda.beneficiario && (
-                            <div className="text-[10px] text-purple-300/70 truncate max-w-[180px]" title={emenda.beneficiario}>
+                            <div className="text-[10px] text-[#2D0652]/70 truncate max-w-[180px]" title={emenda.beneficiario}>
                               Dest: {emenda.beneficiario}
                             </div>
                           )}
@@ -795,17 +770,17 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
                         {/* Partido (Badge) */}
                         <td className="py-2.5 px-2.5 text-center whitespace-nowrap">
-                          <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-[#1e0e37] text-purple-200 border border-purple-800/40">
+                          <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#FAF4EB] text-[#2D0652] border border-[#E2D2BC]">
                             {emenda.partido_sigla || emenda.partido}
                           </span>
                         </td>
 
                         {/* Objeto */}
                         <td className="py-2.5 px-3.5">
-                          <div className="font-medium text-slate-200 leading-snug line-clamp-2" title={emenda.subprojeto}>
+                          <div className="font-medium text-[#2D0652] leading-snug line-clamp-2" title={emenda.subprojeto}>
                             <span>{emenda.subprojeto}</span>
                             {emenda.tipo_projeto_cultural && (
-                              <span className="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#2a1120] text-[#FF4500] border border-[#FF4500]/30 whitespace-nowrap ml-1.5 align-middle">
+                              <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.2 rounded-full bg-[#FFE8E0] text-[#FF4500] border border-[#FFC2B2] whitespace-nowrap ml-1.5 align-middle">
                                 {emenda.tipo_projeto_cultural}
                               </span>
                             )}
@@ -813,31 +788,31 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                         </td>
 
                         {/* Órgão / Secretaria */}
-                        <td className="py-2.5 px-3 whitespace-nowrap text-slate-300 text-[11px]">
+                        <td className="py-2.5 px-3 whitespace-nowrap text-[#2D0652]/80 text-[11px] font-medium">
                           <span className="truncate max-w-[140px] block" title={emenda.secretaria || emenda.orgao}>
                             {emenda.secretaria || emenda.orgao}
                           </span>
                         </td>
 
                         {/* Dotação Alocada */}
-                        <td className="py-2.5 px-3.5 text-right font-mono font-bold text-white whitespace-nowrap">
+                        <td className="py-2.5 px-3.5 text-right font-mono font-bold text-[#2D0652] whitespace-nowrap">
                           {formatBRL(emenda.valor)}
                         </td>
 
                         {/* Valor Liquidado */}
-                        <td className="py-2.5 px-3.5 text-right font-mono font-semibold text-[#FF4500] whitespace-nowrap">
+                        <td className="py-2.5 px-3.5 text-right font-mono font-bold text-[#FF4500] whitespace-nowrap">
                           {formatBRL(emenda.valor_gasto || 0)}
                         </td>
 
                         {/* Situação */}
                         <td className="py-2.5 px-3.5 text-center whitespace-nowrap">
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                            className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
                               emenda.status === 'Concluída'
-                                ? 'bg-emerald-950/70 text-emerald-300 border-emerald-800/40'
+                                ? 'bg-[#E3F7E8] text-[#166534] border-[#B7ECC3]'
                                 : emenda.status === 'Em Execução / Vigente'
-                                ? 'bg-orange-950/70 text-orange-300 border-orange-800/40'
-                                : 'bg-purple-950/70 text-purple-300 border-purple-800/40'
+                                ? 'bg-[#FFE8E0] text-[#D33600] border-[#FFC2B2]'
+                                : 'bg-[#FAF4EB] text-[#2D0652] border-[#E2D2BC]'
                             }`}
                           >
                             {emenda.status}
@@ -851,13 +826,13 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                               e.stopPropagation();
                               toggleExpand(emenda.id);
                             }}
-                            className="p-1.5 rounded-md hover:bg-purple-900/40 text-purple-300 transition-colors"
+                            className="p-1.5 rounded-full hover:bg-white text-[#6A0DAD] transition-colors cursor-pointer"
                             title={isExpanded ? 'Recolher detalhes' : 'Ver detalhes técnicos'}
                           >
                             {isExpanded ? (
                               <ChevronUp className="w-4 h-4 text-[#FF4500]" />
                             ) : (
-                              <ChevronDown className="w-4 h-4 text-purple-400" />
+                              <ChevronDown className="w-4 h-4 text-[#6A0DAD]" />
                             )}
                           </button>
                         </td>
@@ -865,24 +840,24 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
                       {/* Expanded Technical Audit Row */}
                       {isExpanded && (
-                        <tr className="bg-[#1b0a2f] border-b border-purple-900/40">
+                        <tr className="bg-[#FAF4EB] border-b border-[#E2D2BC]">
                           <td colSpan={10} className="p-4 sm:p-5">
-                            <div className="bg-[#150b24] rounded-xl p-4 border border-purple-900/50 shadow-2xs space-y-3">
-                              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-purple-900/30">
+                            <div className="bg-white rounded-2xl p-4 border border-[#E2D2BC] shadow-xs space-y-3">
+                              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#E2D2BC]">
                                 <div>
-                                  <span className="text-[10px] uppercase font-bold tracking-wider text-purple-400">
+                                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#6A0DAD]">
                                     Auditoria e Detalhamento Fiscal • ID: {emenda.id}
                                   </span>
-                                  <h4 className="text-sm font-bold text-white font-['Outfit'] mt-0.5">
+                                  <h4 className="text-sm font-bold text-[#2D0652] mt-0.5" style={{ fontFamily: 'var(--font-display)' }}>
                                     {emenda.subprojeto}
                                   </h4>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={e => handleCopyFicha(emenda, e)}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1e0e37] hover:bg-purple-900/50 text-purple-200 rounded-lg text-xs font-semibold transition-colors border border-purple-800/40"
+                                    className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FAF4EB] hover:bg-[#F5EAD8] text-[#2D0652] rounded-full text-xs font-bold transition-colors border border-[#E2D2BC] cursor-pointer"
                                   >
-                                    {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                    {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                                     <span>{isCopied ? 'Copiado!' : 'Copiar Registro'}</span>
                                   </button>
                                 </div>
@@ -891,66 +866,66 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                                 <div className="space-y-1.5">
                                   <div>
-                                    <span className="text-purple-300/70 block text-[11px]">Proponente & Partido:</span>
-                                    <span className="font-semibold text-white">
+                                    <span className="text-[#2D0652]/70 block text-[11px] font-bold">Proponente & Partido:</span>
+                                    <span className="font-bold text-[#2D0652]">
                                       {emenda.parlamentar} ({emenda.partido_sigla || emenda.partido})
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-purple-300/70 block text-[11px]">Entidade Beneficiária:</span>
-                                    <span className="font-semibold text-slate-200">
+                                    <span className="text-[#2D0652]/70 block text-[11px] font-bold">Entidade Beneficiária:</span>
+                                    <span className="font-medium text-[#2D0652]">
                                       {emenda.beneficiario || 'Município de Viamão / Secretaria Municipal'}
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-purple-300/70 block text-[11px]">Programa Orçamentário:</span>
-                                    <span className="text-slate-300">{emenda.projeto}</span>
+                                    <span className="text-[#2D0652]/70 block text-[11px] font-bold">Programa Orçamentário:</span>
+                                    <span className="text-[#2D0652]/80">{emenda.projeto}</span>
                                   </div>
                                 </div>
 
                                 <div className="space-y-1.5">
                                   <div>
-                                    <span className="text-purple-300/70 block text-[11px]">Nota de Empenho:</span>
-                                    <span className="font-mono font-bold text-white">
+                                    <span className="text-[#2D0652]/70 block text-[11px] font-bold">Nota de Empenho:</span>
+                                    <span className="font-mono font-bold text-[#2D0652]">
                                       {emenda.empenho_numero || 'Em tramitação contábil'}
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-purple-300/70 block text-[11px]">Processo Administrativo:</span>
-                                    <span className="font-mono text-purple-200">
+                                    <span className="text-[#2D0652]/70 block text-[11px] font-bold">Processo Administrativo:</span>
+                                    <span className="font-mono text-[#6A0DAD] font-bold">
                                       {emenda.processo_administrativo || 'Não informado'}
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-purple-300/70 block text-[11px]">Esfera & Instrumento:</span>
-                                    <span className="text-slate-300">{emenda.esfera} • Fomento / Repasse</span>
+                                    <span className="text-[#2D0652]/70 block text-[11px] font-bold">Esfera & Instrumento:</span>
+                                    <span className="text-[#2D0652]/80">{emenda.esfera} • Fomento / Repasse</span>
                                   </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                  <span className="text-purple-200 font-bold block text-[11px] flex items-center gap-1">
+                                  <span className="text-[#2D0652] font-bold block text-[11px] flex items-center gap-1">
                                     <ShieldCheck className="w-3.5 h-3.5 text-[#FF4500]" />
                                     Fontes Oficiais Verificadas:
                                   </span>
-                                  <div className="bg-[#1a0c30] p-2.5 rounded-lg border border-purple-900/40 space-y-1">
+                                  <div className="bg-[#FAF4EB] p-2.5 rounded-xl border border-[#E2D2BC] space-y-1">
                                     {emenda.fontes_cruzadas && emenda.fontes_cruzadas.length > 0 ? (
                                       emenda.fontes_cruzadas.map((f, i) => (
-                                        <div key={i} className="text-[11px] text-slate-300 flex items-start gap-1">
-                                          <span className="text-emerald-400 font-bold">✓</span>
+                                        <div key={i} className="text-[11px] text-[#2D0652] flex items-start gap-1">
+                                          <span className="text-emerald-600 font-bold">✓</span>
                                           <span>{f}</span>
                                         </div>
                                       ))
                                     ) : (
-                                      <div className="text-[11px] text-slate-300">{emenda.fonte}</div>
+                                      <div className="text-[11px] text-[#2D0652]">{emenda.fonte}</div>
                                     )}
                                   </div>
                                 </div>
                               </div>
 
                               {emenda.justificativa && (
-                                <div className="pt-2 border-t border-purple-900/30 text-xs text-slate-300">
-                                  <span className="font-semibold text-purple-200 block mb-0.5">Descrição Técnica do Objeto:</span>
-                                  <p className="leading-relaxed bg-[#1a0c30] p-2.5 rounded-lg border border-purple-900/40">
+                                <div className="pt-2 border-t border-[#E2D2BC] text-xs text-[#2D0652]">
+                                  <span className="font-bold text-[#2D0652] block mb-0.5">Descrição Técnica do Objeto:</span>
+                                  <p className="leading-relaxed bg-[#FAF4EB] p-2.5 rounded-xl border border-[#E2D2BC]">
                                     {emenda.justificativa}
                                   </p>
                                 </div>
@@ -965,23 +940,23 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
               )}
             </tbody>
 
-            {/* Total Row (Spreadsheet Footer) */}
+            {/* Total Row */}
             {emendasFiltradas.length > 0 && (
               <tfoot>
-                <tr className="bg-[#1a0b30] font-bold text-slate-200 border-t-2 border-purple-800/60">
+                <tr className="bg-[#FAF4EB] font-bold text-[#2D0652] border-t-2 border-[#E2D2BC]">
                   <td colSpan={6} className="py-3 px-3.5 text-right uppercase tracking-wider text-xs">
-                    Totais da Planilha Filtrada ({emendasFiltradas.length} linhas):
+                    Totais da Planilha ({emendasFiltradas.length} linhas):
                   </td>
-                  <td className="py-3 px-3.5 text-right font-mono text-xs text-[#c084fc]">
+                  <td className="py-3 px-3.5 text-right font-mono text-xs text-[#6A0DAD]">
                     {formatBRL(totalAlocado)}
                   </td>
                   <td className="py-3 px-3.5 text-right font-mono text-xs text-[#FF4500]">
                     {formatBRL(totalGasto)}
                   </td>
-                  <td className="py-3 px-3 text-center font-mono text-xs text-white">
+                  <td className="py-3 px-3 text-center font-mono text-xs text-[#2D0652]">
                     {percentualGeral}%
                   </td>
-                  <td className="py-3 px-3.5 text-purple-300/80 text-[11px] font-normal whitespace-nowrap">
+                  <td className="py-3 px-3.5 text-[#2D0652]/70 text-[11px] font-medium whitespace-nowrap">
                     Saldo: {formatBRL(saldoPendente)}
                   </td>
                 </tr>

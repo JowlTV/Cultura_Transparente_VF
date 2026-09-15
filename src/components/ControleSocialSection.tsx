@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
 import {
-  ShieldAlert,
   FileCheck2,
-  Send,
   ExternalLink,
   Copy,
   Check,
   Scale,
   Building,
-  AlertOctagon,
-  Users,
-  FileText,
-  HelpCircle
 } from 'lucide-react';
 
 export const ControleSocialSection: React.FC = () => {
@@ -131,35 +125,31 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#1b0a2f] via-[#220d3a] to-[#120622] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-purple-800/40">
-        {/* Background Graphic Accents */}
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-[#6A0DAD]/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-1/3 -mb-12 w-64 h-64 bg-[#FF4500]/15 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 bg-[#6A0DAD]/30 border border-purple-700/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-purple-200">
+      <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs">
+        <div className="max-w-3xl space-y-3">
+          <div className="inline-flex items-center gap-2 bg-[#EFE6FD] border border-[#DCC7FB] px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-[#6A0DAD]">
             <Scale className="w-3.5 h-3.5 text-[#FF4500]" />
             Exercício Democrático da Cidadania Ativa
           </div>
-          <h2 className="text-xl sm:text-3xl font-bold font-['Outfit'] tracking-tight text-white">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
             Controle Social & Pedidos de Informação (LAI)
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#2D0652]/80 leading-relaxed font-medium">
             A transparência pública só se consolida quando os cidadãos participam ativamente da fiscalização. 
-            Utilize nosso gerador de pedidos da <strong className="text-white">Lei de Acesso à Informação</strong> com fundamentação jurídica pronta para protocolar na Prefeitura de Viamão.
+            Utilize nosso gerador de pedidos da <strong className="text-[#2D0652]">Lei de Acesso à Informação</strong> com fundamentação jurídica pronta para protocolar na Prefeitura de Viamão.
           </p>
         </div>
       </div>
 
       {/* Interactive LAI Request Generator */}
-      <div className="bg-[#150b24] rounded-3xl p-5 sm:p-7 border border-purple-900/40 shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-purple-900/30">
+      <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2D2BC]">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-white font-['Outfit'] flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
               <FileCheck2 className="w-5 h-5 text-[#FF4500]" />
               Gerador Automático de Pedido de Informação (e-SIC Viamão)
             </h3>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-[#2D0652]/70 mt-0.5 font-medium">
               Selecione o tema orçamentário desejado e copie o requerimento formulado com base nas leis vigentes.
             </p>
           </div>
@@ -167,26 +157,26 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             <button
               onClick={handleCopiar}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-[#FF4500] hover:bg-[#e03d00] text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-orange-950/40 border border-orange-400/30"
+              className="flex items-center gap-1.5 px-5 py-2.5 bg-[#FF4500] hover:bg-[#E03D00] text-white rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
-              {copiado ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-              <span>{copiado ? 'Ofício Copiado!' : 'Copiar Texto do Requerimento'}</span>
+              {copiado ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4" />}
+              <span>{copiado ? 'Ofício Copiado!' : 'Copiar Requerimento'}</span>
             </button>
             <a
               href="https://viamao.1doc.com.br/atendimento"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3.5 py-2.5 bg-[#1e1037] hover:bg-purple-900/40 text-purple-200 rounded-xl text-xs font-bold border border-purple-800/40 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-white hover:bg-[#F5EAD8] text-[#2D0652] rounded-full text-xs font-bold border border-[#E2D2BC] transition-colors"
             >
-              <span>Abrir Central e-SIC Viamão (1Doc)</span>
-              <ExternalLink className="w-3.5 h-3.5 text-purple-300" />
+              <span>Abrir Central e-SIC (1Doc)</span>
+              <ExternalLink className="w-3.5 h-3.5 text-[#6A0DAD]" />
             </a>
           </div>
         </div>
 
         {/* Theme Selector */}
         <div className="space-y-2.5">
-          <label className="text-xs font-bold text-purple-200 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-[#2D0652] uppercase tracking-wider block">
             1. Escolha o Objeto da Fiscalização:
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
@@ -199,10 +189,10 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
               <button
                 key={item.id}
                 onClick={() => setTemaSelecionado(item.id)}
-                className={`p-3.5 rounded-2xl border text-left text-xs transition-all ${
+                className={`p-4 rounded-2xl border text-left text-xs transition-all cursor-pointer ${
                   temaSelecionado === item.id
-                    ? 'border-[#FF4500] bg-[#FF4500]/15 text-white shadow-xs font-bold ring-1 ring-[#FF4500]/50'
-                    : 'border-purple-900/40 bg-[#10071e] hover:bg-purple-900/30 text-slate-300 font-semibold'
+                    ? 'border-[#6A0DAD] bg-[#EFE6FD] text-[#2D0652] shadow-xs font-bold ring-2 ring-[#6A0DAD]'
+                    : 'border-[#E2D2BC] bg-white hover:bg-[#F5EAD8] text-[#2D0652] font-semibold'
                 }`}
               >
                 <div className="text-base mb-1.5">{item.icon}</div>
@@ -212,10 +202,10 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
           </div>
         </div>
 
-        {/* Citizen Identifiers (Optional for personalization) */}
+        {/* Citizen Identifiers */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
           <div className="space-y-1.5">
-            <label className="text-slate-300 font-medium block">
+            <label className="text-[#2D0652] font-bold block">
               Seu Nome Completo (Opcional - pode preencher no formulário oficial):
             </label>
             <input
@@ -223,12 +213,12 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
               placeholder="Ex: Maria da Silva"
               value={nomeCidadao}
               onChange={e => setNomeCidadao(e.target.value)}
-              className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
+              className="w-full p-3 bg-white border border-[#E2D2BC] rounded-2xl text-[#2D0652] placeholder-[#2D0652]/40 focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-slate-300 font-medium block">
+            <label className="text-[#2D0652] font-bold block">
               Seu CPF ou RG (Opcional):
             </label>
             <input
@@ -236,7 +226,7 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
               placeholder="Ex: 000.000.000-00"
               value={docCidadao}
               onChange={e => setDocCidadao(e.target.value)}
-              className="w-full p-3 bg-[#10071e] border border-purple-900/40 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-[#FF4500]"
+              className="w-full p-3 bg-white border border-[#E2D2BC] rounded-2xl text-[#2D0652] placeholder-[#2D0652]/40 focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
             />
           </div>
         </div>
@@ -244,25 +234,25 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
         {/* Live Generated Preview */}
         <div className="space-y-2 pt-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-purple-200">Texto Pronto para Protocolo no e-SIC:</span>
-            <span className="text-slate-400">Pressione "Copiar" e cole na Ouvidoria Municipal</span>
+            <span className="font-bold text-[#2D0652]">Texto Pronto para Protocolo no e-SIC:</span>
+            <span className="text-[#2D0652]/60 font-medium">Pressione "Copiar" e cole na Ouvidoria Municipal</span>
           </div>
           <textarea
             readOnly
             rows={12}
             value={textoOficioGerado}
-            className="w-full p-4 bg-[#0c0714] text-purple-100 font-mono text-xs rounded-2xl border border-purple-900/60 focus:outline-hidden resize-none leading-relaxed"
+            className="w-full p-4 bg-white text-[#2D0652] font-mono text-xs rounded-2xl border border-[#E2D2BC] focus:outline-hidden resize-none leading-relaxed"
           ></textarea>
         </div>
       </div>
 
       {/* Official Audit & Reporting Channels */}
-      <div className="bg-[#150b24] rounded-3xl p-5 sm:p-7 border border-purple-900/40 shadow-xs space-y-4">
-        <h3 className="text-base sm:text-lg font-bold text-white font-['Outfit'] flex items-center gap-2">
+      <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs space-y-4">
+        <h3 className="text-base sm:text-lg font-bold text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
           <Building className="w-4 h-4 text-[#FF4500]" />
           Canais Oficiais de Ouvidoria, Denúncia e Controle Externo
         </h3>
-        <p className="text-xs text-slate-300">
+        <p className="text-xs text-[#2D0652]/80 font-medium">
           Caso você identifique indícios de irregularidades, ausência de resposta no prazo legal ou queira submeter uma representação formal:
         </p>
 
@@ -270,27 +260,27 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
           {canaisFiscalizacao.map((canal, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-2xl border border-purple-900/40 bg-[#10071e] hover:bg-purple-950/40 transition-all flex flex-col justify-between space-y-3"
+              className="p-5 rounded-2xl border border-[#E2D2BC] bg-white hover:bg-[#FAF4EB] transition-all flex flex-col justify-between space-y-3"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <span className="text-xs font-bold text-white">{canal.nome}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#6A0DAD]/30 text-purple-200 border border-purple-700/40">
+                  <span className="text-xs font-bold text-[#2D0652]">{canal.nome}</span>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB]">
                     {canal.esfera}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">{canal.papel}</p>
+                <p className="text-xs text-[#2D0652]/75 leading-relaxed font-medium">{canal.papel}</p>
               </div>
 
-              <div className="pt-2.5 border-t border-purple-900/30 flex flex-wrap items-center justify-between gap-2 text-xs">
-                <span className="text-[11px] text-slate-400 font-medium">{canal.prazo}</span>
+              <div className="pt-3 border-t border-[#E2D2BC] flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="text-[11px] text-[#2D0652]/60 font-semibold">{canal.prazo}</span>
                 <div className="flex items-center gap-2">
                   {canal.portalSecundario && (
                     <a
                       href={canal.portalSecundario}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[11px] text-purple-300 hover:text-white transition-colors"
+                      className="text-[11px] text-[#6A0DAD] hover:underline font-bold"
                       title="Portal Institucional"
                     >
                       Site Oficial
@@ -300,9 +290,9 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
                     href={canal.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-bold text-[#FF4500] hover:text-orange-400 transition-colors bg-[#1e1037] px-2.5 py-1 rounded-lg border border-purple-800/40"
+                    className="inline-flex items-center gap-1 font-bold text-[#FF4500] hover:text-[#E03D00] transition-colors bg-[#FFE8E0] px-3 py-1 rounded-full border border-[#FFC2B2]"
                   >
-                    <span>Acessar Ouvidoria / Protocolo</span>
+                    <span>Acessar Ouvidoria</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>

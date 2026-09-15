@@ -20,11 +20,9 @@ import {
   TrendingUp,
   Filter,
   Layers,
-  ShieldCheck,
   CheckCircle2,
   Calendar,
   Building2,
-  Sparkles,
   Download,
 } from 'lucide-react';
 import { Emenda } from '../types/culture';
@@ -38,7 +36,6 @@ interface BudgetDashboardProps {
 
 export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
   emendas,
-  onNavigateToPoint,
 }) => {
   const [selectedYear, setSelectedYear] = useState<string>('todos');
   const [selectedSecretaria, setSelectedSecretaria] = useState<string>('todas');
@@ -79,7 +76,6 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
   }, [emendasFiltradas]);
 
   const saldoEmendas = totalAlocadoEmendas - totalGastoEmendas;
-  const taxaExecucao = totalAlocadoEmendas > 0 ? (totalGastoEmendas / totalAlocadoEmendas) * 100 : 0;
 
   // 1. Data for Bar Chart: Alocado vs Gasto por Secretaria
   const barDataPorSecretaria = useMemo(() => {
@@ -107,7 +103,6 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
   const pieDataPorTipo = useMemo(() => {
     const map: Record<string, number> = {};
 
-    // From cultural emendas
     emendas
       .filter(e => e.is_cultura)
       .forEach(e => {
@@ -116,13 +111,13 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
       });
 
     const colors: Record<string, string> = {
-      'Hip-Hop & Cultura Urbana': '#6A0DAD', // Roxo Identidade Visual
-      'Audiovisual & Cinema': '#FF4500', // Laranja Acento
-      'Patrimônio & Restauro': '#8b24d6', // Púrpura Médio
-      'Tradição & Folclore': '#ea580c', // Laranja Queimado
-      'Música & Artes Cênicas': '#a855f7', // Roxo Claro
-      'Literatura & Leitura': '#fb923c', // Laranja Claro
-      'Outras Ações Culturais': '#c084fc', // Lilás
+      'Hip-Hop & Cultura Urbana': '#6A0DAD',
+      'Audiovisual & Cinema': '#FF4500',
+      'Patrimônio & Restauro': '#2D0652',
+      'Tradição & Folclore': '#D33600',
+      'Música & Artes Cênicas': '#9333EA',
+      'Literatura & Leitura': '#E03D00',
+      'Outras Ações Culturais': '#7E22CE',
     };
 
     return Object.entries(map).map(([name, value]) => ({
@@ -146,14 +141,14 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
       const alocado = payload[0]?.value || 0;
       const gasto = payload[1]?.value || 0;
       return (
-        <div className="bg-[#0e061b] text-slate-100 p-3.5 rounded-xl text-xs shadow-2xl border border-purple-900/60 space-y-1.5 font-['Plus_Jakarta_Sans']">
-          <p className="font-bold text-[#FF4500] border-b border-purple-900/40 pb-1">{label}</p>
+        <div className="bg-[#2D0652] text-white p-3.5 rounded-xl text-xs shadow-2xl border border-purple-400/40 space-y-1.5">
+          <p className="font-bold text-[#FF4500] border-b border-purple-400/30 pb-1">{label}</p>
           <div className="flex items-center justify-between gap-4">
-            <span className="text-slate-300">Orçamento Alocado:</span>
-            <span className="font-bold text-[#c084fc]">{formatBRL(alocado)}</span>
+            <span className="text-purple-200">Orçamento Alocado:</span>
+            <span className="font-bold text-white">{formatBRL(alocado)}</span>
           </div>
           <div className="flex items-center justify-between gap-4">
-            <span className="text-slate-300">Gastos Realizados:</span>
+            <span className="text-purple-200">Gastos Realizados:</span>
             <span className="font-bold text-[#FF4500]">{formatBRL(gasto)}</span>
           </div>
         </div>
@@ -165,12 +160,12 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
   const CustomTooltipLine = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#0e061b] text-slate-100 p-3 rounded-xl text-xs shadow-2xl border border-purple-900/60 space-y-1">
-          <p className="font-bold text-[#FF4500] border-b border-purple-900/40 pb-1">{label}</p>
-          <div className="text-[#c084fc]">
+        <div className="bg-[#2D0652] text-white p-3 rounded-xl text-xs shadow-2xl border border-purple-400/40 space-y-1">
+          <p className="font-bold text-[#FF4500] border-b border-purple-400/30 pb-1">{label}</p>
+          <div>
             Alocado Acumulado: <strong>{formatBRL(payload[0]?.value || 0)}</strong>
           </div>
-          <div className="text-[#FF4500]">
+          <div>
             Liquidado Acumulado: <strong>{formatBRL(payload[1]?.value || 0)}</strong>
           </div>
         </div>
@@ -216,18 +211,18 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Civic Header - Identidade Visual #6A0DAD e #FF4500 */}
-      <div className="bg-gradient-to-br from-[#1a0830] via-[#2d0f50] to-[#FF4500]/70 rounded-2xl p-6 sm:p-8 text-white shadow-xs border border-purple-900/40 relative overflow-hidden">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+      {/* Header Container */}
+      <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 px-3 py-1 rounded-full text-xs font-semibold text-purple-200">
+            <div className="inline-flex items-center gap-2 bg-[#EFE6FD] border border-[#DCC7FB] px-3.5 py-1 rounded-full text-xs font-bold text-[#6A0DAD]">
               <BarChart3 className="w-3.5 h-3.5 text-[#FF4500]" />
               Observatório Orçamentário da Cultura de Viamão / RS
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold font-['Outfit'] tracking-tight text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
               Painel Interativo de Orçamentos e Execução Financeira
             </h2>
-            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#2D0652]/80 leading-relaxed font-medium">
               Acompanhamento detalhado da alocação de dotações, empenhos, liquidações e saldos do setor cultural e áreas afins de Viamão. Dados auditáveis extraídos do Fundo Municipal de Cultura, SEDAC-RS, MinC e ALRS.
             </p>
           </div>
@@ -235,26 +230,26 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={exportBudgetCSV}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#6A0DAD] hover:bg-[#590a94] text-white rounded-xl text-xs font-bold transition-all shadow-xs border border-purple-400/30"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#FF4500] hover:bg-[#E03D00] text-white rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
-              <Download className="w-4 h-4 text-[#FF4500]" />
+              <Download className="w-4 h-4 text-white" />
               <span>Exportar Dados (CSV)</span>
             </button>
           </div>
         </div>
 
-        {/* Interactive Filters Bar */}
-        <div className="mt-6 pt-5 border-t border-purple-900/40 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs relative z-10">
-          {/* Filter Year */}
+        {/* Filters Bar */}
+        <div className="mt-6 pt-5 border-t border-[#E2D2BC] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          {/* Year */}
           <div>
-            <label className="block text-purple-200 font-semibold mb-1 flex items-center gap-1.5">
+            <label className="block text-[#2D0652] font-bold mb-1 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-[#FF4500]" />
               Exercício / Ano:
             </label>
             <select
               value={selectedYear}
               onChange={e => setSelectedYear(e.target.value)}
-              className="w-full bg-[#130722] border border-purple-900/40 text-slate-100 rounded-xl px-3 py-2 focus:outline-hidden focus:border-[#6A0DAD]"
+              className="w-full bg-white border border-[#E2D2BC] text-[#2D0652] rounded-xl px-3 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
             >
               <option value="todos">Todos os Anos (2024 - 2026)</option>
               <option value="2026">2026 (Exercício Atual)</option>
@@ -263,16 +258,16 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
             </select>
           </div>
 
-          {/* Filter Secretaria */}
+          {/* Secretaria */}
           <div>
-            <label className="block text-purple-200 font-semibold mb-1 flex items-center gap-1.5">
+            <label className="block text-[#2D0652] font-bold mb-1 flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5 text-[#FF4500]" />
               Secretaria / Órgão:
             </label>
             <select
               value={selectedSecretaria}
               onChange={e => setSelectedSecretaria(e.target.value)}
-              className="w-full bg-[#130722] border border-purple-900/40 text-slate-100 rounded-xl px-3 py-2 focus:outline-hidden focus:border-[#6A0DAD]"
+              className="w-full bg-white border border-[#E2D2BC] text-[#2D0652] rounded-xl px-3 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
             >
               <option value="todas">Todas as Secretarias</option>
               {secretariasDisponiveis.map(sec => (
@@ -283,16 +278,16 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
             </select>
           </div>
 
-          {/* Filter Tipo de Projeto */}
+          {/* Tipo de Projeto */}
           <div>
-            <label className="block text-purple-200 font-semibold mb-1 flex items-center gap-1.5">
+            <label className="block text-[#2D0652] font-bold mb-1 flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5 text-[#FF4500]" />
               Tipo de Projeto Cultural:
             </label>
             <select
               value={selectedTipo}
               onChange={e => setSelectedTipo(e.target.value)}
-              className="w-full bg-[#130722] border border-purple-900/40 text-slate-100 rounded-xl px-3 py-2 focus:outline-hidden focus:border-[#6A0DAD]"
+              className="w-full bg-white border border-[#E2D2BC] text-[#2D0652] rounded-xl px-3 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-[#6A0DAD]"
             >
               <option value="todos">Todos os Segmentos Culturais</option>
               {tiposDisponiveis.map(t => (
@@ -305,27 +300,27 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
 
           {/* Scope Toggle */}
           <div>
-            <label className="block text-purple-200 font-semibold mb-1 flex items-center gap-1.5">
+            <label className="block text-[#2D0652] font-bold mb-1 flex items-center gap-1.5">
               <Filter className="w-3.5 h-3.5 text-[#FF4500]" />
               Escopo Orçamentário:
             </label>
-            <div className="grid grid-cols-2 gap-1 bg-[#130722] p-1 rounded-xl border border-purple-900/40 text-[11px]">
+            <div className="grid grid-cols-2 gap-1 bg-white p-1 rounded-xl border border-[#E2D2BC] text-xs">
               <button
                 onClick={() => setViewMode('apenas_cultura')}
-                className={`py-1 rounded-lg font-bold transition-all ${
+                className={`py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
                   viewMode === 'apenas_cultura'
                     ? 'bg-[#6A0DAD] text-white shadow-xs'
-                    : 'text-slate-300 hover:text-white'
+                    : 'text-[#2D0652]/70 hover:text-[#2D0652]'
                 }`}
               >
                 Cultura
               </button>
               <button
                 onClick={() => setViewMode('geral')}
-                className={`py-1 rounded-lg font-bold transition-all ${
+                className={`py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
                   viewMode === 'geral'
                     ? 'bg-[#6A0DAD] text-white shadow-xs'
-                    : 'text-slate-300 hover:text-white'
+                    : 'text-[#2D0652]/70 hover:text-[#2D0652]'
                 }`}
               >
                 Todas Áreas
@@ -335,52 +330,52 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
         </div>
       </div>
 
-      {/* KPI Cards (Identidade Visual #6A0DAD e #FF4500) */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Card 1: Alocado */}
-        <div className="bg-[#150b24] p-5 rounded-2xl border border-purple-900/40 shadow-xs hover:border-[#6A0DAD] transition-colors">
-          <div className="flex items-center justify-between text-xs font-semibold text-purple-300/70 mb-1">
+        <div className="bg-[#FAF4EB] p-6 rounded-3xl border border-[#E2D2BC] shadow-xs">
+          <div className="flex items-center justify-between text-xs font-bold text-[#2D0652]/70 mb-1">
             <span>Orçamento Alocado (Dotação)</span>
-            <span className="p-1 rounded-md bg-purple-900/40 text-[#c084fc] border border-purple-800/40">
+            <span className="p-1.5 rounded-full bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB]">
               <Layers className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-bold font-['Outfit'] text-white tracking-tight">
+          <div className="text-2xl sm:text-3xl font-bold text-[#6A0DAD] tracking-tight mt-1" style={{ fontFamily: 'var(--font-display)' }}>
             {formatBRL(totalAlocadoEmendas)}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
+          <p className="text-xs text-[#2D0652]/60 mt-1 font-medium">
             {emendasFiltradas.length} emendas no filtro selecionado.
           </p>
         </div>
 
         {/* Card 2: Gastos Realizados */}
-        <div className="bg-[#150b24] p-5 rounded-2xl border border-purple-900/40 shadow-xs hover:border-[#FF4500] transition-colors">
-          <div className="flex items-center justify-between text-xs font-semibold text-orange-300/80 mb-1">
+        <div className="bg-[#FAF4EB] p-6 rounded-3xl border border-[#E2D2BC] shadow-xs">
+          <div className="flex items-center justify-between text-xs font-bold text-[#2D0652]/70 mb-1">
             <span>Gastos Realizados (Liquidados)</span>
-            <span className="p-1 rounded-md bg-orange-950/50 text-[#FF4500] border border-orange-800/40">
+            <span className="p-1.5 rounded-full bg-[#FFE8E0] text-[#FF4500] border border-[#FFC2B2]">
               <CheckCircle2 className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-bold font-['Outfit'] text-[#FF4500] tracking-tight">
+          <div className="text-2xl sm:text-3xl font-bold text-[#FF4500] tracking-tight mt-1" style={{ fontFamily: 'var(--font-display)' }}>
             {formatBRL(totalGastoEmendas)}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
+          <p className="text-xs text-[#2D0652]/60 mt-1 font-medium">
             Valores devidamente empenhados e pagos aos proponentes.
           </p>
         </div>
 
         {/* Card 3: Saldo a Executar */}
-        <div className="bg-[#150b24] p-5 rounded-2xl border border-purple-900/40 shadow-xs hover:border-[#6A0DAD] transition-colors">
-          <div className="flex items-center justify-between text-xs font-semibold text-purple-300/70 mb-1">
+        <div className="bg-[#FAF4EB] p-6 rounded-3xl border border-[#E2D2BC] shadow-xs">
+          <div className="flex items-center justify-between text-xs font-bold text-[#2D0652]/70 mb-1">
             <span>Saldo a Executar</span>
-            <span className="p-1 rounded-md bg-purple-900/40 text-[#c084fc] border border-purple-800/40">
+            <span className="p-1.5 rounded-full bg-white text-[#2D0652] border border-[#E2D2BC]">
               <TrendingUp className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-bold font-['Outfit'] text-slate-200 tracking-tight">
+          <div className="text-2xl sm:text-3xl font-bold text-[#2D0652] tracking-tight mt-1" style={{ fontFamily: 'var(--font-display)' }}>
             {formatBRL(saldoEmendas)}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
+          <p className="text-xs text-[#2D0652]/60 mt-1 font-medium">
             Recursos em fase de convênio ou chamamento público.
           </p>
         </div>
@@ -388,15 +383,15 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
 
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Gráfico 1: BARRAS DUPLAS - Alocado vs Gasto por Secretaria */}
-        <div className="lg:col-span-7 bg-[#150b24] p-5 sm:p-6 rounded-2xl border border-purple-900/40 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-purple-900/30">
+        {/* Gráfico 1: BARRAS DUPLAS */}
+        <div className="lg:col-span-7 bg-[#FAF4EB] p-6 sm:p-7 rounded-3xl border border-[#E2D2BC] shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E2D2BC]">
             <div>
-              <h3 className="font-bold text-white text-sm sm:text-base font-['Outfit'] flex items-center gap-2">
+              <h3 className="font-bold text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
                 <BarChart3 className="w-4 h-4 text-[#FF4500]" />
-                Orçamento Alocado vs. Gastos Realizados por Secretaria
+                Orçamento Alocado vs. Gastos por Secretaria
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#2D0652]/70 mt-0.5 font-medium">
                 Comparativo de dotação aprovada versus valor liquidado/pago (R$)
               </p>
             </div>
@@ -408,10 +403,10 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                 data={barDataPorSecretaria}
                 margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#281145" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2D2BC" />
                 <XAxis
                   dataKey="secretaria"
-                  tick={{ fill: '#c084fc', fontSize: 11 }}
+                  tick={{ fill: '#6A0DAD', fontSize: 11 }}
                   interval={0}
                   angle={-15}
                   textAnchor="end"
@@ -419,13 +414,13 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                 />
                 <YAxis
                   tickFormatter={value => `R$ ${(value / 1000).toFixed(0)}k`}
-                  tick={{ fill: '#c084fc', fontSize: 11 }}
+                  tick={{ fill: '#6A0DAD', fontSize: 11 }}
                 />
                 <Tooltip content={<CustomTooltipBar />} />
                 <Legend
                   wrapperStyle={{ paddingTop: 10, fontSize: 12 }}
                   formatter={(value: string) => (
-                    <span className="text-slate-200 font-medium">
+                    <span className="text-[#2D0652] font-semibold">
                       {value === 'alocado' ? 'Orçamento Alocado' : 'Gasto Realizado (Liquidado)'}
                     </span>
                   )}
@@ -449,15 +444,15 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
           </div>
         </div>
 
-        {/* Gráfico 2: PIZZA / ROSCA - Distribuição por Tipo de Projeto Cultural */}
-        <div className="lg:col-span-5 bg-[#150b24] p-5 sm:p-6 rounded-2xl border border-purple-900/40 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-purple-900/30">
+        {/* Gráfico 2: PIZZA / ROSCA */}
+        <div className="lg:col-span-5 bg-[#FAF4EB] p-6 sm:p-7 rounded-3xl border border-[#E2D2BC] shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E2D2BC]">
             <div>
-              <h3 className="font-bold text-white text-sm sm:text-base font-['Outfit'] flex items-center gap-2">
+              <h3 className="font-bold text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
                 <PieIcon className="w-4 h-4 text-[#FF4500]" />
                 Distribuição por Segmento Cultural
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#2D0652]/70 mt-0.5 font-medium">
                 Proporção das verbas por linguagem e modalidade
               </p>
             </div>
@@ -482,19 +477,19 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                 <Tooltip
                   formatter={(val: any) => [formatBRL(Number(val) || 0), 'Valor']}
                   contentStyle={{
-                    backgroundColor: '#0e061b',
-                    borderRadius: '0.75rem',
+                    backgroundColor: '#2D0652',
+                    borderRadius: '1rem',
                     color: '#fff',
                     fontSize: '12px',
-                    borderColor: '#4c1d95',
+                    borderColor: '#6A0DAD',
                   }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Custom scannable legend */}
-          <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-purple-900/30">
+          {/* Legend */}
+          <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#E2D2BC]">
             {pieDataPorTipo.map((item, idx) => (
               <div key={idx} className="flex items-center gap-2">
                 <span
@@ -502,8 +497,8 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                   style={{ backgroundColor: item.color }}
                 ></span>
                 <div className="truncate">
-                  <span className="text-slate-200 font-medium truncate block">{item.name}</span>
-                  <span className="text-[11px] text-purple-300 font-mono font-semibold">
+                  <span className="text-[#2D0652] font-semibold truncate block">{item.name}</span>
+                  <span className="text-[11px] text-[#6A0DAD] font-mono font-bold">
                     {formatBRL(item.value)}
                   </span>
                 </div>
@@ -513,24 +508,24 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
         </div>
       </div>
 
-      {/* Gráfico 3: Evolução Temporal de Alocação vs Liquidação */}
-      <div className="bg-[#150b24] p-5 sm:p-6 rounded-2xl border border-purple-900/40 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-purple-900/30">
+      {/* Gráfico 3: Evolução Temporal */}
+      <div className="bg-[#FAF4EB] p-6 sm:p-7 rounded-3xl border border-[#E2D2BC] shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E2D2BC]">
           <div>
-            <h3 className="font-bold text-white text-sm sm:text-base font-['Outfit'] flex items-center gap-2">
+            <h3 className="font-bold text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
               <TrendingUp className="w-4 h-4 text-[#FF4500]" />
               Evolução Cronológica: Orçamentos Alocados vs. Gastos Realizados
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#2D0652]/70 mt-0.5 font-medium">
               Rastreamento temporal mês a mês demonstrando o ritmo de liquidação.
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-950/60 text-purple-200 border border-purple-800/40 font-medium">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB] font-bold">
               <span className="w-2 h-2 rounded-full bg-[#6A0DAD]"></span>
               Alocação Acumulada
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-950/60 text-orange-200 border border-orange-800/40 font-medium">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFE8E0] text-[#FF4500] border border-[#FFC2B2] font-bold">
               <span className="w-2 h-2 rounded-full bg-[#FF4500]"></span>
               Gastos Liquidados
             </span>
@@ -553,11 +548,11 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
                   <stop offset="95%" stopColor="#FF4500" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#281145" />
-              <XAxis dataKey="mes" tick={{ fill: '#c084fc', fontSize: 11 }} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2D2BC" />
+              <XAxis dataKey="mes" tick={{ fill: '#6A0DAD', fontSize: 11 }} />
               <YAxis
                 tickFormatter={value => `R$ ${(value / 1000).toFixed(0)}k`}
-                tick={{ fill: '#c084fc', fontSize: 11 }}
+                tick={{ fill: '#6A0DAD', fontSize: 11 }}
               />
               <Tooltip content={<CustomTooltipLine />} />
               <Area
