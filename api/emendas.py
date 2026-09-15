@@ -11,11 +11,12 @@ import json
 import urllib.parse
 import sys
 import os
+import re
 from typing import List, Dict, Any, Optional
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from backend.apis import CguTransparenciaApi, PortalTransparenciaRsApi
+from backend.apis import CguTransparenciaApi, PortalTransparenciaRsApi, normalizar_texto
 from backend.utils import setup_logger, cache
 
 logger = setup_logger("VercelApiEmendas")
@@ -98,6 +99,25 @@ class handler(BaseHTTPRequestHandler):
                         "total_capturado": 0
                     }
 
+            # 3. Camada Final de Segurança Territorial: Redundância Obrigatória
+            # Descarta qualquer registro que não seja comprovadamente do município de Viamão.
+            emendas_validadas: List[Dict[str, Any]] = []
+            descartes_seguranca = 0
+
+            for item in emendas_result:
+                mun_item = normalizar_texto(item.get("municipio") or "")
+                # Exige estritamente "Viamão" (ou variações pontuais com UF) e rejeita termos regionais/genéricos
+                if mun_item in ("viamao", "viamao rs", "viamao - rs", "viamao / rs", "municipio de viamao", "municipio de viamao / rs") or (item.get("municipio") == "Viamão"):
+                    emendas_validadas.append(item)
+                else:
+                    descartes_seguranca += 1
+                    logger.warning(
+                        f"Camada final de segurança descartou emenda não-Viamão: "
+                        f"id={item.get('id')} municipio='{item.get('municipio')}' autor='{item.get('autor')}'"
+                    )
+
+            emendas_result = emendas_validadas
+
             # Filtro opcional por cultura
             if apenas_cultura:
                 emendas_result = [e for e in emendas_result if e.get("is_cultura")]
@@ -109,7 +129,7 @@ class handler(BaseHTTPRequestHandler):
 
             response_data = {
                 "success": True,
-                "municipio": municipio,
+                "municipio": "Viamão",
                 "uf": "RS",
                 "codigo_ibge": codigo_ibge,
                 "esfera_solicitada": esfera,
@@ -121,7 +141,12 @@ class handler(BaseHTTPRequestHandler):
                 "valor_total_cultura": valor_total_cultura,
                 "emendas": emendas_result,
                 "status_fontes": status_fontes,
-                "politica_auditoria": "Dados oficiais agregados do Portal da Transparência CGU e Portal RS CAGE."
+                "auditoria_territorial": {
+                    "municipio_obrigatorio": "Viamão",
+                    "descartes_camada_seguranca": descartes_seguranca,
+                    "politica": "Apenas emendas comprovadamente destinadas a Viamão/RS."
+                },
+                "politica_auditoria": "Dados oficiais agregados do Portal da Transparência CGU e Portal RS CAGE exclusivos para Viamão/RS."
             }
 
             payload = json.dumps(response_data, ensure_ascii=False).encode("utf-8")

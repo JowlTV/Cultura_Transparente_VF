@@ -17,6 +17,7 @@ from api.lpg import handler as LpgHandler
 from api.news import handler as NewsHandler
 from api.emendas import handler as EmendasHandler
 from backend.models import EmendaRecord
+from backend.utils import cache
 
 
 def invoke_handler(handler_class, path: str):
@@ -43,6 +44,9 @@ def invoke_handler(handler_class, path: str):
 
 
 class TestEndpoints(unittest.TestCase):
+
+    def setUp(self):
+        cache.clear()
 
     def test_emendas_endpoint_regression_multi_ano_typing(self):
         """
@@ -161,6 +165,62 @@ class TestEndpoints(unittest.TestCase):
             self.assertIn("200 OK", status_line)
             mock_cgu.buscar_emendas.assert_not_called()
             mock_rs.buscar_emendas_estaduais.assert_called_once()
+
+    def test_emendas_endpoint_camada_seguranca_territorial(self):
+        """
+        Garante que a camada final de segurança em /api/emendas:
+        1. Descarta emendas injetadas que possuam municipio diferente de Viamão
+        2. Registra o total de descartes em auditoria_territorial
+        """
+        mock_cgu = MagicMock()
+        mock_cgu.api_key = "fake_key"
+        mock_cgu.buscar_emendas.return_value = [
+            EmendaRecord(
+                id="FED-01",
+                autor="Deputado Nacional",
+                partido="MDB",
+                tipo="Individual",
+                ano=2024,
+                orgao="MinC",
+                esfera="Federal (API CGU)",
+                valor=50000.0,
+                pago=50000.0,
+                status="Pago",
+                objeto="Cultura",
+                municipio="RS (Abrangência Regional Viamão)",  # Inválido / não-estrito
+                is_cultura=True,
+                area_atuacao="Cultura"
+            ),
+            EmendaRecord(
+                id="FED-02",
+                autor="Deputado Local",
+                partido="PT",
+                tipo="Individual",
+                ano=2024,
+                orgao="MinC",
+                esfera="Federal (API CGU)",
+                valor=80000.0,
+                pago=80000.0,
+                status="Pago",
+                objeto="Cultura Hip-Hop em Viamão",
+                municipio="Viamão",  # Válido
+                is_cultura=True,
+                area_atuacao="Cultura"
+            )
+        ]
+
+        with patch("api.emendas.CguTransparenciaApi", return_value=mock_cgu), \
+             patch("api.emendas.PortalTransparenciaRsApi") as mock_rs_cls:
+            mock_rs = MagicMock()
+            mock_rs.buscar_emendas_estaduais.return_value = []
+            mock_rs_cls.return_value = mock_rs
+
+            status_line, body = invoke_handler(EmendasHandler, "/api/emendas?esfera=federal")
+
+        self.assertIn("200 OK", status_line)
+        self.assertEqual(body.get("total_emendas"), 1)
+        self.assertEqual(body.get("emendas")[0]["id"], "FED-02")
+        self.assertEqual(body.get("auditoria_territorial", {}).get("descartes_camada_seguranca"), 1)
 
     def test_smoke_index_endpoint(self):
         """Smoke test do endpoint /api (Health Check e Índice)."""

@@ -278,9 +278,16 @@ class CguTransparenciaApi:
         self.client = client or http_client
         self.single_flight = single_flight_cache or single_flight
 
-    def _fetch_cgu_registros_raw(self, ano_exercicio: int, headers: Dict[str, str], codigo_funcao: Optional[str] = "13") -> List[Dict[str, Any]]:
+    def _fetch_cgu_registros_raw(
+        self,
+        ano_exercicio: int,
+        headers: Dict[str, str],
+        codigo_ibge: Optional[str] = CODIGO_IBGE_VIAMAO,
+        codigo_funcao: Optional[str] = "13"
+    ) -> List[Dict[str, Any]]:
         """
         Executa a requisição real à API oficial da CGU (/api-de-dados/emendas)
+        filtrando por código IBGE do município e função orçamentária,
         paginando até 10 páginas de 15 registros para cobrir as emendas do exercício.
         """
         registros: List[Dict[str, Any]] = []
@@ -291,6 +298,8 @@ class CguTransparenciaApi:
                 "ano": ano_exercicio,
                 "pagina": page
             }
+            if codigo_ibge:
+                params["codigoIbge"] = codigo_ibge
             if codigo_funcao:
                 params["codigoFuncao"] = codigo_funcao
             
@@ -322,13 +331,17 @@ class CguTransparenciaApi:
         use_cache: bool = True
     ) -> List[EmendaRecord]:
         """
-        Busca emendas parlamentares federais destinadas ao município de Viamão e RS
+        Busca emendas parlamentares federais destinadas estritamente ao município de Viamão/RS
         consolidando resultados de múltiplos exercícios financeiros com proteção single-flight.
+        
+        Regra Territorial Estrita:
+        Descarte imediato de qualquer registro que não comprove destinação para Viamão/RS.
+        Não aceita categorias intermediárias de 'abrangência regional' ou 'RS em geral'.
         
         :param anos: Lista de anos fiscais para consulta (se None, usa 2024, 2025, 2026)
         :param ano: Ano único (caso fornecido, sobrepõe 'anos')
         :param codigo_ibge: Código IBGE do município (padrão Viamão: 4323002)
-        :param municipio: Nome do município para filtro de localidade
+        :param municipio: Nome do município para validação territorial estrita
         :param codigo_funcao: Código da função orçamentária ('13' = Cultura)
         :param use_cache: Ativa cache com TTL de 24h
         :return: Lista de objetos EmendaRecord normalizados e deduplicados
@@ -357,16 +370,20 @@ class CguTransparenciaApi:
         }
 
         def _process_ano(ano_exercicio: int) -> List[Dict[str, Any]]:
-            cache_key = f"cgu:emendas:fn_{codigo_funcao}:{ano_exercicio}"
+            cache_key = f"cgu:emendas:ibge_{codigo_ibge}:fn_{codigo_funcao}:{ano_exercicio}"
             try:
                 if use_cache:
                     return self.single_flight.get_or_fetch(
                         cache_key,
-                        fetch_fn=lambda a=ano_exercicio: self._fetch_cgu_registros_raw(a, headers, codigo_funcao=codigo_funcao),
+                        fetch_fn=lambda a=ano_exercicio: self._fetch_cgu_registros_raw(
+                            a, headers, codigo_ibge=codigo_ibge, codigo_funcao=codigo_funcao
+                        ),
                         ttl_seconds=86400
                     )
                 else:
-                    return self._fetch_cgu_registros_raw(ano_exercicio, headers, codigo_funcao=codigo_funcao)
+                    return self._fetch_cgu_registros_raw(
+                        ano_exercicio, headers, codigo_ibge=codigo_ibge, codigo_funcao=codigo_funcao
+                    )
             except Exception as e:
                 logger.warning(f"Falha ao consultar API da CGU para o ano {ano_exercicio}: {e}")
                 return []
@@ -377,26 +394,19 @@ class CguTransparenciaApi:
 
         for ano_exercicio, registros in zip(anos_consulta, resultados_anos):
             registros = registros if isinstance(registros, list) else []
-            logger.info(f"CGU Emendas {ano_exercicio} (Função {codigo_funcao}): {len(registros)} registros retornados.")
+            logger.info(f"CGU Emendas {ano_exercicio} (IBGE {codigo_ibge}, Função {codigo_funcao}): {len(registros)} registros retornados.")
 
             for r in registros:
                 localidade = r.get("localidadeDoGasto") or ""
                 loc_norm = normalizar_texto(localidade)
                 
-                # Filtra emendas com destino a Viamão, Rio Grande do Sul (UF) ou escopo geral/nacional,
-                # excluindo explicitamente registros de outros estados/municípios fora do RS.
-                is_viamao = "viamao" in loc_norm
-                is_rs = "rs" in loc_norm or "rio grande do sul" in loc_norm
-                outras_ufs = [
-                    "- sp", "- rj", "- mg", "- pr", "- sc", "- ba", "- ce", "- pe", "- go", "- df",
-                    "- ma", "- pa", "- am", "- mt", "- ms", "- es", "- pb", "- rn", "- al", "- pi",
-                    "- se", "- ro", "- to", "- ac", "- ap", "- rr"
-                ]
-                eh_outro_estado = any(uf in loc_norm for uf in outras_ufs) or any(
-                    f"{uf} (uf)" in loc_norm for uf in ["sao paulo", "minas gerais", "ceara", "parana", "bahia", "rio de janeiro", "santa catarina"]
-                )
+                # Regra Inegociável: Apenas emendas comprovadamente destinadas a Viamão/RS.
+                # Não aceita categorias intermediárias de 'abrangência regional' ou 'RS em geral'.
+                tokens = set(re.split(r'[^a-z0-9]+', loc_norm))
+                is_viamao = "viamao" in tokens or (municipio and normalizar_texto(municipio) in tokens)
                 
-                if eh_outro_estado and not (is_viamao or is_rs):
+                if not is_viamao:
+                    logger.debug(f"Registro federal da CGU descartado por não ser comprovadamente de Viamão: {localidade}")
                     continue
 
                 codigo_emenda = str(r.get("codigoEmenda") or len(emendas_map) + 1)
@@ -445,8 +455,6 @@ class CguTransparenciaApi:
                         existente.fontes_cruzadas.append(f"Orçamento Geral da União {ano_exercicio}")
                     continue
 
-                beneficiario_final = "Município de Viamão / RS" if is_viamao else f"Projetos Culturais RS ({localidade})"
-
                 emenda = EmendaRecord(
                     id=emenda_id,
                     autor=autor_raw,
@@ -460,10 +468,10 @@ class CguTransparenciaApi:
                     status="Em Execução / Vigente" if pago_final < valor_empenhado else "Concluída",
                     is_cultura=is_cultura,
                     area_atuacao="Cultura & Turismo" if is_cultura else funcao_nome,
-                    municipio="Viamão" if is_viamao else "RS (Abrangência Regional Viamão)",
+                    municipio="Viamão",
                     esfera="Federal (API CGU)",
                     numero_emenda=codigo_emenda,
-                    beneficiario=beneficiario_final,
+                    beneficiario="Município de Viamão / RS",
                     fonte="Portal da Transparência do Governo Federal (CGU)",
                     fontes_cruzadas=["Portal da Transparência CGU (API de Dados)", f"Orçamento Geral da União {ano_exercicio}"],
                     subprojeto=f"{subfuncao_nome} - {localidade}",
@@ -492,6 +500,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 100000.0,
         "valor_pago": 100000.0,
         "status": "Concluída",
+        "municipio": "Viamão",
         "beneficiario": "Prefeitura Municipal de Viamão - SMC",
     },
     {
@@ -504,6 +513,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 60000.0,
         "valor_pago": 60000.0,
         "status": "Concluída",
+        "municipio": "Viamão",
         "beneficiario": "Associação Cultural e Tradicionalista de Viamão",
     },
     {
@@ -516,6 +526,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 50000.0,
         "valor_pago": 50000.0,
         "status": "Concluída",
+        "municipio": "Viamão",
         "beneficiario": "Conselho Municipal de Cultura de Viamão",
     },
     {
@@ -528,6 +539,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 50000.0,
         "valor_pago": 50000.0,
         "status": "Concluída",
+        "municipio": "Viamão",
         "beneficiario": "Rede de Bibliotecas Comunitárias de Viamão",
     },
     {
@@ -540,6 +552,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 75000.0,
         "valor_pago": 75000.0,
         "status": "Concluída",
+        "municipio": "Viamão",
         "beneficiario": "Município de Viamão",
     },
     {
@@ -552,6 +565,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 50000.0,
         "valor_pago": 50000.0,
         "status": "Concluída",
+        "municipio": "Viamão",
         "beneficiario": "Coletivo Cultural Comunitário de Viamão",
     },
     # Exercício 2025
@@ -565,6 +579,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 50000.0,
         "valor_pago": 50000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Coletivo Educacional e Artístico de Viamão",
     },
     {
@@ -577,6 +592,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 100000.0,
         "valor_pago": 80000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Associação Cultural e Campeira de Viamão",
     },
     {
@@ -589,6 +605,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 80000.0,
         "valor_pago": 80000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Associação de Moradores e Produtores de Itapuã",
     },
     {
@@ -601,6 +618,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 120000.0,
         "valor_pago": 120000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Secretaria Municipal de Cultura de Viamão",
     },
     {
@@ -613,6 +631,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 50000.0,
         "valor_pago": 35000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Coletivo Cultural Periferia Ativa de Viamão",
     },
     # Exercício 2026
@@ -626,6 +645,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 100000.0,
         "valor_pago": 100000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Secretaria Municipal de Educação e Cultura de Viamão",
     },
     {
@@ -638,6 +658,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 200000.0,
         "valor_pago": 150000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Paróquia Nossa Senhora da Conceição e Mitra Arquidiocesana",
     },
     {
@@ -650,6 +671,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 100000.0,
         "valor_pago": 75000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Associação de Moradores da Santa Isabel",
     },
     {
@@ -662,6 +684,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 50000.0,
         "valor_pago": 50000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Coletivo de Cultura Urbana e Juventude de Viamão",
     },
     {
@@ -674,6 +697,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 50000.0,
         "valor_pago": 50000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Escola Estadual de Ensino Médio Setembrina",
     },
     {
@@ -686,6 +710,7 @@ AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
         "valor": 150000.0,
         "valor_pago": 120000.0,
         "status": "Em Execução / Vigente",
+        "municipio": "Viamão",
         "beneficiario": "Associação Cultural e Beneficente de Viamão",
     },
 ]
@@ -730,7 +755,7 @@ class PortalTransparenciaRsApi:
         use_cache: bool = True
     ) -> List[EmendaRecord]:
         """
-        Busca emendas parlamentares estaduais destinadas a Viamão/RS
+        Busca emendas parlamentares estaduais destinadas estritamente a Viamão/RS
         com proteção de single-flight e garantia de cobertura para 2024, 2025 e 2026.
         """
         municipio_norm = normalizar_texto(municipio)
@@ -769,9 +794,16 @@ class PortalTransparenciaRsApi:
                     registros = [r for r in AUDITED_EMENDAS_RS_VIAMAO if r.get("ano") == ano]
 
                 for r in registros:
-                    mun_registro = normalizar_texto(r.get("municipio") or r.get("beneficiario") or r.get("localidade") or "Viamão")
+                    raw_mun = r.get("municipio") or r.get("beneficiario") or r.get("localidade") or ""
+                    mun_registro = normalizar_texto(raw_mun)
                     
-                    if municipio_norm and (municipio_norm not in mun_registro and "viamao" not in mun_registro):
+                    if not mun_registro:
+                        logger.warning("Registro estadual descartado: fonte não informou município, impossível validar território.")
+                        continue
+
+                    tokens_mun = set(re.split(r'[^a-z0-9]+', mun_registro))
+                    if "viamao" not in tokens_mun and (not municipio_norm or municipio_norm not in tokens_mun):
+                        logger.info(f"Registro estadual descartado por ser de outro município ({raw_mun}).")
                         continue
 
                     num_ep = str(r.get("numero_emenda") or r.get("ep") or r.get("id") or len(emendas) + 1)

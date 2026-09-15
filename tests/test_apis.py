@@ -150,7 +150,7 @@ class TestApis(unittest.TestCase):
                     "nomeAutor": f"Deputado do Ano {ano}",
                     "partido": "MDB",
                     "orgaoSuperior": {"nome": "Ministério da Cultura"},
-                    "localidadeDoGasto": f"Projeto Cultural {ano}",
+                    "localidadeDoGasto": f"Projeto Cultural Viamão {ano}",
                     "valorEmpenhado": 100000.0,
                     "valorPago": 50000.0
                 }
@@ -181,7 +181,7 @@ class TestApis(unittest.TestCase):
                     "nomeAutor": f"Deputado {ano}",
                     "partido": "PL",
                     "orgaoSuperior": {"nome": "Ministério do Turismo"},
-                    "localidadeDoGasto": f"Festa Tradicional {ano}",
+                    "localidadeDoGasto": f"Festa Tradicional Viamão {ano}",
                     "valorEmpenhado": 80000.0,
                     "valorPago": 80000.0
                 }
@@ -277,6 +277,96 @@ class TestApis(unittest.TestCase):
         self.assertTrue(emenda.is_cultura)
         self.assertEqual(emenda.tipo_projeto_cultural, "Patrimônio & Restauro")
         self.assertEqual(emenda.esfera, "Estadual (ALRS)")
+
+    def test_cgu_transparencia_api_descarte_nao_viamao(self):
+        """
+        Garante que a API da CGU descarta categoricamente:
+        1. Registros de outros estados (SP, PR, RJ, etc.)
+        2. Registros de outros municípios do RS (Porto Alegre, Canoas, etc.)
+        3. Registros genéricos de 'RS (UF)' ou 'Nacional'
+        Retendo EXCLUSIVAMENTE registros com destinação comprovada a Viamão.
+        """
+        mock_client = MagicMock()
+        mock_client.fetch_json.return_value = [
+            {
+                "codigoEmenda": "2024001",
+                "ano": 2024,
+                "nomeAutor": "Deputado A",
+                "localidadeDoGasto": "LONDRINA - PR",
+                "valorEmpenhado": 100000.0,
+                "funcao": "Cultura"
+            },
+            {
+                "codigoEmenda": "2024002",
+                "ano": 2024,
+                "nomeAutor": "Deputado B",
+                "localidadeDoGasto": "PORTO ALEGRE - RS",
+                "valorEmpenhado": 200000.0,
+                "funcao": "Cultura"
+            },
+            {
+                "codigoEmenda": "2024003",
+                "ano": 2024,
+                "nomeAutor": "Deputado C",
+                "localidadeDoGasto": "RIO GRANDE DO SUL (UF)",
+                "valorEmpenhado": 300000.0,
+                "funcao": "Cultura"
+            },
+            {
+                "codigoEmenda": "2024004",
+                "ano": 2024,
+                "nomeAutor": "Deputada D",
+                "localidadeDoGasto": "Associação Hip-Hop de Viamão - RS",
+                "valorEmpenhado": 150000.0,
+                "funcao": "Cultura"
+            }
+        ]
+
+        api = CguTransparenciaApi(api_key="teste-chave-cgu", client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
+        emendas = api.buscar_emendas(ano=2024)
+
+        # Apenas a emenda nº 2024004 (Viamão) pode ser aceita
+        self.assertEqual(len(emendas), 1)
+        self.assertEqual(emendas[0].numero_emenda, "2024004")
+        self.assertEqual(emendas[0].municipio, "Viamão")
+        self.assertEqual(emendas[0].beneficiario, "Município de Viamão / RS")
+
+    def test_portal_transparencia_rs_descarte_vazio_e_outros_municipios(self):
+        """
+        Garante que a API do Portal RS descarta:
+        1. Registros sem município/localidade preenchidos (sem fallback perigoso)
+        2. Registros de outros municípios gaúchos
+        Retendo apenas registros estritamente comprovados de Viamão.
+        """
+        mock_client = MagicMock()
+        mock_client.fetch_json.return_value = [
+            {
+                "numero_emenda": "0001",
+                "objeto": "Obra sem localidade definida",
+                # Omitidos propositalmente: municipio, beneficiario, localidade
+                "valor_alocado": 50000.0
+            },
+            {
+                "numero_emenda": "0002",
+                "municipio": "Pelotas",
+                "objeto": "Conservação de Praça em Pelotas",
+                "valor_alocado": 80000.0
+            },
+            {
+                "numero_emenda": "0003",
+                "municipio": "Viamão",
+                "objeto": "Restauro do Casarão Cultural de Viamão",
+                "valor_alocado": 120000.0,
+                "valor_pago": 120000.0
+            }
+        ]
+
+        api = PortalTransparenciaRsApi(client=mock_client, single_flight_cache=SingleFlightCache(cache_instance=TTLCache()))
+        emendas = api.buscar_emendas_estaduais(municipio="Viamão", anos=[2024])
+
+        self.assertEqual(len(emendas), 1)
+        self.assertEqual(emendas[0].numero_emenda, "Ep 0003")
+        self.assertEqual(emendas[0].municipio, "Viamão")
 
     def test_classificacao_cultural_e_normalizacao(self):
         """Verifica robustez das rotinas de classificação cultural e normalização de texto."""
