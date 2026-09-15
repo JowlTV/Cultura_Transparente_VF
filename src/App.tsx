@@ -60,7 +60,8 @@ export default function App() {
         if (newsRes.status === 'fulfilled' && newsRes.value.data && newsRes.value.data.length > 0) {
           setNoticias(newsRes.value.data);
         }
-        if (emendasRes.status === 'fulfilled' && emendasRes.value.data) {
+        if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data)) {
+          // Trata array retornado (mesmo que vazio []) como resultado sincronizado válido, distinto de falha/exceção
           setEmendas(emendasRes.value.data);
         }
 
@@ -105,7 +106,8 @@ export default function App() {
       if (newsRes.status === 'fulfilled' && newsRes.value.data && newsRes.value.data.length > 0) {
         setNoticias(newsRes.value.data);
       }
-      if (emendasRes.status === 'fulfilled' && emendasRes.value.data) {
+      if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data)) {
+        // Trata array retornado (mesmo que vazio []) como resultado sincronizado válido, distinto de falha/exceção
         setEmendas(emendasRes.value.data);
       }
 

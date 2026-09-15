@@ -34,7 +34,8 @@ import {
   Sparkles,
   Layers,
   Building2,
-  DollarSign
+  DollarSign,
+  Info
 } from 'lucide-react';
 import { Emenda } from '../types/culture';
 import { formatBRL, exportEmendasToCSV } from '../utils/formatters';
@@ -416,8 +417,20 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
 
             {/* Partido */}
             <div>
-              <label className="text-[11px] text-purple-300/70 block mb-0.5 font-medium">Partido Político:</label>
+              <div className="flex items-center justify-between mb-0.5">
+                <label htmlFor="filtro-partido-select" className="text-[11px] text-purple-300/70 font-medium">
+                  Partido Político:
+                </label>
+                <div className="group relative flex items-center">
+                  <Info className="w-3.5 h-3.5 text-purple-400/60 hover:text-purple-300 cursor-help transition-colors" />
+                  <div className="absolute right-0 bottom-full mb-1.5 hidden group-hover:block z-40 w-64 p-2.5 bg-slate-900/95 border border-purple-900/70 rounded-lg text-[11px] leading-relaxed text-slate-200 shadow-2xl backdrop-blur-md">
+                    <span className="font-semibold text-purple-300 block mb-0.5">Base Dinâmica:</span>
+                    Esta lista reflete apenas os partidos presentes nas emendas atualmente cadastradas e sincronizadas. Parlamentares de outras legendas sem registros no acervo são integrados progressivamente conforme novas fontes públicas são auditadas.
+                  </div>
+                </div>
+              </div>
               <select
+                id="filtro-partido-select"
                 value={filtroPartido}
                 onChange={e => setFiltroPartido(e.target.value)}
                 className="w-full bg-[#130722] border border-purple-900/40 rounded-lg p-2 text-xs text-slate-200 focus:outline-hidden focus:border-[#6A0DAD]"
@@ -427,6 +440,9 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>
+              <p className="text-[10px] text-purple-300/60 mt-1 leading-snug">
+                * Partidos presentes nos dados sincronizados (base dinâmica progressiva).
+              </p>
             </div>
 
             {/* Situação */}
