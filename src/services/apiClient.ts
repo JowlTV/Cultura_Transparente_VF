@@ -340,6 +340,16 @@ class CulturalApiClient {
 
         const latencyMs = Math.round(performance.now() - startTime);
 
+        let fallbackData = INITIAL_EMENDAS;
+        if (esfera === 'federal') {
+          fallbackData = fallbackData.filter(e => e.esfera.includes('Federal'));
+        } else if (esfera === 'estadual') {
+          fallbackData = fallbackData.filter(e => e.esfera.includes('Estadual'));
+        }
+        if (apenasCultura) {
+          fallbackData = fallbackData.filter(e => e.is_cultura);
+        }
+
         if (response.ok) {
           const payload = await response.json();
           if (payload.success && Array.isArray(payload.emendas)) {
@@ -373,18 +383,21 @@ class CulturalApiClient {
               };
             });
 
+            const emendasFinais = sanitizedEmendas.length > 0 ? sanitizedEmendas : fallbackData;
+            const isFallbackResult = sanitizedEmendas.length === 0;
+
             const result = {
-              data: sanitizedEmendas,
+              data: emendasFinais,
               report: {
                 endpoint: '/api/emendas',
                 status: 'online' as const,
                 latencyMs,
                 lastChecked: new Date().toLocaleTimeString('pt-BR'),
                 rateLimitInfo: 'CGU API (120 req/min) & Transparência RS',
-                totalRecords: sanitizedEmendas.length,
+                totalRecords: emendasFinais.length,
               },
               statusFontes: payload.status_fontes,
-              isFallback: false
+              isFallback: isFallbackResult
             };
             this.setCached(cacheKey, result);
             return result;

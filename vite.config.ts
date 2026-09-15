@@ -448,7 +448,61 @@ function devApiPlugin(): Plugin {
           }
         }
 
-        // 3. ENDPOINT: /api/chat (Semaphore Queue, Prompt Caching & Model Failover)
+        // 3. ENDPOINT: /api/emendas (Executa handler de api/emendas.py)
+        if (pathname === '/api/emendas') {
+          try {
+            const queryStr = parsedUrl.search ? parsedUrl.search.slice(1) : '';
+            const pyScript = `
+import sys, json
+from io import BytesIO
+
+real_stdout = sys.stdout
+sys.stdout = sys.stderr
+
+from api.emendas import handler
+
+h = handler.__new__(handler)
+h.command = 'GET'
+h.path = '/api/emendas?' + ${JSON.stringify(queryStr)}
+h.request_version = 'HTTP/1.1'
+h.requestline = 'GET ' + h.path + ' HTTP/1.1'
+h.client_address = ('127.0.0.1', 8000)
+h.rfile = BytesIO()
+h.wfile = BytesIO()
+h.headers = {}
+h._headers_buffer = []
+h.do_GET()
+
+raw = h.wfile.getvalue()
+parts = raw.split(b'\\r\\n\\r\\n', 1)
+payload = parts[1].decode('utf-8') if len(parts) > 1 else '{}'
+real_stdout.write(payload)
+real_stdout.flush()
+`;
+            const { spawn } = await import('child_process');
+            const py = spawn('python3', ['-c', pyScript], { cwd: process.cwd(), timeout: 15000 });
+            let out = '';
+            py.stdout.on('data', d => { out += d.toString(); });
+            py.on('close', () => {
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.end(out || JSON.stringify({ success: true, emendas: [] }));
+            });
+            py.on('error', err => {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.end(JSON.stringify({ success: false, error: String(err) }));
+            });
+            return;
+          } catch (e: any) {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.end(JSON.stringify({ success: false, error: String(e) }));
+            return;
+          }
+        }
+
+        // 4. ENDPOINT: /api/chat (Semaphore Queue, Prompt Caching & Model Failover)
         if (pathname === '/api/chat') {
           let body = '';
           req.on('data', chunk => {
