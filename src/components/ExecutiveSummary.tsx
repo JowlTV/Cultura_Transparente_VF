@@ -487,8 +487,8 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                       {manchete.veiculo_imprensa}
                     </span>
                   )}
-                  <span className="text-purple-200 text-xs flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-purple-300" />
+                  <span className="text-white/80 text-xs flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-[#FF4500]" />
                     {manchete.data}
                   </span>
                 </div>

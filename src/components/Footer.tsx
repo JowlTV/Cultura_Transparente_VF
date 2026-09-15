@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-4 text-xs">
             <div className="bg-[#21043D] p-3.5 rounded-2xl border border-[#3D0B6D] space-y-1">
-              <span className="text-purple-300 block text-[11px] flex items-center gap-1 font-semibold">
+              <span className="text-white/85 block text-[11px] flex items-center gap-1 font-semibold">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 CNPJ da Prefeitura Municipal de Viamão:
               </span>
@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-purple-300/70 text-[11px]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white/70 text-[11px]">
           <div>
             Desenvolvido em conformidade com a <strong>Lei de Acesso à Informação (Lei nº 12.527/2011)</strong> e a <strong>Lei da Transparência (LC nº 131/2009)</strong>.
           </div>

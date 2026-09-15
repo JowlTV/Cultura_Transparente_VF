@@ -136,16 +136,16 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
             {currentNews.titulo}
           </span>
 
-          <span className="hidden xl:inline-block text-[10px] text-purple-300/80 shrink-0">
+          <span className="hidden xl:inline-block text-[10px] text-white/70 shrink-0">
             ({currentNews.data})
           </span>
 
-          <ExternalLink className="w-3 h-3 text-purple-300 group-hover:text-[#FF4500] shrink-0 opacity-80" />
+          <ExternalLink className="w-3 h-3 text-white/70 group-hover:text-[#FF4500] shrink-0 opacity-80" />
         </div>
 
         {/* Right Navigation & Status Controls */}
-        <div className="flex items-center gap-1.5 shrink-0 text-purple-200">
-          <span className="text-[10px] font-mono text-purple-300 hidden sm:inline">
+        <div className="flex items-center gap-1.5 shrink-0 text-white/80">
+          <span className="text-[10px] font-mono text-white/70 hidden sm:inline">
             {currentIndex + 1}/{MINC_NOTICIAS_OFICIAIS.length}
           </span>
 

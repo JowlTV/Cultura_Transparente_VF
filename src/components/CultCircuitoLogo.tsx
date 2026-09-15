@@ -50,7 +50,7 @@ export const CultCircuitoLogo: React.FC<CultCircuitoLogoProps> = ({
           {/* Vertical Divider Line */}
           <div
             className={`w-[1.5px] h-8 self-center rounded-full ${
-              lockupTheme === 'dark' ? 'bg-purple-300/40' : 'bg-[#2D0652]/30'
+              lockupTheme === 'dark' ? 'bg-white/30' : 'bg-[#2D0652]/30'
             }`}
             aria-hidden="true"
           />

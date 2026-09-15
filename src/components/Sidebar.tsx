@@ -120,7 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation Items List */}
         <div className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin">
-          <div className="px-3 py-1 text-[10px] font-bold text-purple-300/70 uppercase tracking-wider">
+          <div className="px-3 py-1 text-[10px] font-bold text-white/70 uppercase tracking-wider">
             Navegação Principal
           </div>
 
@@ -133,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => handleSelect(tab.id)}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all duration-200 group ${
                   isActive
-                    ? 'bg-[#6A0DAD] text-white font-bold shadow-lg shadow-purple-950/40 border border-purple-300/30'
+                    ? 'bg-[#6A0DAD] text-white font-bold shadow-lg shadow-purple-950/40 border border-white/20'
                     : 'text-purple-100/80 hover:text-white hover:bg-white/10 font-medium'
                 }`}
               >
@@ -163,7 +163,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <p className="text-[10px] text-purple-200/80 leading-tight">
             Em conformidade com a <strong>Lei nº 12.527/2011</strong> (LAI) e <strong>LC nº 131/2009</strong>.
           </p>
-          <div className="pt-1 text-[10px] text-purple-300/70 flex items-center justify-between">
+          <div className="pt-1 text-[10px] text-white/70 flex items-center justify-between">
             <span>Município de Viamão / RS</span>
             <span className="font-mono text-[9px] bg-[#2D0652] px-1.5 py-0.5 rounded text-purple-200 border border-purple-500/30">v2.5</span>
           </div>

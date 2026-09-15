@@ -138,7 +138,7 @@ export default function App() {
           <span className="font-semibold">{toastMessage}</span>
           <button
             onClick={() => setToastMessage(null)}
-            className="text-purple-300 hover:text-white ml-2 text-sm font-bold"
+            className="text-white/70 hover:text-white ml-2 text-sm font-bold"
           >
             ✕
           </button>
@@ -178,7 +178,7 @@ export default function App() {
             />
           )}
 
-          <Suspense fallback={<div className="p-8 text-center text-xs text-purple-300 animate-pulse">Carregando painel auditado...</div>}>
+          <Suspense fallback={<div className="p-8 text-center text-xs text-[#6A0DAD] font-semibold animate-pulse">Carregando painel auditado...</div>}>
             {activeTab === 'auxilio-fazedor' && (
               <AuxilioFazedorSection onShowToast={showToast} />
             )}

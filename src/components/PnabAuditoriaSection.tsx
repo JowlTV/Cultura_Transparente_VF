@@ -75,7 +75,7 @@ export const PnabAuditoriaSection: React.FC = () => {
                 Ministério da Cultura • Governo Federal
               </span>
               <span className="px-3 py-1 bg-white/10 text-purple-200 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 border border-white/15">
-                <ShieldCheck className="w-3.5 h-3.5 text-purple-300" />
+                <ShieldCheck className="w-3.5 h-3.5 text-white/70" />
                 Lei Federal nº 14.399/2022 • PNAB
               </span>
               <span className="px-3 py-1 bg-[#FFE8E0] text-[#FF4500] rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 border border-[#FF4500]/40">
@@ -347,7 +347,7 @@ export const PnabAuditoriaSection: React.FC = () => {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                     etapa.isDone
-                      ? 'bg-[#6A0DAD] text-white border-2 border-purple-300'
+                      ? 'bg-[#6A0DAD] text-white border-2 border-[#DCC7FB]'
                       : etapa.isCurrent
                       ? 'bg-[#FF4500] text-white border-2 border-orange-300 animate-pulse'
                       : 'bg-white text-[#2D0652] border-2 border-[#E2D2BC]'
