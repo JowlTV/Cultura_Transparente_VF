@@ -448,8 +448,18 @@ function devApiPlugin(): Plugin {
           }
         }
 
-        // 3. ENDPOINT: /api/emendas (Executa handler de api/emendas.py)
+        // 3. ENDPOINT: /api/emendas (Executa handler de api/emendas.py com cache em memória e timeout resiliente)
         if (pathname === '/api/emendas') {
+          const cacheKey = `emendas_${parsedUrl.search || ''}`;
+          const cached = getCache<any>(cacheKey);
+          if (cached) {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.setHeader('X-Cache', 'HIT');
+            res.end(typeof cached.data === 'string' ? cached.data : JSON.stringify(cached.data));
+            return;
+          }
+
           try {
             const queryStr = parsedUrl.search ? parsedUrl.search.slice(1) : '';
             const pyScript = `
@@ -480,12 +490,21 @@ real_stdout.write(payload)
 real_stdout.flush()
 `;
             const { spawn } = await import('child_process');
-            const py = spawn('python3', ['-c', pyScript], { cwd: process.cwd(), timeout: 15000 });
+            const py = spawn('python3', ['-c', pyScript], { cwd: process.cwd(), timeout: 35000 });
             let out = '';
             py.stdout.on('data', d => { out += d.toString(); });
-            py.on('close', () => {
+            py.on('close', code => {
+              if (out && out.trim().startsWith('{')) {
+                try {
+                  const parsed = JSON.parse(out);
+                  if (parsed.success && Array.isArray(parsed.emendas) && parsed.emendas.length > 0) {
+                    setCache(cacheKey, parsed, 10 * 60 * 1000);
+                  }
+                } catch {}
+              }
               res.statusCode = 200;
               res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.setHeader('X-Cache', 'MISS');
               res.end(out || JSON.stringify({ success: true, emendas: [] }));
             });
             py.on('error', err => {

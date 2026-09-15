@@ -14,6 +14,7 @@ import json
 import time
 import logging
 import threading
+import tempfile
 from typing import Any, Optional, Dict, Callable
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
@@ -176,8 +177,9 @@ class TTLCache:
             logger.warning(f"Falha ao carregar cache do disco: {e}")
 
 
-# Instância global compartilhada de cache (TTL padrão de 1 hora)
-cache = TTLCache(default_ttl_seconds=3600)
+# Instância global compartilhada de cache resiliente (TTL padrão de 24 horas e persistência em disco)
+_DEFAULT_DISK_CACHE = os.environ.get("CACHE_DISK_FILE") or os.path.join(tempfile.gettempdir(), "cultura_transparente_cache.json")
+cache = TTLCache(default_ttl_seconds=86400, disk_file=_DEFAULT_DISK_CACHE)
 
 
 # =============================================================================

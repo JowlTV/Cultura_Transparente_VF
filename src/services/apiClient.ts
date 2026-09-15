@@ -328,7 +328,7 @@ class CulturalApiClient {
       const startTime = performance.now();
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
 
         const url = `/api/emendas?esfera=${esfera}&anos=${encodeURIComponent(anos)}&apenas_cultura=${apenasCultura ? 'true' : 'false'}`;
         const response = await fetch(url, {
