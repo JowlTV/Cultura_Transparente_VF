@@ -1,4 +1,4 @@
-import { Emenda } from '../types/culture';
+import { Emenda, NewsItem } from '../types/culture';
 
 export function formatBRL(valor: number): string {
   try {
@@ -150,3 +150,35 @@ export function exportEmendasToCSV(emendas: Emenda[]): void {
   link.click();
   document.body.removeChild(link);
 }
+
+/**
+ * Converte strings de data em múltiplos formatos (DD/MM/YYYY, DD/MM/YYYY HH:mm, YYYY-MM-DD, ISO)
+ * em timestamp numérico para ordenação cronológica precisa.
+ */
+export function parseDateToTimestamp(dateStr: string): number {
+  if (!dateStr) return 0;
+  const str = dateStr.trim();
+  
+  // Padrão brasileiro DD/MM/YYYY ou DD/MM/YYYY HH:mm
+  const brMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2}))?/);
+  if (brMatch) {
+    const day = parseInt(brMatch[1], 10);
+    const month = parseInt(brMatch[2], 10) - 1;
+    const year = parseInt(brMatch[3], 10);
+    const hour = brMatch[4] ? parseInt(brMatch[4], 10) : 0;
+    const minute = brMatch[5] ? parseInt(brMatch[5], 10) : 0;
+    return new Date(year, month, day, hour, minute).getTime();
+  }
+
+  // Padrão ISO ou YYYY-MM-DD
+  const parsed = Date.parse(str);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+/**
+ * Ordena lista de notícias em ordem decrescente de data (da mais recente para a mais antiga).
+ */
+export function sortNewsByDateDesc(news: NewsItem[]): NewsItem[] {
+  return [...news].sort((a, b) => parseDateToTimestamp(b.data) - parseDateToTimestamp(a.data));
+}
+

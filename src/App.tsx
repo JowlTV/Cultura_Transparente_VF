@@ -20,13 +20,14 @@ import {
 } from './data/initialData';
 import { Emenda, NewsItem, LpgPlanoAcao } from './types/culture';
 import { apiClient } from './services/apiClient';
+import { sortNewsByDateDesc } from './utils/formatters';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('visao-geral');
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [emendas, setEmendas] = useState<Emenda[]>(INITIAL_EMENDAS);
-  const [noticias, setNoticias] = useState<NewsItem[]>(INITIAL_NEWS);
+  const [noticias, setNoticias] = useState<NewsItem[]>(() => sortNewsByDateDesc(INITIAL_NEWS));
   const [lpgData, setLpgData] = useState<LpgPlanoAcao>(INITIAL_LPG_DATA);
   const [isFetchingLpg, setIsFetchingLpg] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>('11/09/2026 11:25');
@@ -58,7 +59,7 @@ export default function App() {
           setLpgData(lpgRes.value.data);
         }
         if (newsRes.status === 'fulfilled' && newsRes.value.data && newsRes.value.data.length > 0) {
-          setNoticias(newsRes.value.data);
+          setNoticias(sortNewsByDateDesc(newsRes.value.data));
         }
         if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data) && emendasRes.value.data.length > 0) {
           setEmendas(emendasRes.value.data);
@@ -103,7 +104,7 @@ export default function App() {
         setLpgData(lpgRes.value.data);
       }
       if (newsRes.status === 'fulfilled' && newsRes.value.data && newsRes.value.data.length > 0) {
-        setNoticias(newsRes.value.data);
+        setNoticias(sortNewsByDateDesc(newsRes.value.data));
       }
       if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data) && emendasRes.value.data.length > 0) {
         setEmendas(emendasRes.value.data);

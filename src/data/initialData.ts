@@ -532,30 +532,6 @@ export const INITIAL_NEWS: NewsItem[] = [
     ]
   },
   {
-    id: 'news-ifrs-sarau-viamao',
-    data: '26/08/2026',
-    origem: 'Instituto Federal (IFRS)',
-    veiculo_imprensa: 'IFRS - Campus Viamão',
-    categoria_filtro: 'viamao',
-    titulo: 'Campus Viamão realiza Sarau Cultural e debates sobre Direitos Humanos e Cidadania',
-    resumo: 'O Instituto Federal do Rio Grande do Sul (Campus Viamão) sedia sarau cultural com apresentações musicais, literatura e artes cênicas de artistas locais, promovendo o debate sobre memória, patrimônio e direitos fundamentais.',
-    link: 'https://viamao.ifrs.edu.br/',
-    etiqueta: 'Sarau & Literatura',
-    jurisdicao: 'Municipal (Viamão)',
-    imagem: 'https://ifrs.edu.br/viamao/wp-content/themes/ifrs-portal-theme/favicons/favicon.ico',
-    elegibilidade: 'Comunidade local, estudantes, poetas e artistas de Viamão',
-    prazo: 'Evento Periódico Institucional',
-    plataforma: 'Portal Oficial IFRS Campus Viamão',
-    fonte_confiavel: true,
-    pesquisa_google: true,
-    url_pesquisa_google: 'https://www.google.com/search?q=campus+viamao+sarau+cultural+ifrs',
-    requisitos_praticos: [
-      'Espaço público federal aberto à comunidade viamonense',
-      'Inscrições gratuitas para apresentações culturais',
-      'Integração com o calendário acadêmico e comunitário'
-    ]
-  },
-  {
     id: 'news-sedac-fac-editais-rs',
     data: '28/08/2026',
     origem: 'Estadual (SEDAC-RS)',
@@ -577,6 +553,30 @@ export const INITIAL_NEWS: NewsItem[] = [
       'Cadastro e homologação ativa no Pró-cultura RS',
       'Regularidade fiscal estadual e federal (CNDT e CND)',
       'Conta corrente fiduciária vinculada no Banrisul'
+    ]
+  },
+  {
+    id: 'news-ifrs-sarau-viamao',
+    data: '26/08/2026',
+    origem: 'Instituto Federal (IFRS)',
+    veiculo_imprensa: 'IFRS - Campus Viamão',
+    categoria_filtro: 'viamao',
+    titulo: 'Campus Viamão realiza Sarau Cultural e debates sobre Direitos Humanos e Cidadania',
+    resumo: 'O Instituto Federal do Rio Grande do Sul (Campus Viamão) sedia sarau cultural com apresentações musicais, literatura e artes cênicas de artistas locais, promovendo o debate sobre memória, patrimônio e direitos fundamentais.',
+    link: 'https://viamao.ifrs.edu.br/',
+    etiqueta: 'Sarau & Literatura',
+    jurisdicao: 'Municipal (Viamão)',
+    imagem: 'https://ifrs.edu.br/viamao/wp-content/themes/ifrs-portal-theme/favicons/favicon.ico',
+    elegibilidade: 'Comunidade local, estudantes, poetas e artistas de Viamão',
+    prazo: 'Evento Periódico Institucional',
+    plataforma: 'Portal Oficial IFRS Campus Viamão',
+    fonte_confiavel: true,
+    pesquisa_google: true,
+    url_pesquisa_google: 'https://www.google.com/search?q=campus+viamao+sarau+cultural+ifrs',
+    requisitos_praticos: [
+      'Espaço público federal aberto à comunidade viamonense',
+      'Inscrições gratuitas para apresentações culturais',
+      'Integração com o calendário acadêmico e comunitário'
     ]
   },
   {

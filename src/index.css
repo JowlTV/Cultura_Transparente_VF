@@ -9,7 +9,7 @@
   --color-areia-card: #FAF4EB;
   --color-areia-borda: #E2D2BC;
 
-  --font-display: "Caprasimo", "Georgia", serif;
+  --font-display: "Libre Baskerville", "Georgia", serif;
   --font-sans: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Figtree", ui-monospace, "SF Mono", "Roboto Mono", monospace;
 }
@@ -22,15 +22,9 @@
     letter-spacing: -0.01em;
   }
 
-  h1, h2, h3 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
-    color: #2D0652;
-  }
-
-  h4, h5, h6 {
-    font-family: var(--font-sans);
-    font-weight: 700;
     color: #2D0652;
   }
 }

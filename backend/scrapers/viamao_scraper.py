@@ -138,6 +138,19 @@ class ViamaoCultureScraper:
                 or termo_lower in n.get("etiqueta", "").lower()
             ]
 
+        def _parse_dt(item: Dict[str, Any]) -> datetime:
+            d_str = item.get("data", "")
+            if not d_str:
+                return datetime.min
+            try:
+                return datetime.strptime(d_str.strip()[:10], "%d/%m/%Y")
+            except Exception:
+                try:
+                    return datetime.strptime(d_str.strip()[:10], "%Y-%m-%d")
+                except Exception:
+                    return datetime.min
+
+        noticias_validas.sort(key=_parse_dt, reverse=True)
         return noticias_validas
 
     def pesquisar_google_noticias_viamao(self, termo: str = "cultura") -> List[Dict[str, Any]]:

@@ -16,7 +16,8 @@ class handler(BaseHTTPRequestHandler):
             "rotas_disponiveis": {
                 "/api/lpg": "Auditoria de repasses e metas da Lei Paulo Gustavo (MinC / Transferegov Fundo a Fundo)",
                 "/api/news": "Pesquisa de notícias e editais de Viamão via Google News com filtro anti-fake-news",
-                "/api/emendas": "Coleta e auditoria de emendas parlamentares federais (CGU) e estaduais (Portal RS / CAGE)"
+                "/api/emendas": "Coleta e auditoria de emendas parlamentares federais (CGU) e estaduais (Portal RS / CAGE)",
+                "/api/chat": "Assistente de IA para elaboração técnica de projetos culturais (PNAB, LPG, Emendas)"
             },
             "politica_cache": "Vercel Edge Caching (s-maxage=3600 até 14400s)",
             "timeout_garantido": "Sub-10s (Hobby Free Tier Vercel)"

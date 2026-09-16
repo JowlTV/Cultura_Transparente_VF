@@ -20,7 +20,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Emenda, NewsItem } from '../types/culture';
-import { formatBRL } from '../utils/formatters';
+import { formatBRL, sortNewsByDateDesc } from '../utils/formatters';
 import { apiClient } from '../services/apiClient';
 
 interface ExecutiveSummaryProps {
@@ -51,7 +51,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
     try {
       const res = await apiClient.fetchNews(termo || 'cultura', filtroCategoria);
       if (onUpdateNoticias && res.data) {
-        onUpdateNoticias(res.data);
+        onUpdateNoticias(sortNewsByDateDesc(res.data));
       }
       if (res.data.length > 0) {
         setSearchFeedback({
@@ -82,7 +82,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
     try {
       const res = await apiClient.fetchNews('cultura');
       if (onUpdateNoticias && res.data) {
-        onUpdateNoticias(res.data);
+        onUpdateNoticias(sortNewsByDateDesc(res.data));
       }
       setSearchFeedback({
         tipo: 'info',
@@ -99,9 +99,9 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
   const totalEmendasGastas = emendasCulturais.reduce((acc, curr) => acc + (curr.valor_gasto || 0), 0);
   const volumeTotalCultura = totalEmendasCulturais;
 
-  // Filtragem e Motor do Feed de Notícias Oficiais
+  // Filtragem e Motor do Feed de Notícias Oficiais (sempre ordenadas cronologicamente da mais recente para a mais antiga)
   const noticiasFiltradas = useMemo(() => {
-    return noticias.filter(n => {
+    const filtradas = noticias.filter(n => {
       let matchesCategoria = true;
       if (filtroCategoria === 'editais') {
         matchesCategoria = n.categoria_filtro === 'editais' || Boolean(n.prazo) || n.etiqueta.toLowerCase().includes('edital');
@@ -123,9 +123,11 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
 
       return matchesCategoria && matchesBusca;
     });
+
+    return sortNewsByDateDesc(filtradas);
   }, [noticias, filtroCategoria, buscaTexto]);
 
-  // Manchete Principal da Edição
+  // Manchete Principal da Edição (mais recente)
   const manchete = useMemo(() => {
     if (filtroCategoria === 'todos' && !buscaTexto.trim() && noticiasFiltradas.length > 0) {
       return noticiasFiltradas[0];
@@ -139,23 +141,6 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Hero Header - Roxo Cult #6A0DAD com Roxo Profundo #2D0652 e destaque Laranja #FF4500 */}
-      <div className="bg-gradient-to-br from-[#2D0652] via-[#6A0DAD] to-[#FF4500] rounded-3xl p-6 sm:p-8 text-white shadow-lg border border-purple-400/30 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1 rounded-full text-xs font-semibold text-white mb-3 backdrop-blur-xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
-            Portal Oficial de Transparência, Editais e Fomento Cultural
-          </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            Cult Circuito Viamão
-          </h1>
-          <p className="mt-3 text-xs sm:text-sm text-purple-100 leading-relaxed font-normal">
-            Acompanhe em tempo real oportunidades de fomento, editais abertos, prazos de inscrição e a destinação de verbas públicas para a cultura em Viamão/RS através de dados auditados e fontes oficiais primárias.
-          </p>
-        </div>
-      </div>
-
       {/* KPI Cards Grid (3 Colunas em Fundo Areia Claro #FAF4EB / Branco) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Total Emendas Culturais */}

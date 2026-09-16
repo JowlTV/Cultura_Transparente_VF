@@ -1,48 +1,7 @@
 import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { GoogleGenAI } from '@google/genai';
 import crypto from 'crypto';
-
-const CULTURAL_SYSTEM_PROMPT = `
-Você é o Consultor Especialista de Elaboração de Projetos Culturais da plataforma Cultura Transparente de Viamão/RS.
-Sua missão é atuar como um consultor sênior em gestão cultural e elaboração técnica de propostas para editais públicos brasileiros:
-- Política Nacional Aldir Blanc (PNAB - Lei nº 14.399/2022)
-- Lei Paulo Gustavo (LPG - Lei Complementar nº 195/2022)
-- Fundo de Apoio à Cultura do RS (FAC-RS / Pró-Cultura RS / SEDAC-RS)
-- Lei Federal de Incentivo à Cultura (Lei Rouanet / Pronac - Lei nº 8.313/1991)
-- Editais Municipais de Viamão/RS
-
-DIRETRIZES DE ATUAÇÃO E METODOLOGIA ITERATIVA:
-1. Conduza o proponente cultural de forma acolhedora, objetiva e passo a passo.
-2. Faça perguntas em blocos curtos (1 ou 2 por vez) para coletar:
-   - Objeto & Local em Viamão/RS
-   - Justificativa e Impacto Comunitário
-   - Acessibilidade (Física, Comunicacional com Libras/Audiodescrição, e Atitudinal) e Democratização de Acesso (100% gratuito ou preços populares)
-   - Metas, Cronograma em 4 etapas e Planilha Orçamentária discriminada
-   - Regularidade fiscal e certidões (CND Federal, Estadual, Municipal de Viamão, CNDT e FGTS para PJ).
-
-GATILHO DE CONSOLIDAÇÃO DO PROJETO FINAL:
-Quando o usuário disser que terminou, solicitar a consolidação ("terminei", "finalizar", "gerar projeto", "consolidar", "exportar") ou após responder aos pontos essenciais:
-Você DEVE gerar o projeto cultural completo, estruturado e formal em Markdown, INICIANDO OBRIGATORIAMENTE COM A TAG:
-[PROJETO_FINAL]
-
-Estrutura obrigatória dentro do [PROJETO_FINAL]:
-# PROJETO CULTURAL: [Nome do Projeto]
-## Edital Alvo: [PNAB / FAC-RS / LPG / Lei Rouanet / Municipal Viamão]
-## Proponente: [Nome ou Coletivo Cultural] | Viamão/RS
-
-### 1. IDENTIFICAÇÃO E RESUMO EXECUTIVO
-### 2. JUSTIFICATIVA E RELEVÂNCIA CULTURAL
-### 3. OBJETIVOS E METAS QUANTITATIVAS E QUALITATIVAS
-### 4. PLANO DE DEMOCRATIZAÇÃO DE ACESSO E CONTRAPARTIDA SOCIAL
-### 5. MEDIDAS DE ACESSIBILIDADE (Lei nº 13.146/2015)
-### 6. CRONOGRAMA DE EXECUÇÃO (Tabela em Markdown)
-### 7. PLANILHA ORÇAMENTÁRIA DETALHADA (Tabela com Rubrica, Unid., Qtd, Valor Unit. R$ e Total R$)
-### 8. EQUIPE PRINCIPAL E FICHA TÉCNICA
-### 9. PLANO DE DIVULGAÇÃO E COMUNICAÇÃO
-### 10. CHECKLIST DE CERTIDÕES E DOCUMENTOS DE HABILITAÇÃO
-`;
 
 // =============================================================================
 // HIGH-CONCURRENCY TIER: IN-MEMORY CACHE & SINGLE-FLIGHT COALESCER
@@ -74,32 +33,6 @@ const STATIC_PNAB_PAYLOAD = JSON.stringify({
   rate_limit_info: 'High-Concurrency In-Memory Buffer (1000+ req/s)'
 });
 const STATIC_PNAB_ETAG = `"${crypto.createHash('md5').update(STATIC_PNAB_PAYLOAD).digest('hex')}"`;
-
-// Concurrency Queue & Semaphore for /api/chat
-const MAX_CONCURRENT_AI_CALLS = 25;
-let activeAiCalls = 0;
-const aiQueue: Array<() => void> = [];
-
-function acquireAiSlot(): Promise<void> {
-  if (activeAiCalls < MAX_CONCURRENT_AI_CALLS) {
-    activeAiCalls++;
-    return Promise.resolve();
-  }
-  return new Promise(resolve => {
-    aiQueue.push(() => {
-      activeAiCalls++;
-      resolve();
-    });
-  });
-}
-
-function releaseAiSlot(): void {
-  activeAiCalls = Math.max(0, activeAiCalls - 1);
-  if (aiQueue.length > 0) {
-    const next = aiQueue.shift();
-    if (next) next();
-  }
-}
 
 function getCache<T>(key: string): CacheEntry<T> | null {
   const entry = memoryCache.get(key);
@@ -150,136 +83,6 @@ async function executeSingleFlight<T>(key: string, ttlMs: number, fn: () => Prom
   const data = await promise;
   const updated = getCache<T>(key);
   return { data, etag: updated?.etag || 'W/"live"' };
-}
-
-function generateServerFallbackResponse(messages: Array<{ role: string; content: string }>): string {
-  const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content?.toLowerCase() || '';
-
-  const isFinal =
-    lastUserMsg.includes('finalizar') ||
-    lastUserMsg.includes('terminei') ||
-    lastUserMsg.includes('gerar projeto') ||
-    lastUserMsg.includes('consolidar') ||
-    lastUserMsg.includes('exportar') ||
-    lastUserMsg.includes('concluir') ||
-    messages.filter(m => m.role === 'user').length >= 4;
-
-  if (isFinal) {
-    return `🎉 **Projeto Cultural Consolidado com Sucesso!**
-
-Estruturei todas as informações de acordo com os padrões técnicos da **PNAB**, **FAC-RS** e **Lei de Acesso à Cultura**. O projeto já conta com justificativa sólida, plano de acessibilidade (Libras e arquitetônica), cronograma em 5 etapas e planilha orçamentária detalhada.
-
-👉 Acesse a aba **"Projeto Consolidado"** para visualizar a versão completa ou clique no botão **"Exportar Projeto para PDF"** para baixar o documento pronto para submissão!
-
-[PROJETO_FINAL]
-# PROJETO CULTURAL: Ressoar Periférico - Arte, Memória e Cidadania em Viamão
-## Edital Alvo: Política Nacional Aldir Blanc (PNAB Viamão) / FAC-RS
-## Proponente: Coletivo Cultural Raízes de Viamão | Cidade: Viamão/RS
-
-### 1. IDENTIFICAÇÃO E RESUMO EXECUTIVO
-- **Objeto**: Realização de ciclo de oficinas culturais comunitárias (música, hip-hop e memória oral) e mostra artística final aberta ao público em Viamão/RS.
-- **Linguagem / Segmento Cultural**: Cultura Urbana, Música e Educação Patrimonial.
-- **Público Estimado**: 350 participantes diretos e 1.200 espectadores indiretos.
-- **Local de Realização**: Centro Cultural e Escolas Municipais das regiões Santa Isabel e Vila Elza - Viamão/RS.
-- **Período de Execução**: 4 meses de duração (Pré-produção, Execução, Pós-produção e Prestação de Contas).
-
----
-
-### 2. JUSTIFICATIVA E RELEVÂNCIA CULTURAL
-O projeto responde à necessidade de descentralização cultural no município de Viamão/RS, garantindo aos jovens e comunidades de bairros periféricos o acesso a ferramentas de expressão artística, formação cidadã e valorização da identidade local. Atende estritamente às diretrizes da Política Nacional Aldir Blanc (Lei nº 14.399/2022) e do Plano Municipal de Cultura.
-
----
-
-### 3. OBJETIVOS E METAS
-- **Objetivo Geral**: Promover o desenvolvimento artístico e a democratização do acesso à cultura em territórios vulneráveis de Viamão através de ações formativas continuadas.
-- **Metas Quantitativas**:
-  - Realizar 8 oficinas teórico-práticas de 3 horas cada (total de 24 horas/aula).
-  - Certificar no mínimo 80 educandos/artistas locais.
-  - Realizar 1 mostra artística final de encerramento com apresentações dos alunos e artistas convidados.
-  - Distribuir gratuitamente 100% dos ingressos e materiais didáticos.
-
----
-
-### 4. PLANO DE DEMOCRATIZAÇÃO DE ACESSO E CONTRAPARTIDA SOCIAL
-- **Gratuidade Total**: 100% das oficinas e evento final com entrada franca.
-- **Descentralização**: Atividades realizadas diretamente em bairros periféricos de Viamão.
-- **Contrapartida Social**: Doação de equipamentos e registros audiovisuais para as bibliotecas e escolas polo da região.
-
----
-
-### 5. MEDIDAS DE ACESSIBILIDADE (Lei nº 13.146/2015)
-- **Acessibilidade Física**: Locais 100% planos com rampas de acesso, sanitários adaptados e assentos prioritários.
-- **Acessibilidade Comunicacional**: Presença de Intérprete de Libras durante a Mostra Final e material de divulgação impresso com QR Code audiodescrito.
-- **Acessibilidade Atitudinal**: Equipe treinada para acolhimento humanizado a pessoas com deficiência e neurodivergentes.
-
----
-
-### 6. CRONOGRAMA DE EXECUÇÃO
-| Etapa | Atividade / Ação | Mês / Período | Responsável |
-|---|---|---|---|
-| **Pré-produção** | Contratação de equipe, reservas de espaços e início da divulgação | Mês 1 | Coordenador Geral |
-| **Produção** | Inscrições e realização das 8 oficinas culturais | Mês 2 e 3 | Educadores / Produtor |
-| **Execução** | Montagem de palco, ensaios gerais e Mostra Final de Encerramento | Mês 3 | Equipe Técnica e Artistas |
-| **Pós-produção** | Edição de vídeo registro, relatórios de impacto e avaliação | Mês 4 | Assistente de Produção |
-| **Prestação de Contas** | Consolidação contábil, relatório de cumprimento do objeto e envio ao órgão | Mês 4 | Gestor Financeiro |
-
----
-
-### 7. PLANILHA ORÇAMENTÁRIA DETALHADA
-| Item | Descrição da Rubrica | Unid. | Qtd | Valor Unit. (R$) | Valor Total (R$) |
-|---|---|---|---|---|---|
-| 1.1 | Coordenador Geral / Proponente | Mês | 4 | R$ 2.000,00 | R$ 8.000,00 |
-| 1.2 | Produtor Executivo e Logística | Mês | 3 | R$ 1.500,00 | R$ 4.500,00 |
-| 1.3 | Educadores Artísticos / Oficineiros | Hora/Aula | 24 | R$ 150,00 | R$ 3.600,00 |
-| 1.4 | Intérprete de Libras (Acessibilidade) | Diária | 2 | R$ 750,00 | R$ 1.500,00 |
-| 1.5 | Sonorização, Iluminação e Palco | Diária | 1 | R$ 2.800,00 | R$ 2.800,00 |
-| 1.6 | Designer Gráfico & Mídias Sociais | Serviço | 1 | R$ 1.200,00 | R$ 1.200,00 |
-| 1.7 | Material Didático e Consumo Oficinas | Kit | 80 | R$ 25,00 | R$ 2.000,00 |
-| 1.8 | Registro Audiovisual e Fotografia | Serviço | 1 | R$ 1.400,00 | R$ 1.400,00 |
-| **TOTAL** | **VALOR GLOBAL DO PROJETO** | - | - | - | **R$ 25.000,00** |
-
----
-
-### 8. CHECKLIST DE HABILITAÇÃO & CERTIDÕES
-- [x] CND Federal / PGFN (Débitos da União)
-- [x] CND Estadual do RS (Receita Estadual)
-- [x] CND Municipal de Viamão (Tributos Municipais)
-- [x] CNDT (Certidão Negativa de Débitos Trabalhistas)
-- [x] Certificado de Regularidade FGTS (CRF Caixa)
-- [x] Comprovante de Domicílio e Atuação Cultural em Viamão/RS
-- [x] Portfólio Artístico dos últimos 2 anos (Cartazes, links, fotos, matérias de jornal)
-`;
-  }
-
-  if (lastUserMsg.includes('orçamento') || lastUserMsg.includes('custo') || lastUserMsg.includes('valor')) {
-    return `Para estruturar o orçamento do seu projeto em Viamão de acordo com as diretrizes da PNAB e do FAC-RS, recomendo dividir nas seguintes proporções técnicas:
-
-1. **Equipe Principal / Coordenação (15% a 25%)**: Remuneração da coordenação geral, produção executiva e gestão financeira.
-2. **Atividades Artísticas e Oficinas (35% a 50%)**: Pagamento de cachês a artistas locais, oficineiros e educadores culturais.
-3. **Acessibilidade Obrigatória (5% a 10%)**: Intérprete de Libras (mínimo 1 diária) e audiodescrição ou material tátil.
-4. **Infraestrutura e Logística (15% a 20%)**: Sonorização, iluminação, locação de espaço acessível ou transporte.
-5. **Divulgação e Registro (5% a 10%)**: Designer gráfico, redes sociais e registro fotográfico/vídeo para prestação de contas.
-
-Qual é a estimativa aproximada do valor total que você pretende pleitear para adequarmos as rubricas?`;
-  }
-
-  if (lastUserMsg.includes('acessibilidade') || lastUserMsg.includes('libras') || lastUserMsg.includes('deficiência')) {
-    return `A acessibilidade é um critério de **alta pontuação técnica** na PNAB e nos editais estaduais (FAC-RS) em conformidade com a Lei Brasileira de Inclusão (Lei nº 13.146/2015).
-
-Para o seu projeto em Viamão, podemos incluir:
-- **Acessibilidade Comunicacional**: Presença de Intérprete de Libras nas apresentações e legendagem ou audiodescrição em conteúdos digitais.
-- **Acessibilidade Arquitetônica**: Escolha de locais com piso nivelado, rampas e sanitários adaptados (ex: Centros Culturais ou Escolas Polo de Viamão).
-- **Acessibilidade Atitudinal**: Formação breve da equipe para acolhimento de pessoas com deficiência e neurodivergentes.
-
-Deseja que eu já insira a previsão dessas rubricas no cronograma e orçamento da sua proposta?`;
-  }
-
-  return `Olá! Excelente iniciativa. Como seu consultor de projetos culturais para editais públicos (PNAB Viamão, FAC-RS, LPG e Rouanet), vou te guiar passo a passo para que sua proposta atinja a pontuação máxima de habilitação e mérito.
-
-Para começarmos com o pé direito:
-1. **Qual é o formato principal do seu projeto** (ex: show musical, festival, ciclo de oficinas, peça de teatro, livro, documentário)?
-2. **Em qual bairro ou espaço de Viamão/RS** você planeja realizar a ação (ex: Santa Isabel, Centro, Itapuã, Águas Claras, Viamópolis)?
-3. **Qual é a estimativa de público** e para qual edital você pretende submeter (PNAB Viamão, FAC-RS ou Rouanet)?`;
 }
 
 function devApiPlugin(): Plugin {
@@ -521,7 +324,7 @@ real_stdout.flush()
           }
         }
 
-        // 4. ENDPOINT: /api/chat (Semaphore Queue, Prompt Caching & Model Failover)
+        // 4. ENDPOINT: /api/chat (Invokes api/chat.py serverless handler)
         if (pathname === '/api/chat') {
           let body = '';
           req.on('data', chunk => {
@@ -532,102 +335,56 @@ real_stdout.flush()
 
           req.on('end', async () => {
             try {
-              const parsed = JSON.parse(body || '{}');
-              const messages = parsed.messages || [];
-              const apiKey = process.env.GEMINI_API_KEY;
+              const pyScript = `
+import sys, json, os
+from io import BytesIO
 
-              // Compute fast prompt hash for instant response cache
-              const promptHash = crypto.createHash('sha256').update(JSON.stringify(messages)).digest('hex');
-              const cacheKey = `chat_${promptHash}`;
-              const cachedResponse = getCache<{ text: string }>(cacheKey);
+real_stdout = sys.stdout
+sys.stdout = sys.stderr
 
-              if (cachedResponse) {
+from api.chat import handler
+
+h = handler.__new__(handler)
+h.command = 'POST'
+h.path = '/api/chat'
+h.request_version = 'HTTP/1.1'
+h.requestline = 'POST /api/chat HTTP/1.1'
+h.client_address = ('127.0.0.1', 8000)
+body_bytes = ${JSON.stringify(body)}.encode('utf-8')
+h.rfile = BytesIO(body_bytes)
+h.wfile = BytesIO()
+h.headers = {'Content-Length': str(len(body_bytes)), 'Content-Type': 'application/json'}
+h._headers_buffer = []
+h.do_POST()
+
+raw = h.wfile.getvalue()
+parts = raw.split(b'\\r\\n\\r\\n', 1)
+payload = parts[1].decode('utf-8') if len(parts) > 1 else '{}'
+real_stdout.write(payload)
+real_stdout.flush()
+`;
+              const { spawn } = await import('child_process');
+              const py = spawn('python3', ['-c', pyScript], {
+                cwd: process.cwd(),
+                env: process.env,
+                timeout: 35000
+              });
+              let out = '';
+              py.stdout.on('data', d => { out += d.toString(); });
+              py.on('close', code => {
                 res.statusCode = 200;
-                res.setHeader('X-Cache', 'HIT');
-                res.end(JSON.stringify({
-                  success: true,
-                  text: cachedResponse.data.text,
-                  cached: true
-                }));
-                return;
-              }
-
-              if (apiKey) {
-                await acquireAiSlot();
-                try {
-                  const ai = new GoogleGenAI({ apiKey });
-                  const formattedContents = messages
-                    .filter((m: any) => m.role === 'user' || m.role === 'assistant')
-                    .map((m: any) => ({
-                      role: m.role === 'assistant' ? 'model' : 'user',
-                      parts: [{ text: m.content || '' }]
-                    }));
-
-                  const contentsPayload = formattedContents.length > 0 ? formattedContents : [{ role: 'user', parts: [{ text: 'Olá!' }] }];
-                  
-                  const candidateModels = [
-                    'gemini-3.8-flash',
-                    'gemini-3.1-flash-lite',
-                    'gemini-3.1-pro-preview',
-                    'gemini-flash-latest'
-                  ];
-
-                  let responseText = '';
-                  let lastError = null;
-
-                  for (const modelName of candidateModels) {
-                    try {
-                      const response = await ai.models.generateContent({
-                        model: modelName,
-                        contents: contentsPayload,
-                        config: {
-                          systemInstruction: CULTURAL_SYSTEM_PROMPT,
-                          temperature: 0.7,
-                        }
-                      });
-
-                      if (response && response.text) {
-                        responseText = response.text;
-                        break;
-                      }
-                    } catch {
-                      // Silent failover to next candidate model
-                    }
-                  }
-
-                  if (!responseText) {
-                    responseText = generateServerFallbackResponse(messages);
-                  }
-
-                  // Cache response for 30 minutes
-                  setCache(cacheKey, { text: responseText }, 30 * 60 * 1000);
-
-                  res.statusCode = 200;
-                  res.setHeader('X-Cache', 'MISS');
-                  res.end(JSON.stringify({
-                    success: true,
-                    text: responseText
-                  }));
-                  return;
-                } finally {
-                  releaseAiSlot();
-                }
-              } else {
-                const text = generateServerFallbackResponse(messages);
-                res.statusCode = 200;
-                res.end(JSON.stringify({
-                  success: true,
-                  text
-                }));
-                return;
-              }
-            } catch {
-              const text = generateServerFallbackResponse(messages);
-              res.statusCode = 200;
-              res.end(JSON.stringify({
-                success: true,
-                text
-              }));
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                res.end(out || JSON.stringify({ success: false, error: 'Resposta vazia do handler de IA' }));
+              });
+              py.on('error', err => {
+                res.statusCode = 500;
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                res.end(JSON.stringify({ success: false, error: String(err) }));
+              });
+            } catch (e: any) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.end(JSON.stringify({ success: false, error: String(e) }));
             }
           });
           return;

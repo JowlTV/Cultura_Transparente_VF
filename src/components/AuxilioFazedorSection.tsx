@@ -40,7 +40,7 @@ export const AuxilioFazedorSection: React.FC<AuxilioFazedorSectionProps> = ({ on
       id: 'msg-welcome',
       role: 'assistant',
       timestamp: 'Agora',
-      content: `👋 **Olá, Fazedor de Cultura de Viamão!**\n\nSou seu **Consultor Inteligente de Elaboração de Projetos Culturais**. Meu papel é te ajudar a estruturar uma proposta técnica sólida, competitiva e 100% aderente às exigências de editais como **PNAB (Lei Aldir Blanc)**, **FAC-RS**, **LPG** e **Lei Rouanet**.\n\nPara começarmos a construir seu projeto passo a passo:\n\n1. **Qual é a sua ideia ou projeto cultural** (ex: show, oficina comunitária, festival, peça de teatro, livro, documentário)?\n2. **Para qual edital você planeja se inscrever?**`,
+      content: `👋 **Olá, Fazedor de Cultura de Viamão!**\n\nSou seu **Consultor Inteligente de Elaboração de Projetos Culturais**. Meu papel é te ajudar a estruturar uma proposta técnica sólida, competitiva e 100% aderente às exigências de editais como **PNAB (Lei Aldir Blanc)**, **LPG (Lei Paulo Gustavo)**, **Emendas Parlamentares** e **Editais Municipais de Viamão**.\n\nPara começarmos a construir seu projeto passo a passo:\n\n1. **Qual é a sua ideia ou projeto cultural** (ex: show, oficina comunitária, festival, peça de teatro, livro, documentário)?\n2. **Para qual instrumento ou edital você planeja se inscrever?**`,
     },
   ]);
 
@@ -180,7 +180,7 @@ export const AuxilioFazedorSection: React.FC<AuxilioFazedorSectionProps> = ({ on
                 Assistente ao Proponente Cultural
               </span>
               <span className="px-3 py-0.5 bg-white text-[#2D0652] rounded-full text-xs font-bold border border-[#E2D2BC]">
-                PNAB • FAC-RS • Rouanet • LPG
+                PNAB • LPG • Emendas • Editais Municipais
               </span>
             </div>
 
@@ -580,38 +580,6 @@ export const AuxilioFazedorSection: React.FC<AuxilioFazedorSectionProps> = ({ on
               </div>
             </div>
 
-            {/* FAC-RS */}
-            <div className="bg-[#FAF4EB] border border-[#E2D2BC] rounded-3xl p-5 space-y-3 shadow-xs">
-              <span className="px-3 py-0.5 bg-[#FFE8E0] text-[#FF4500] border border-[#FFC2B2] rounded-full text-[10px] font-bold">
-                SEDAC / Pró-Cultura RS
-              </span>
-              <h3 className="text-sm font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
-                Fundo de Apoio à Cultura (FAC-RS)
-              </h3>
-              <p className="text-xs text-[#2D0652]/80 leading-relaxed font-medium">
-                Editais estaduais da Secretaria de Estado da Cultura do Rio Grande do Sul (SEDAC) com foco em descentralização, patrimônio e artes integradas.
-              </p>
-              <div className="pt-2 text-xs font-bold text-[#6A0DAD]">
-                Exige CEPC (Cadastro Estadual de Produtor Cultural) atualizado.
-              </div>
-            </div>
-
-            {/* Lei Rouanet */}
-            <div className="bg-[#FAF4EB] border border-[#E2D2BC] rounded-3xl p-5 space-y-3 shadow-xs">
-              <span className="px-3 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-[10px] font-bold">
-                Lei nº 8.313/1991 (Pronac)
-              </span>
-              <h3 className="text-sm font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
-                Lei Rouanet / Incentivo Federal
-              </h3>
-              <p className="text-xs text-[#2D0652]/80 leading-relaxed font-medium">
-                Mecanismo de renúncia fiscal federal via captação de patrocínio junto a empresas tributadas pelo Lucro Real ou pessoas físicas.
-              </p>
-              <div className="pt-2 text-xs font-bold text-blue-700">
-                Submissão permanente via Sistema SALIC / MinC.
-              </div>
-            </div>
-
             {/* LPG */}
             <div className="bg-[#FAF4EB] border border-[#E2D2BC] rounded-3xl p-5 space-y-3 shadow-xs">
               <span className="px-3 py-0.5 bg-[#E3F7E8] text-[#166534] border border-[#B7ECC3] rounded-full text-[10px] font-bold">
@@ -621,10 +589,42 @@ export const AuxilioFazedorSection: React.FC<AuxilioFazedorSectionProps> = ({ on
                 Lei Paulo Gustavo (LPG)
               </h3>
               <p className="text-xs text-[#2D0652]/80 leading-relaxed font-medium">
-                Apoio emergencial prioritário ao setor audiovisual, salas de cinema, mostras, festivais e demais áreas culturais.
+                Apoio emergencial ao setor audiovisual, salas de cinema, mostras e demais linguagens culturais com plano de ação homologado no MinC.
               </p>
               <div className="pt-2 text-xs font-bold text-[#166534]">
                 Execução e acompanhamento municipal em Viamão.
+              </div>
+            </div>
+
+            {/* Emendas Parlamentares */}
+            <div className="bg-[#FAF4EB] border border-[#E2D2BC] rounded-3xl p-5 space-y-3 shadow-xs">
+              <span className="px-3 py-0.5 bg-[#FFE8E0] text-[#FF4500] border border-[#FFC2B2] rounded-full text-[10px] font-bold">
+                CGU & CAGE/RS
+              </span>
+              <h3 className="text-sm font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+                Emendas Parlamentares para Cultura
+              </h3>
+              <p className="text-xs text-[#2D0652]/80 leading-relaxed font-medium">
+                Recursos orçamentários indicados por deputados federais e estaduais para infraestrutura, eventos tradicionais e projetos culturais em Viamão.
+              </p>
+              <div className="pt-2 text-xs font-bold text-[#FF4500]">
+                Rastreamento por empenho, liquidação e pagamento.
+              </div>
+            </div>
+
+            {/* Editais Municipais */}
+            <div className="bg-[#FAF4EB] border border-[#E2D2BC] rounded-3xl p-5 space-y-3 shadow-xs">
+              <span className="px-3 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-[10px] font-bold">
+                Secretaria Municipal de Cultura
+              </span>
+              <h3 className="text-sm font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+                Editais e Chamamentos Municipais
+              </h3>
+              <p className="text-xs text-[#2D0652]/80 leading-relaxed font-medium">
+                Chamamentos públicos diretos da Prefeitura de Viamão para feiras comunitárias, eventos tradicionais, artes cênicas e música local.
+              </p>
+              <div className="pt-2 text-xs font-bold text-blue-700">
+                Inscrição e habilitação via Diário Oficial e Secretaria.
               </div>
             </div>
           </div>
