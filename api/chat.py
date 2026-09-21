@@ -12,6 +12,10 @@ import json
 import os
 import sys
 import hashlib
+import time
+import re
+import socket
+import concurrent.futures
 import urllib.request
 import urllib.error
 
@@ -21,6 +25,17 @@ from backend.apis import TransferegovApi
 from backend.utils import setup_logger, cache
 
 logger = setup_logger("VercelApiChat")
+
+def sanitize_api_key(text: str, api_key: str = "") -> str:
+    """Remove qualquer menção a chaves de API para prevenir vazamento em logs e respostas."""
+    if not text:
+        return ""
+    sanitized = text
+    if api_key and len(api_key) > 4:
+        sanitized = sanitized.replace(api_key, "[CHAVE_OCULTA]")
+    sanitized = re.sub(r'AIza[0-9A-Za-z-_]{35}', '[CHAVE_OCULTA]', sanitized)
+    sanitized = re.sub(r'key=[^&\s"\']+', 'key=[CHAVE_OCULTA]', sanitized)
+    return sanitized
 
 CULTURAL_SYSTEM_PROMPT = """Você é o Consultor Especialista de Elaboração de Projetos Culturais da plataforma Cultura Transparente de Viamão/RS.
 Sua missão é atuar como um consultor sênior em gestão cultural e elaboração técnica de propostas para editais públicos e instrumentos de fomento:
@@ -156,12 +171,29 @@ def obter_contexto_factual_viamao(user_query: str = "") -> str:
     )
 
 
+def obter_contexto_factual_com_timeout(user_query: str = "", timeout: float = 2.0) -> str:
+    """Executa a coleta de contexto com limite estrito de timeout (máximo 2.0s).
+    Se exceder o prazo, segue sem contexto em vez de travar a resposta.
+    """
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(obter_contexto_factual_viamao, user_query)
+        try:
+            return future.result(timeout=timeout)
+        except concurrent.futures.TimeoutError:
+            logger.warning(f"Coleta de contexto factual excedeu limite de {timeout}s; prosseguindo sem enriquecimento.")
+            return ""
+        except Exception as e:
+            logger.warning(f"Erro ao obter contexto factual: {e}")
+            return ""
+
+
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, x-goog-api-key, X-Requested-With")
+        self.send_header("Cache-Control", "no-store")
         self.send_header("Access-Control-Max-Age", "86400")
         self.end_headers()
 
@@ -181,11 +213,16 @@ class handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)
 
     def do_POST(self):
+        start_time = time.time()
+        # Prazo global de 8.5s para garantir término seguro dentro do limite serverless
+        GLOBAL_TIMEOUT_SECONDS = 8.5
+
         try:
             content_length = int(self.headers.get("Content-Length", 0))
             if content_length > 1000000:
@@ -223,10 +260,10 @@ class handler(BaseHTTPRequestHandler):
                 })
                 return
 
-            # Extração de contexto de todas as mensagens do usuário
+            # Extração de contexto de todas as mensagens do usuário (com timeout estrito de 2s)
             user_texts = [m.get("content", "") for m in messages if m.get("role") == "user"]
             combined_user_text = " ".join(user_texts)
-            contexto_factual = obter_contexto_factual_viamao(combined_user_text)
+            contexto_factual = obter_contexto_factual_com_timeout(combined_user_text, timeout=2.0)
 
             system_instruction_completa = CULTURAL_SYSTEM_PROMPT + contexto_factual
 
@@ -244,37 +281,54 @@ class handler(BaseHTTPRequestHandler):
             if not formatted_contents:
                 formatted_contents = [{"role": "user", "parts": [{"text": "Olá!"}]}]
 
+            # Modelos Gemini 3.x em disponibilidade geral com suporte oficial ativo
             candidate_models = [
-                "gemini-2.5-flash",
-                "gemini-2.0-flash",
-                "gemini-1.5-flash",
-                "gemini-2.5-flash-lite"
+                "gemini-3.6-flash",
+                "gemini-3.5-flash",
+                "gemini-3.5-flash-lite",
+                "gemini-3.1-flash-lite"
             ]
 
             response_text = ""
-            last_error_msg = ""
+            model_attempts = []
 
             for model_name in candidate_models:
+                elapsed = time.time() - start_time
+                time_left = GLOBAL_TIMEOUT_SECONDS - elapsed
+
+                if time_left <= 0.5:
+                    logger.warning(f"Prazo global de {GLOBAL_TIMEOUT_SECONDS}s esgotado antes de tentar {model_name}.")
+                    model_attempts.append({
+                        "model": model_name,
+                        "status": 408,
+                        "error": "Tempo limite de execução atingido (timeout)."
+                    })
+                    break
+
+                # Timeout específico para cada tentativa respeitando o saldo restante
+                attempt_timeout = max(0.5, min(time_left, 4.0))
+
                 try:
-                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+                    # Chave enviada via cabeçalho x-goog-api-key, sem expor na URL
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
                     req_payload = {
                         "systemInstruction": {
                             "parts": [{"text": system_instruction_completa}]
                         },
-                        "contents": formatted_contents,
-                        "generationConfig": {
-                            "temperature": 0.7
-                        }
+                        "contents": formatted_contents
                     }
                     data_bytes = json.dumps(req_payload).encode("utf-8")
                     req = urllib.request.Request(
                         url,
                         data=data_bytes,
-                        headers={"Content-Type": "application/json"},
+                        headers={
+                            "Content-Type": "application/json",
+                            "x-goog-api-key": api_key
+                        },
                         method="POST"
                     )
 
-                    with urllib.request.urlopen(req, timeout=30) as response:
+                    with urllib.request.urlopen(req, timeout=attempt_timeout) as response:
                         status_code = getattr(response, "status", getattr(response, "code", 200))
                         if status_code == 200 or status_code is None:
                             res_json = json.loads(response.read().decode("utf-8"))
@@ -288,22 +342,48 @@ class handler(BaseHTTPRequestHandler):
                 except urllib.error.HTTPError as http_err:
                     error_body = ""
                     try:
-                        error_body = http_err.read().decode("utf-8")
+                        error_body = http_err.read().decode("utf-8", errors="replace")
                     except Exception:
                         pass
-                    last_error_msg = f"HTTP {http_err.code} ({model_name}): {error_body}"
-                    logger.warning(f"Failover Gemini ({model_name}): {last_error_msg}")
+                    sanitized_body = sanitize_api_key(error_body, api_key)
+                    err_entry = {
+                        "model": model_name,
+                        "status": http_err.code,
+                        "error": f"HTTP {http_err.code}: {sanitized_body[:200]}"
+                    }
+                    model_attempts.append(err_entry)
+                    logger.warning(f"Failover Gemini ({model_name}): status {http_err.code}")
+                except (TimeoutError, urllib.error.URLError, socket.timeout) as ex:
+                    is_timeout = isinstance(ex, (TimeoutError, socket.timeout)) or (
+                        isinstance(ex, urllib.error.URLError) and (
+                            isinstance(getattr(ex, "reason", None), (TimeoutError, socket.timeout))
+                            or "timed out" in str(getattr(ex, "reason", "")).lower()
+                        )
+                    )
+                    status_code = 408 if is_timeout else 500
+                    error_str = "Tempo limite excedido na requisição ao modelo" if is_timeout else sanitize_api_key(str(ex), api_key)
+                    model_attempts.append({
+                        "model": model_name,
+                        "status": status_code,
+                        "error": error_str
+                    })
+                    logger.warning(f"Failover Gemini ({model_name}): {error_str}")
                 except Exception as ex:
-                    last_error_msg = f"Erro em {model_name}: {str(ex)}"
-                    logger.warning(f"Failover Gemini ({model_name}): {last_error_msg}")
+                    error_str = sanitize_api_key(str(ex), api_key)
+                    model_attempts.append({
+                        "model": model_name,
+                        "status": 500,
+                        "error": error_str
+                    })
+                    logger.warning(f"Failover Gemini ({model_name}): {error_str}")
 
             if not response_text:
-                logger.error(f"Todos os modelos Gemini falharam. Último erro: {last_error_msg}")
+                logger.error("Todos os modelos Gemini falharam ou tempo limite foi atingido.")
                 self.send_json_response(200, {
                     "success": False,
                     "error": "Os servidores de inteligência artificial estão temporariamente indisponíveis. Por favor, tente novamente em alguns instantes.",
                     "code": "AI_MODELS_UNAVAILABLE",
-                    "details": last_error_msg
+                    "details": model_attempts
                 })
                 return
 
@@ -316,10 +396,11 @@ class handler(BaseHTTPRequestHandler):
             })
 
         except Exception as e:
-            logger.error(f"Exceção fatal no endpoint /api/chat: {e}")
+            sanitized_e = sanitize_api_key(str(e), os.environ.get("GEMINI_API_KEY", ""))
+            logger.error(f"Exceção fatal no endpoint /api/chat: {sanitized_e}")
             self.send_json_response(500, {
                 "success": False,
-                "error": f"Erro interno ao processar requisição: {str(e)}",
+                "error": f"Erro interno ao processar requisição: {sanitized_e}",
                 "code": "INTERNAL_SERVER_ERROR"
             })
 
@@ -329,6 +410,7 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)

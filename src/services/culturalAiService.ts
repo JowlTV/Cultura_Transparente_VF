@@ -119,6 +119,75 @@ export const PROJETOS_EXEMPLO = [
   },
 ];
 
+interface ModelAttempt {
+  model?: string;
+  status?: number;
+  error?: string;
+}
+
+export function translateAiFailure(data: {
+  code?: string;
+  error?: string;
+  details?: Array<ModelAttempt> | string;
+}): string {
+  if (data.code === 'MISSING_GEMINI_API_KEY') {
+    return 'A chave de inteligência artificial (GEMINI_API_KEY) não está configurada no ambiente de produção. Por favor, configure a variável de ambiente para habilitar o assistente.';
+  }
+
+  const details = data.details;
+  const statuses: number[] = [];
+  let isTimeout = false;
+
+  if (Array.isArray(details)) {
+    for (const d of details) {
+      if (typeof d.status === 'number') {
+        statuses.push(d.status);
+      }
+      if (
+        d.status === 408 ||
+        (d.error && (
+          d.error.toLowerCase().includes('timeout') ||
+          d.error.toLowerCase().includes('timed out') ||
+          d.error.toLowerCase().includes('tempo limite')
+        ))
+      ) {
+        isTimeout = true;
+      }
+    }
+  } else if (typeof details === 'string') {
+    const matches = details.match(/\b(400|403|404|408|429|500|503)\b/g);
+    if (matches) {
+      matches.forEach(m => statuses.push(Number(m)));
+    }
+    if (
+      details.toLowerCase().includes('timeout') ||
+      details.toLowerCase().includes('timed out') ||
+      details.toLowerCase().includes('tempo limite')
+    ) {
+      isTimeout = true;
+    }
+  }
+
+  // Priorização dos motivos reais de falha conforme especificação
+  if (statuses.includes(429)) {
+    return 'limite de uso da chave de IA atingido';
+  }
+  if (statuses.includes(400) || statuses.includes(403)) {
+    return 'chave de IA inválida ou sem permissão';
+  }
+  if (statuses.includes(404)) {
+    return 'modelo de IA descontinuado';
+  }
+  if (isTimeout || statuses.includes(408)) {
+    return 'a IA demorou demais para responder';
+  }
+
+  // Mensagem genérica quando não houver código identificável
+  const fallback = data.error || 'Os servidores de inteligência artificial estão temporariamente indisponíveis. Por favor, tente novamente em alguns instantes.';
+  // Garante que nenhuma chave seja vazada
+  return fallback.replace(/AIza[0-9A-Za-z-_]{35}/g, '[CHAVE_OCULTA]').replace(/key=[^&\s"']+/g, 'key=[CHAVE_OCULTA]');
+}
+
 export async function sendMessageToAssistant(
   messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>
 ): Promise<{ text: string; hasFinalProject: boolean; finalProjectMarkdown?: string; isError?: boolean }> {
@@ -135,18 +204,19 @@ export async function sendMessageToAssistant(
       if (data.success && rawText.trim().length > 0) {
         return parseAssistantResponse(rawText);
       }
-      if (!data.success && data.error) {
+      if (!data.success) {
+        const errorMsg = translateAiFailure(data);
         return {
-          text: `⚠️ **Aviso do Assistente de IA:** ${data.error}`,
+          text: `⚠️ **Aviso do Assistente de IA:** ${errorMsg}`,
           hasFinalProject: false,
           isError: true,
         };
       }
     } else {
-      let errText = 'Falha na resposta do servidor.';
+      let errText = 'Os servidores de inteligência artificial estão temporariamente indisponíveis.';
       try {
         const errJson = await res.json();
-        if (errJson.error) errText = errJson.error;
+        errText = translateAiFailure(errJson);
       } catch {}
       return {
         text: `⚠️ **Erro na comunicação com a IA:** ${errText}`,

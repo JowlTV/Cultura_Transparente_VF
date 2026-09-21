@@ -4,12 +4,37 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
+    "api/chat.py": {
+      "maxDuration": 15,
+      "memory": 1024
+    },
     "api/*.py": {
       "maxDuration": 10,
       "memory": 1024
     }
   },
   "headers": [
+    {
+      "source": "/api/chat",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "POST,OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, x-goog-api-key"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
     {
       "source": "/api/(.*)",
       "headers": [

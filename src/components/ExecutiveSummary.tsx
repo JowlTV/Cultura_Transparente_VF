@@ -221,7 +221,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
               Auxílio ao Fazedor de Cultura · Estruturador de Projetos
             </h3>
             <p className="text-xs text-purple-100/80 max-w-2xl leading-relaxed">
-              Elabore propostas técnicas para PNAB, FAC-RS, Rouanet e editais municipais com auxílio inteligente passo a passo, cronograma, planilha orçamentária e exportação em PDF.
+              Elabore propostas técnicas para PNAB, Lei Paulo Gustavo, Emendas Parlamentares e editais municipais com auxílio inteligente passo a passo, cronograma, planilha orçamentária e exportação em PDF.
             </p>
           </div>
         </div>

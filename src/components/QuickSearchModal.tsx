@@ -118,7 +118,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
           <input
             type="text"
             autoFocus
-            placeholder="Pesquise por Hip-Hop, Ep 1692, edital FAC, deputado ou entidade cultural..."
+            placeholder="Pesquise por Hip-Hop, Ep 1692, Lei Paulo Gustavo, deputado ou entidade cultural..."
             value={query}
             onChange={e => setQuery(e.target.value)}
             className="w-full text-sm sm:text-base text-[#2D0652] placeholder-[#2D0652]/40 focus:outline-hidden font-medium"
@@ -138,7 +138,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
               <Search className="w-8 h-8 mx-auto mb-2 text-[#6A0DAD]/40" />
               <p className="font-semibold text-[#2D0652]">Digite pelo menos 2 caracteres para pesquisar em toda a base de dados de Viamão.</p>
               <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-                {['Hip-Hop', 'Ep 1692', 'FAC / SEDAC', 'Pró-cultura', 'Bonatto', 'Matriz', 'PNAB'].map(tag => (
+                {['Hip-Hop', 'Ep 1692', 'LPG / SEDAC', 'Pró-cultura', 'Bonatto', 'Matriz', 'PNAB'].map(tag => (
                   <button
                     key={tag}
                     onClick={() => setQuery(tag)}
@@ -152,7 +152,7 @@ export const QuickSearchModal: React.FC<QuickSearchModalProps> = ({
           ) : resultados.length === 0 ? (
             <div className="text-center py-10 text-[#2D0652]/60">
               <p className="font-bold text-[#2D0652]">Nenhum registro encontrado para "{query}".</p>
-              <p className="text-xs mt-1">Tente pesquisar termos como "Hip-hop", "Bonatto", "Igreja Matriz", "Aldir Blanc" ou "FAC".</p>
+              <p className="text-xs mt-1">Tente pesquisar termos como "Hip-hop", "Bonatto", "Igreja Matriz", "Aldir Blanc" ou "Paulo Gustavo".</p>
             </div>
           ) : (
             resultados.map((res, i) => (

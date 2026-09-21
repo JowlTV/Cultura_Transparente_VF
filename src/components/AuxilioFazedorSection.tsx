@@ -274,7 +274,7 @@ export const AuxilioFazedorSection: React.FC<AuxilioFazedorSectionProps> = ({ on
                   </h2>
                   <div className="flex items-center gap-1.5 text-[10px] text-[#2D0652]/70 font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    <span>Inteligência especializada em PNAB, FAC-RS e Rouanet</span>
+                    <span>Inteligência especializada em PNAB, Lei Paulo Gustavo e Emendas Parlamentares</span>
                   </div>
                 </div>
               </div>

@@ -27,7 +27,7 @@ class TestViamaoNewsScraper(unittest.TestCase):
         self.assertTrue(validar_conteudo_cultural("Sarau de literatura e música no IFRS"))
         self.assertTrue(validar_conteudo_cultural("Oficina de Dança e Hip-Hop"))
         self.assertTrue(validar_conteudo_cultural("Preservação do patrimônio histórico"))
-        self.assertTrue(validar_conteudo_cultural("Fundo de Apoio à Cultura (FAC) abre inscrições"))
+        self.assertTrue(validar_conteudo_cultural("Pró-Cultura RS abre inscrições para chamadas"))
         self.assertTrue(validar_conteudo_cultural("Secretaria Municipal da Cultura divulga resultados"))
 
         # Casos não culturais (devem ser rejeitados)

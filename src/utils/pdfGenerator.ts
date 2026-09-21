@@ -119,7 +119,7 @@ export async function exportElementToPdf(
     const footerHtml = `
       <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 30px; font-size: 9px; color: #888888; display: flex; justify-content: space-between;">
         <span>Elaborado com o Assistente ao Fazedor de Cultura • Cultura Transparente Viamão/RS</span>
-        <span>Conformidade com Lei nº 14.399/2022 (PNAB), Lei nº 8.313/1991 (Rouanet) e FAC-RS</span>
+        <span>Conformidade com Lei nº 14.399/2022 (PNAB), Lei Complementar nº 195/2022 (LPG) e Emendas Parlamentares</span>
       </div>
     `;
 

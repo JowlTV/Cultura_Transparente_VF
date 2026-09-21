@@ -217,6 +217,133 @@ class TestChatEndpoint(unittest.TestCase):
         self.assertEqual(body.get("text"), "Resposta gerada com sucesso após failover!")
         self.assertEqual(mock_urlopen.call_count, 2)
 
+    @patch.dict(os.environ, {"GEMINI_API_KEY": "fake_test_key"})
+    @patch("api.chat.TransferegovApi")
+    @patch("api.chat.urllib.request.urlopen")
+    def test_failover_404_then_success(self, mock_urlopen, mock_transferegov_cls):
+        """Simula primeiro modelo falhando com 404 e segundo respondendo com sucesso."""
+        import urllib.error
+
+        mock_err_404 = urllib.error.HTTPError(
+            url="https://api",
+            code=404,
+            msg="Not Found",
+            hdrs={},
+            fp=BytesIO(b'{"error": "models/gemini-3.6-flash is not found"}')
+        )
+
+        mock_success = MagicMock()
+        mock_success.__enter__.return_value = mock_success
+        mock_success.status = 200
+        mock_success.code = 200
+        mock_success.read.return_value = json.dumps({
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [
+                            {"text": "Projeto estruturado com sucesso pelo modelo de contingência!"}
+                        ]
+                    }
+                }
+            ]
+        }).encode("utf-8")
+
+        mock_urlopen.side_effect = [mock_err_404, mock_success]
+
+        status_line, body = invoke_post_handler(
+            ChatHandler,
+            "/api/chat",
+            {"messages": [{"role": "user", "content": "Como criar cronograma para edital?"}]}
+        )
+
+        self.assertIn("200 OK", status_line)
+        self.assertTrue(body.get("success"))
+        self.assertEqual(body.get("text"), "Projeto estruturado com sucesso pelo modelo de contingência!")
+        self.assertEqual(mock_urlopen.call_count, 2)
+
+    @patch.dict(os.environ, {"GEMINI_API_KEY": "fake_test_key"})
+    @patch("api.chat.TransferegovApi")
+    @patch("api.chat.urllib.request.urlopen")
+    def test_all_models_fail_429(self, mock_urlopen, mock_transferegov_cls):
+        """Simula todos os modelos falhando com 429 (quota excedida)."""
+        import urllib.error
+
+        def make_429_err(model_name):
+            return urllib.error.HTTPError(
+                url=f"https://api/{model_name}",
+                code=429,
+                msg="Too Many Requests",
+                hdrs={},
+                fp=BytesIO(b'{"error": "Resource has been exhausted (e.g. check quota)"}')
+            )
+
+        mock_urlopen.side_effect = [
+            make_429_err("gemini-3.6-flash"),
+            make_429_err("gemini-3.5-flash"),
+            make_429_err("gemini-3.5-flash-lite"),
+            make_429_err("gemini-3.1-flash-lite")
+        ]
+
+        status_line, body = invoke_post_handler(
+            ChatHandler,
+            "/api/chat",
+            {"messages": [{"role": "user", "content": "Ajuda com contrapartida social"}]}
+        )
+
+        self.assertIn("200 OK", status_line)
+        self.assertFalse(body.get("success"))
+        self.assertEqual(body.get("code"), "AI_MODELS_UNAVAILABLE")
+        self.assertIsInstance(body.get("details"), list)
+        self.assertEqual(len(body.get("details")), 4)
+        for detail in body.get("details"):
+            self.assertEqual(detail["status"], 429)
+            self.assertIn("429", detail["error"])
+
+    @patch.dict(os.environ, {"GEMINI_API_KEY": "fake_test_key"})
+    @patch("api.chat.TransferegovApi")
+    @patch("api.chat.urllib.request.urlopen")
+    @patch("api.chat.time.time")
+    def test_timeout_exhausted_before_last_model(self, mock_time, mock_urlopen, mock_transferegov_cls):
+        """Simula esgotamento do tempo global antes de tentar todos os modelos."""
+        import urllib.error
+
+        # Função geradora de tempo para não quebrar chamadas internas de logging
+        call_count = {"count": 0}
+        def dynamic_time():
+            call_count["count"] += 1
+            if call_count["count"] <= 2:
+                return 1000.0
+            return 1008.2  # Após primeira tentativa, simula que 8.2s já se passaram (saldo 0.3s <= 0.5s)
+
+        mock_time.side_effect = dynamic_time
+
+        # Primeiro modelo falha com 500
+        mock_urlopen.side_effect = [
+            urllib.error.HTTPError(
+                url="https://api/gemini-3.6-flash",
+                code=500,
+                msg="Internal Error",
+                hdrs={},
+                fp=BytesIO(b'{"error": "Internal server error"}')
+            )
+        ]
+
+        status_line, body = invoke_post_handler(
+            ChatHandler,
+            "/api/chat",
+            {"messages": [{"role": "user", "content": "Consultar edital com pressa"}]}
+        )
+
+        self.assertIn("200 OK", status_line)
+        self.assertFalse(body.get("success"))
+        self.assertEqual(body.get("code"), "AI_MODELS_UNAVAILABLE")
+        self.assertIsInstance(body.get("details"), list)
+
+        # O segundo modelo registrado deve ser por timeout (408)
+        timeout_details = [d for d in body.get("details") if d.get("status") == 408]
+        self.assertTrue(len(timeout_details) >= 1)
+        self.assertIn("timeout", timeout_details[0]["error"].lower())
+
 
 if __name__ == "__main__":
     unittest.main()

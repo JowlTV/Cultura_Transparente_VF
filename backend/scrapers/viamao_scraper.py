@@ -30,7 +30,7 @@ TERMOS_CULTURA = [
     "secretaria municipal de cultura", "pnab", "aldir blanc", "paulo gustavo", "lpg",
     "folclore", "artesanato", "artesão", "artesao", "artesã", "artesa", "tradição",
     "tradicao", "farroupilha", "circo", "museu", "slam", "poesia", "coral",
-    "oficina cultural", "fac", "pró-cultura", "pro-cultura", "procultura",
+    "oficina cultural", "pró-cultura", "pro-cultura", "procultura",
     "cultura viva", "ponto de cultura", "talentos da terra"
 ]
 
@@ -330,15 +330,15 @@ class ViamaoCultureScraper:
                 "url_pesquisa_google": "https://www.google.com/search?q=campus+viamao+sarau+cultural+ifrs"
             },
             {
-                "id": "noticia-sedac-fac-editais",
-                "titulo": "SEDAC-RS divulga chamadas do Fundo de Apoio à Cultura (FAC) e Pró-Cultura RS",
-                "resumo": "A Secretaria de Estado da Cultura do RS mantém chamamentos e editais setoriais pelo FAC, com fomento descentralizado para proponentes de Viamão e do RS.",
+                "id": "noticia-sedac-editais",
+                "titulo": "SEDAC-RS divulga chamadas e editais setoriais do Pró-Cultura RS",
+                "resumo": "A Secretaria de Estado da Cultura do RS mantém chamamentos e editais setoriais com fomento descentralizado para proponentes de Viamão e do RS.",
                 "link": "https://www.procultura.rs.gov.br/",
                 "origem": "Estadual (SEDAC-RS)",
                 "orgao": "Secretaria de Estado da Cultura (SEDAC-RS)",
                 "veiculo_imprensa": "Secretaria de Estado da Cultura (SEDAC-RS)",
                 "categoria_filtro": "editais",
-                "etiqueta": "Editais FAC / Pró-Cultura",
+                "etiqueta": "Editais SEDAC / Pró-Cultura",
                 "data": "28/08/2026",  # Data de abertura das chamadas públicas
                 "imagem": "https://cultura.rs.gov.br/favicon.ico",
                 "jurisdicao": "Estadual (RS)",
