@@ -31,9 +31,21 @@ export const AuxilioFazedorSection: React.FC<AuxilioFazedorSectionProps> = ({ on
   const [activeSubTab, setActiveSubTab] = useState<'chat' | 'projeto' | 'editais'>('chat');
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLongWaiting, setIsLongWaiting] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [copiedProject, setCopiedProject] = useState(false);
   const [consolidatedMarkdown, setConsolidatedMarkdown] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setIsLongWaiting(false);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setIsLongWaiting(true);
+    }, 15000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -362,7 +374,9 @@ export const AuxilioFazedorSection: React.FC<AuxilioFazedorSectionProps> = ({ on
                     <span className="w-2 h-2 rounded-full bg-[#6A0DAD] animate-bounce delay-100"></span>
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce delay-200"></span>
                     <span className="ml-1 text-xs font-medium text-[#2D0652]">
-                      Consultor estruturando resposta técnica...
+                      {isLongWaiting
+                        ? 'Propostas mais completas podem levar até um minuto'
+                        : 'O consultor está elaborando a resposta…'}
                     </span>
                   </div>
                 </div>

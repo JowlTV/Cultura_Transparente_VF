@@ -367,24 +367,53 @@ real_stdout.flush()
               const py = spawn('python3', ['-c', pyScript], {
                 cwd: process.cwd(),
                 env: process.env,
-                timeout: 35000
+                timeout: 65000
               });
               let out = '';
+              let pyStderr = '';
               py.stdout.on('data', d => { out += d.toString(); });
-              py.on('close', code => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json; charset=utf-8');
-                res.end(out || JSON.stringify({ success: false, error: 'Resposta vazia do handler de IA' }));
+              py.stderr.on('data', d => { pyStderr += d.toString(); });
+              py.on('close', (code, signal) => {
+                if (code !== 0 || signal) {
+                  console.log(`[devApiPlugin /api/chat] Python exit code: ${code}, signal: ${signal}`);
+                }
+                if (pyStderr && pyStderr.trim().length > 0) {
+                  console.error(`[devApiPlugin /api/chat] Python stderr:\n${pyStderr}`);
+                }
+
+                if (out && out.trim().startsWith('{')) {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                  res.end(out);
+                } else {
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                  res.end(JSON.stringify({
+                    success: false,
+                    error: 'O processo da inteligência artificial foi encerrado ou atingiu o tempo limite antes de concluir a resposta.',
+                    code: 'AI_PROCESS_TIMEOUT'
+                  }));
+                }
               });
               py.on('error', err => {
-                res.statusCode = 500;
+                console.error('[devApiPlugin /api/chat] Process error:', err);
+                res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json; charset=utf-8');
-                res.end(JSON.stringify({ success: false, error: String(err) }));
+                res.end(JSON.stringify({
+                  success: false,
+                  error: 'O processo da inteligência artificial foi interrompido ou falhou ao inicializar.',
+                  code: 'AI_PROCESS_TIMEOUT'
+                }));
               });
             } catch (e: any) {
+              console.error('[devApiPlugin /api/chat] Server exception:', e);
               res.statusCode = 500;
               res.setHeader('Content-Type', 'application/json; charset=utf-8');
-              res.end(JSON.stringify({ success: false, error: String(e) }));
+              res.end(JSON.stringify({
+                success: false,
+                error: String(e),
+                code: 'AI_PROCESS_TIMEOUT'
+              }));
             }
           });
           return;

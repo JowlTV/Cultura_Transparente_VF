@@ -299,7 +299,7 @@ class TestChatEndpoint(unittest.TestCase):
             self.assertEqual(detail["status"], 429)
             self.assertIn("429", detail["error"])
 
-    @patch.dict(os.environ, {"GEMINI_API_KEY": "fake_test_key"})
+    @patch.dict(os.environ, {"GEMINI_API_KEY": "fake_test_key", "CHAT_DEADLINE_SECONDS": "8.5"})
     @patch("api.chat.TransferegovApi")
     @patch("api.chat.urllib.request.urlopen")
     @patch("api.chat.time.time")
@@ -307,7 +307,6 @@ class TestChatEndpoint(unittest.TestCase):
         """Simula esgotamento do tempo global antes de tentar todos os modelos."""
         import urllib.error
 
-        # Função geradora de tempo para não quebrar chamadas internas de logging
         call_count = {"count": 0}
         def dynamic_time():
             call_count["count"] += 1
@@ -343,6 +342,142 @@ class TestChatEndpoint(unittest.TestCase):
         timeout_details = [d for d in body.get("details") if d.get("status") == 408]
         self.assertTrue(len(timeout_details) >= 1)
         self.assertIn("timeout", timeout_details[0]["error"].lower())
+
+    @patch.dict(os.environ, {"GEMINI_API_KEY": "fake_test_key"})
+    @patch("api.chat.TransferegovApi")
+    @patch("api.chat.urllib.request.urlopen")
+    def test_first_attempt_timeout_failover_to_lite_model(self, mock_urlopen, mock_transferegov_cls):
+        """Valida que quando a primeira tentativa estoura o teto (timeout), o failover vai direto para o modelo lite."""
+        import socket
+
+        mock_success = MagicMock()
+        mock_success.__enter__.return_value = mock_success
+        mock_success.status = 200
+        mock_success.code = 200
+        mock_success.read.return_value = json.dumps({
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [
+                            {"text": "Resposta rápida do modelo lite após timeout!"}
+                        ]
+                    }
+                }
+            ]
+        }).encode("utf-8")
+
+        # 1ª tentativa estoura timeout no gemini-3.6-flash
+        # 2ª tentativa deve ser chamada com modelo lite (gemini-3.5-flash-lite)
+        mock_urlopen.side_effect = [
+            socket.timeout("The read operation timed out"),
+            mock_success
+        ]
+
+        status_line, body = invoke_post_handler(
+            ChatHandler,
+            "/api/chat",
+            {"messages": [{"role": "user", "content": "Preciso de ajuda urgente com o projeto"}]}
+        )
+
+        self.assertIn("200 OK", status_line)
+        self.assertTrue(body.get("success"))
+        self.assertEqual(body.get("text"), "Resposta rápida do modelo lite após timeout!")
+        self.assertEqual(mock_urlopen.call_count, 2)
+
+        # Inspeciona as URLs das chamadas
+        first_call_req = mock_urlopen.call_args_list[0][0][0]
+        second_call_req = mock_urlopen.call_args_list[1][0][0]
+
+        self.assertIn("gemini-3.6-flash", first_call_req.full_url)
+        self.assertIn("gemini-3.5-flash-lite", second_call_req.full_url)
+
+    @patch.dict(os.environ, {
+        "GEMINI_API_KEY": "fake_test_key",
+        "CHAT_DEADLINE_SECONDS": "40",
+        "CHAT_ATTEMPT_TIMEOUT_SECONDS": "18"
+    })
+    @patch("api.chat.TransferegovApi")
+    @patch("api.chat.urllib.request.urlopen")
+    def test_env_vars_override_deadlines(self, mock_urlopen, mock_transferegov_cls):
+        """Valida que as variáveis de ambiente CHAT_DEADLINE_SECONDS e CHAT_ATTEMPT_TIMEOUT_SECONDS alteram os prazos."""
+        mock_response = MagicMock()
+        mock_response.__enter__.return_value = mock_response
+        mock_response.status = 200
+        mock_response.code = 200
+        mock_response.read.return_value = json.dumps({
+            "candidates": [{"content": {"parts": [{"text": "OK"}]}}]
+        }).encode("utf-8")
+        mock_urlopen.return_value = mock_response
+
+        status_line, body = invoke_post_handler(
+            ChatHandler,
+            "/api/chat",
+            {"messages": [{"role": "user", "content": "Verificar timeout customizado"}]}
+        )
+
+        self.assertIn("200 OK", status_line)
+        self.assertTrue(body.get("success"))
+
+        # Inspeciona o timeout passado na chamada ao urlopen
+        passed_timeout = mock_urlopen.call_args[1].get("timeout")
+        self.assertIsNotNone(passed_timeout)
+        # O timeout deve ser limitado pelo teto de tentativa configurado (18.0s)
+        self.assertAlmostEqual(passed_timeout, 18.0, delta=0.5)
+
+    @patch.dict(os.environ, {"GEMINI_API_KEY": "fake_test_key"})
+    @patch("api.chat.TransferegovApi")
+    @patch("api.chat.urllib.request.urlopen")
+    def test_payload_thinking_config_normal_vs_consolidation(self, mock_urlopen, mock_transferegov_cls):
+        """Valida thinkingLevel low em mensagens normais e medium na consolidação, sem campos proibidos."""
+        mock_response = MagicMock()
+        mock_response.__enter__.return_value = mock_response
+        mock_response.status = 200
+        mock_response.code = 200
+        mock_response.read.return_value = json.dumps({
+            "candidates": [{"content": {"parts": [{"text": "Resposta OK"}]}}]
+        }).encode("utf-8")
+        mock_urlopen.return_value = mock_response
+
+        # 1. Mensagem normal -> thinkingLevel deve ser 'low'
+        status_line, body = invoke_post_handler(
+            ChatHandler,
+            "/api/chat",
+            {"messages": [{"role": "user", "content": "Como funciona a PNAB em Viamão?"}]}
+        )
+        self.assertIn("200 OK", status_line)
+        req_obj_1 = mock_urlopen.call_args[0][0]
+        payload_1 = json.loads(req_obj_1.data.decode("utf-8"))
+
+        self.assertIn("generationConfig", payload_1)
+        gen_cfg_1 = payload_1["generationConfig"]
+        self.assertEqual(gen_cfg_1.get("thinkingConfig", {}).get("thinkingLevel"), "low")
+        self.assertNotIn("thinkingBudget", gen_cfg_1.get("thinkingConfig", {}))
+        self.assertNotIn("temperature", gen_cfg_1)
+        self.assertNotIn("top_p", gen_cfg_1)
+        self.assertNotIn("top_k", gen_cfg_1)
+
+        # 2. Mensagem de consolidação final -> thinkingLevel deve ser 'medium'
+        cache.clear()
+        status_line_2, body_2 = invoke_post_handler(
+            ChatHandler,
+            "/api/chat",
+            {"messages": [
+                {"role": "user", "content": "Tenho todos os dados"},
+                {"role": "assistant", "content": "Excelente"},
+                {"role": "user", "content": "Terminei de responder, por favor gere o [PROJETO_FINAL] consolidado."}
+            ]}
+        )
+        self.assertIn("200 OK", status_line_2)
+        req_obj_2 = mock_urlopen.call_args[0][0]
+        payload_2 = json.loads(req_obj_2.data.decode("utf-8"))
+
+        self.assertIn("generationConfig", payload_2)
+        gen_cfg_2 = payload_2["generationConfig"]
+        self.assertEqual(gen_cfg_2.get("thinkingConfig", {}).get("thinkingLevel"), "medium")
+        self.assertNotIn("thinkingBudget", gen_cfg_2.get("thinkingConfig", {}))
+        self.assertNotIn("temperature", gen_cfg_2)
+        self.assertNotIn("top_p", gen_cfg_2)
+        self.assertNotIn("top_k", gen_cfg_2)
 
 
 if __name__ == "__main__":

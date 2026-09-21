@@ -220,8 +220,16 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         start_time = time.time()
-        # Prazo global de 8.5s para garantir término seguro dentro do limite serverless
-        GLOBAL_TIMEOUT_SECONDS = 8.5
+        # Prazos configuráveis via variáveis de ambiente
+        try:
+            deadline_seconds = float(os.environ.get("CHAT_DEADLINE_SECONDS", "55"))
+        except (ValueError, TypeError):
+            deadline_seconds = 55.0
+
+        try:
+            attempt_cap_seconds = float(os.environ.get("CHAT_ATTEMPT_TIMEOUT_SECONDS", "25"))
+        except (ValueError, TypeError):
+            attempt_cap_seconds = 25.0
 
         try:
             content_length = int(self.headers.get("Content-Length", 0))
@@ -281,6 +289,35 @@ class handler(BaseHTTPRequestHandler):
             if not formatted_contents:
                 formatted_contents = [{"role": "user", "parts": [{"text": "Olá!"}]}]
 
+            # Calibração do nível de raciocínio (thinkingConfig):
+            # 'low' em mensagens normais; 'medium' somente quando solicitado consolidação do projeto final
+            last_user_content = ""
+            for m in reversed(messages):
+                if m.get("role") == "user":
+                    last_user_content = m.get("content", "").lower()
+                    break
+
+            is_consolidation_request = any(term in last_user_content for term in [
+                "consolidar projeto",
+                "projeto final",
+                "[projeto_final]",
+                "estruturar projeto final",
+                "gerar projeto final"
+            ])
+            thinking_level = "medium" if is_consolidation_request else "low"
+
+            req_payload = {
+                "systemInstruction": {
+                    "parts": [{"text": system_instruction_completa}]
+                },
+                "contents": formatted_contents,
+                "generationConfig": {
+                    "thinkingConfig": {
+                        "thinkingLevel": thinking_level
+                    }
+                }
+            }
+
             # Modelos Gemini 3.x em disponibilidade geral com suporte oficial ativo
             candidate_models = [
                 "gemini-3.6-flash",
@@ -288,16 +325,23 @@ class handler(BaseHTTPRequestHandler):
                 "gemini-3.5-flash-lite",
                 "gemini-3.1-flash-lite"
             ]
+            models_to_try = list(candidate_models)
+            tried_models = set()
 
             response_text = ""
             model_attempts = []
 
-            for model_name in candidate_models:
+            while models_to_try:
+                model_name = models_to_try.pop(0)
+                if model_name in tried_models:
+                    continue
+                tried_models.add(model_name)
+
                 elapsed = time.time() - start_time
-                time_left = GLOBAL_TIMEOUT_SECONDS - elapsed
+                time_left = deadline_seconds - elapsed
 
                 if time_left <= 0.5:
-                    logger.warning(f"Prazo global de {GLOBAL_TIMEOUT_SECONDS}s esgotado antes de tentar {model_name}.")
+                    logger.warning(f"Prazo global de {deadline_seconds}s esgotado antes de tentar {model_name}.")
                     model_attempts.append({
                         "model": model_name,
                         "status": 408,
@@ -305,18 +349,12 @@ class handler(BaseHTTPRequestHandler):
                     })
                     break
 
-                # Timeout específico para cada tentativa respeitando o saldo restante
-                attempt_timeout = max(0.5, min(time_left, 4.0))
+                # Timeout específico para cada tentativa respeitando o saldo restante e o teto por tentativa
+                attempt_timeout = max(0.5, min(time_left, attempt_cap_seconds))
 
                 try:
                     # Chave enviada via cabeçalho x-goog-api-key, sem expor na URL
                     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-                    req_payload = {
-                        "systemInstruction": {
-                            "parts": [{"text": system_instruction_completa}]
-                        },
-                        "contents": formatted_contents
-                    }
                     data_bytes = json.dumps(req_payload).encode("utf-8")
                     req = urllib.request.Request(
                         url,
@@ -368,6 +406,12 @@ class handler(BaseHTTPRequestHandler):
                         "error": error_str
                     })
                     logger.warning(f"Failover Gemini ({model_name}): {error_str}")
+
+                    if is_timeout:
+                        # Se uma tentativa estourar o teto, a próxima prioriza o modelo mais rápido da lista (lite)
+                        lite_models = [m for m in models_to_try if "lite" in m and m not in tried_models]
+                        other_models = [m for m in models_to_try if "lite" not in m and m not in tried_models]
+                        models_to_try = lite_models + other_models
                 except Exception as ex:
                     error_str = sanitize_api_key(str(ex), api_key)
                     model_attempts.append({

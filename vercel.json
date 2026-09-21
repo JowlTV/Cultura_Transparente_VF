@@ -5,7 +5,7 @@
   "outputDirectory": "dist",
   "functions": {
     "api/chat.py": {
-      "maxDuration": 15,
+      "maxDuration": 60,
       "memory": 1024
     },
     "api/*.py": {

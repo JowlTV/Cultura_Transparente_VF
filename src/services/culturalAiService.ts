@@ -169,6 +169,9 @@ export function translateAiFailure(data: {
   }
 
   // Priorização dos motivos reais de falha conforme especificação
+  if (data.code === 'AI_PROCESS_TIMEOUT') {
+    return 'a IA demorou demais para responder';
+  }
   if (statuses.includes(429)) {
     return 'limite de uso da chave de IA atingido';
   }
@@ -191,12 +194,17 @@ export function translateAiFailure(data: {
 export async function sendMessageToAssistant(
   messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>
 ): Promise<{ text: string; hasFinalProject: boolean; finalProjectMarkdown?: string; isError?: boolean }> {
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => abortController.abort(), 70000); // 70s no navegador (acima dos 65s do processo)
+
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages }),
+      signal: abortController.signal,
     });
+    clearTimeout(timeoutId);
 
     if (res.ok) {
       const data = await res.json();
@@ -225,6 +233,14 @@ export async function sendMessageToAssistant(
       };
     }
   } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err?.name === 'AbortError') {
+      return {
+        text: '⚠️ **Aviso do Assistente de IA:** a IA demorou demais para responder',
+        hasFinalProject: false,
+        isError: true,
+      };
+    }
     return {
       text: '⚠️ **Indisponibilidade de Conexão:** Não foi possível conectar ao assistente de IA no momento. Por favor, verifique sua conexão ou tente novamente.',
       hasFinalProject: false,
