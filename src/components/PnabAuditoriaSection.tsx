@@ -18,7 +18,7 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
-} from 'lucide-react';
+} from './Icon';
 
 export const PnabAuditoriaSection: React.FC = () => {
   const [mostrarGuiaDetalhado, setMostrarGuiaDetalhado] = useState<boolean>(false);

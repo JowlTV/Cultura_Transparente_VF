@@ -110,3 +110,66 @@ Todos os 18 testes validam:
 
 ---
 
+## 📚 Como Adicionar Novos Editais na Base de Conhecimento
+
+O assistente de elaboração de projetos culturais baseia-se exclusivamente em normativas oficiais arquivadas no diretório `backend/conhecimento/`. Para incluir um novo edital municipal de Viamão ou instrução normativa:
+
+1. **Adicionar o Documento de Texto:**
+   - Crie um arquivo `.txt` ou `.md` dentro de `backend/conhecimento/` com o texto oficial do edital (ex: `edital_01_2026_viamao.txt`).
+   - Mantenha os títulos, artigos, categorias e critérios de elegibilidade fiéis ao documento publicado no Diário Oficial.
+
+2. **Registrar o Edital no `backend/conhecimento/indice.json`:**
+   - Adicione uma entrada no array `documentos` seguindo a estrutura:
+   ```json
+   {
+     "id": "edital-viamao-01-2026",
+     "titulo": "Edital de Fomento Cultural nº 01/2026 - SMC Viamão",
+     "tipo": "edital",
+     "instrumento": "Municipal",
+     "ano": 2026,
+     "arquivo": "edital_01_2026_viamao.txt",
+     "etapas_relevantes": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+     "resumo": "Edital municipal de fomento para projetos culturais em Viamão/RS."
+   }
+   ```
+3. **Mapeamento de Etapas Relevantes:**
+   - O campo `etapas_relevantes` direciona o `backend/conhecimento_retriever.py` a injetar o trecho correspondente na etapa certa da conversa (ex: etapas 7 e 8 para acessibilidade e contrapartida social; etapa 10 para planilha orçamentária).
+
+---
+
+## ☁️ Configuração do Google Cloud para Exportação no Google Drive
+
+A plataforma permite exportar o projeto cultural diretamente para a conta do Google Drive da pessoa, convertendo a proposta em um **Google Doc editável**.
+
+Essa integração é **opcional**: caso a variável `VITE_GOOGLE_CLIENT_ID` não esteja definida, o botão do Google Drive permanece oculto e o usuário conta com o download em formato `.docx` (Microsoft Word / LibreOffice / Google Docs).
+
+### Passo a Passo no Google Cloud Console:
+
+1. **Criar ou Selecionar Projeto:**
+   - Acesse o [Google Cloud Console](https://console.cloud.google.com/).
+   - Crie um novo projeto (ex: `cultura-transparente-viamao`).
+
+2. **Ativar a Google Drive API:**
+   - No menu lateral, acesse **APIs e Serviços** > **Biblioteca**.
+   - Pesquise por `Google Drive API` e clique em **Ativar** (*Enable*).
+
+3. **Configurar a Tela de Consentimento OAuth (OAuth Consent Screen):**
+   - Acesse **APIs e Serviços** > **Tela de permissão OAuth**.
+   - Selecione o tipo de usuário **Externo** e clique em **Criar**.
+   - Preencha o nome do app (ex: `Cultura Transparente Viamão`) e o e-mail de suporte.
+   - Na etapa de **Escopos**, clique em **Adicionar ou remover escopos** e selecione estritamente:
+     - `https://www.googleapis.com/auth/drive.file`
+     *(Escopo não-sensível recomendado pelo Google, que concede acesso apenas aos arquivos criados pelo próprio aplicativo, garantindo total privacidade à conta do usuário).*
+
+4. **Criar Credenciais OAuth (Client ID da Web):**
+   - Acesse **APIs e Serviços** > **Credenciais** > **Criar Credenciais** > **ID do cliente OAuth**.
+   - Em **Tipo de aplicativo**, selecione **Aplicativo da Web** (*Web application*).
+   - Em **Origens JavaScript autorizadas**, insira a URL da sua aplicação (ex: `https://cultura-transparente-vf.vercel.app` e `http://localhost:3000` para desenvolvimento local).
+   - Clique em **Criar** e copie o **Client ID** gerado (formato `XXXXXX.apps.googleusercontent.com`).
+
+5. **Configurar Variável de Ambiente:**
+   - No seu arquivo `.env` local ou no painel de configurações de ambiente do Vercel / Cloud Run:
+     ```env
+     VITE_GOOGLE_CLIENT_ID=seu-client-id.apps.googleusercontent.com
+     ```
+   - Reinicie a aplicação para que o botão "Salvar no meu Google Drive" fique automaticamente disponível na interface.

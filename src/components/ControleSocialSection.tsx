@@ -6,7 +6,7 @@ import {
   Check,
   Scale,
   Building,
-} from 'lucide-react';
+} from './Icon';
 
 export const ControleSocialSection: React.FC = () => {
   const [temaSelecionado, setTemaSelecionado] = useState<string>('pnab');

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, ArrowRight } from 'lucide-react';
+import { Search, X, ArrowRight } from './Icon';
 import { Emenda } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
 

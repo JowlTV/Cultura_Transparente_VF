@@ -10,7 +10,7 @@ import {
   Target,
   ArrowUpRight,
   Info
-} from 'lucide-react';
+} from './Icon';
 import { LpgPlanoAcao } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
 

@@ -2,29 +2,192 @@
 CULTURA TRANSPARENTE - ASSISTENTE DE IA DE PROJETOS CULTURAIS
 Módulo: api/chat.py (Serverless Function Vercel)
 =============================================================================
-Endpoint serverless para atendimento interativo e elaboração de projetos culturais
-com integração às APIs oficiais de Viamão/RS (PNAB, LPG, Emendas) e failover
-resiliente entre modelos Google Gemini.
+Conduz o proponente na construção do seu projeto cultural passo a passo,
+com base estrita em informação oficial (legislação federal, decretos e editais),
+sem inventar informações, sem definir valores para o proponente, com uma
+pergunta por mensagem e com resposta estruturada em JSON.
 """
 
 from http.server import BaseHTTPRequestHandler
 import json
 import os
 import sys
-import hashlib
 import time
 import re
 import socket
 import concurrent.futures
 import urllib.request
 import urllib.error
+from typing import Dict, List, Any, Optional
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from backend.apis import TransferegovApi
-from backend.utils import setup_logger, cache
+from backend.conhecimento_retriever import (
+    extrair_contexto_conhecimento,
+    identificar_politica
+)
+from backend.utils import setup_logger
 
 logger = setup_logger("VercelApiChat")
+
+ROTEIRO_ETAPAS = [
+    {
+        "etapa": 1,
+        "chave": "edital_politica",
+        "nome": "Edital ou Política",
+        "descricao": "Escolha do instrumento: PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão",
+        "pergunta_padrao": "Para qual edital ou política cultural você deseja preparar seu projeto (PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão)?"
+    },
+    {
+        "etapa": 2,
+        "chave": "ideia_projeto",
+        "nome": "Ideia do Projeto",
+        "descricao": "Ideia do projeto em poucas palavras",
+        "pergunta_padrao": "Qual é a ideia central do seu projeto cultural em poucas palavras?"
+    },
+    {
+        "etapa": 3,
+        "chave": "tipo_proponente",
+        "nome": "Tipo de Proponente",
+        "descricao": "Pessoa física, coletivo informal, MEI ou organização/associação",
+        "pergunta_padrao": "Você vai inscrever o projeto como pessoa física, coletivo sem CNPJ, MEI ou organização/associação?"
+    },
+    {
+        "etapa": 4,
+        "chave": "objetivo_principal",
+        "nome": "Objetivo Principal",
+        "descricao": "Objetivo principal e justificativa de impacto cultural",
+        "pergunta_padrao": "Qual é o objetivo principal que o seu projeto quer alcançar em Viamão?"
+    },
+    {
+        "etapa": 5,
+        "chave": "publico_territorio",
+        "nome": "Público e Território",
+        "descricao": "Público-alvo estimado e bairro/território de realização",
+        "pergunta_padrao": "Quem é o público-alvo prioritário e em qual bairro ou região de Viamão a ação será realizada?"
+    },
+    {
+        "etapa": 6,
+        "chave": "atividades_metodologia",
+        "nome": "Atividades e Execução",
+        "descricao": "Atividades que serão realizadas e como acontecerão na prática",
+        "pergunta_padrao": "Quais são as principais atividades do projeto e como elas serão realizadas na prática?"
+    },
+    {
+        "etapa": 7,
+        "chave": "acessibilidade",
+        "nome": "Medidas de Acessibilidade",
+        "descricao": "Medidas de acessibilidade física, comunicacional ou atitudinal",
+        "pergunta_padrao": "Quais medidas de acessibilidade física ou comunicacional (como Libras ou audiodescrição) serão adotadas no projeto?"
+    },
+    {
+        "etapa": 8,
+        "chave": "contrapartida_social",
+        "nome": "Contrapartida Social",
+        "descricao": "Ação gratuita de contrapartida social para a comunidade",
+        "pergunta_padrao": "Qual será a contrapartida social gratuita oferecida pelo projeto à comunidade de Viamão?"
+    },
+    {
+        "etapa": 9,
+        "chave": "cronograma",
+        "nome": "Cronograma",
+        "descricao": "Período estimado de execução e etapas de pré-produção, produção e pós-produção",
+        "pergunta_padrao": "Em quantos meses você planeja executar o projeto e quais os prazos das principais fases?"
+    },
+    {
+        "etapa": 10,
+        "chave": "orcamento",
+        "nome": "Orçamento",
+        "descricao": "Itens de despesa e valores estimados informados pelo proponente",
+        "pergunta_padrao": "Quais são os principais itens de custo do seu projeto e quais os valores estimados para cada um?"
+    },
+    {
+        "etapa": 11,
+        "chave": "revisao_final",
+        "nome": "Revisão Final",
+        "descricao": "Revisão e conferência de todas as seções para exportação",
+        "pergunta_padrao": "Você deseja fazer algum ajuste no texto do seu projeto antes de gerar o documento final para download?"
+    }
+]
+
+CULTURAL_SYSTEM_PROMPT = """Você é o Consultor Oficial de Projetos Culturais da plataforma Cultura Transparente de Viamão/RS.
+Sua missão é conduzir a pessoa na construção do próprio projeto cultural, etapa por etapa, com base unicamente na documentação oficial e nos dados reais do sistema, gerando um documento estruturado.
+
+PRINCÍPIOS INEGOCIÁVEIS:
+1. UMA PERGUNTA POR MENSAGEM:
+   - Nunca faça duas ou mais perguntas na mesma resposta.
+   - Sua mensagem DEVE conter no máximo um ponto de interrogação ('?').
+   - Se precisar de mais informações, pergunte primeiro o ponto mais importante.
+
+2. NÃO INVENTAR INFORMAÇÃO:
+   - Toda afirmação sobre regras, prazos, requisitos, critérios ou valores de um edital ou política deve vir EXCLUSIVAMENTE dos documentos oficiais fornecidos na BASE DE CONHECIMENTO OFICIAL anexa ou dos dados reais do sistema, com citação expressa do documento e item/artigo.
+   - Se a informação não estiver disponível nos documentos fornecidos, diga expressamente: "Não encontrei essa informação nos documentos oficiais disponíveis" e oriente a pessoa a confirmar no edital oficial publicado.
+
+3. NÃO DEFINIR VALORES PARA A PESSOA:
+   - Você NÃO sugere quanto a pessoa deve pedir, quanto cobrar de cachê nem preenche valores de orçamento por conta própria.
+   - Você pode apenas:
+     a) Informar limites e faixas que constem LITERALMENTE no documento oficial (citando o item/artigo).
+     b) Perguntar os valores à pessoa.
+     c) Conferir se o total informado respeita esses limites e se a soma dos itens fecha.
+
+4. O PROJETO É DA PESSOA:
+   - O assistente organiza, pergunta, confere e redige tecnicamente a partir das respostas do usuário.
+   - Todo conteúdo substantivo (ideia, atividades, público, território, valores) vem da pessoa.
+
+5. EMENDAS PARLAMENTARES:
+   - Deixe sempre claro que emenda parlamentar NÃO é um edital aberto ou concurso público. O recurso é indicado por um parlamentar e normalmente destinado a um órgão público ou organização da sociedade civil apta a celebrar parceria (Termo de Fomento via MROSC - Lei nº 13.019/2014). Não prometa acesso garantido ao recurso.
+
+6. DADOS PESSOAIS E LGPD:
+   - NUNCA peça CPF, RG, dados bancários, endereço residencial completo ou telefone no chat.
+   - No documento, essas informações aparecem como campos entre colchetes para preenchimento posterior pela pessoa (ex: "[CPF do proponente]", "[Endereço do proponente]", "[Conta Bancária]").
+   - Se a pessoa digitar dados pessoais no chat, avise educadamente que não é necessário enviá-los e JAMAIS os repita na resposta.
+
+ROTEIRO FIXO DE ETAPAS (1 a 11):
+1. edital_politica: Qual edital ou política (PNAB, Lei Paulo Gustavo, emenda parlamentar, edital municipal de Viamão)
+2. ideia_projeto: Ideia do projeto, em poucas palavras
+3. tipo_proponente: Tipo de proponente (pessoa física, coletivo, MEI, organização)
+4. objetivo_principal: Objetivo principal e justificativa de impacto em Viamão
+5. publico_territorio: Público-alvo prioritário e território/bairro de Viamão onde acontece
+6. atividades_metodologia: Atividades e como serão realizadas na prática
+7. acessibilidade: Medidas de acessibilidade (física, comunicacional com Libras/audiodescrição, e atitudinal)
+8. contrapartida_social: Contrapartida social gratuita para a comunidade
+9. cronograma: Cronograma de execução por etapas
+10. orcamento: Orçamento (itens e valores informados pela pessoa)
+11. revisao_final: Revisão final consolidada
+
+CONDUÇÃO DA CONVERSA:
+- Se a resposta da pessoa for incompleta para a etapa atual, peça o que falta com UMA ÚNICA pergunta.
+- Se a pessoa responder dados de várias etapas de uma vez, aproveite todas as informações, atualize as respectivas seções em 'secoes_atualizadas', confirme brevemente e siga para a próxima etapa pendente.
+- Se a pessoa quiser alterar uma etapa anterior, atualize a seção correspondente e prossiga.
+
+FORMATO OBRIGATÓRIO DA RESPOSTA:
+Sua resposta DEVE ser EXCLUSIVAMENTE um objeto JSON válido, sem texto fora do JSON, no seguinte esquema:
+{
+  "mensagem": "texto acolhedor exibido no chat, contendo NO MÁXIMO UMA pergunta ('?')",
+  "etapa_atual": 1,
+  "secoes_atualizadas": {
+    "edital_politica": "texto redigido...",
+    "ideia_projeto": "texto redigido...",
+    "tipo_proponente": "...",
+    "objetivo_principal": "...",
+    "publico_territorio": "...",
+    "atividades_metodologia": "...",
+    "acessibilidade": "...",
+    "contrapartida_social": "...",
+    "cronograma": "...",
+    "orcamento": "...",
+    "revisao_final": "..."
+  },
+  "fontes_citadas": [
+    { "documento": "Nome oficial do documento", "trecho": "Artigo ou item" }
+  ],
+  "pendencias": [
+    "item pendente se houver"
+  ]
+}
+"""
+
 
 def sanitize_api_key(text: str, api_key: str = "") -> str:
     """Remove qualquer menção a chaves de API para prevenir vazamento em logs e respostas."""
@@ -37,144 +200,97 @@ def sanitize_api_key(text: str, api_key: str = "") -> str:
     sanitized = re.sub(r'key=[^&\s"\']+', 'key=[CHAVE_OCULTA]', sanitized)
     return sanitized
 
-CULTURAL_SYSTEM_PROMPT = """Você é o Consultor Especialista de Elaboração de Projetos Culturais da plataforma Cultura Transparente de Viamão/RS.
-Sua missão é atuar como um consultor sênior em gestão cultural e elaboração técnica de propostas para editais públicos e instrumentos de fomento:
-- Política Nacional Aldir Blanc (PNAB - Lei nº 14.399/2022)
-- Lei Paulo Gustavo (LPG - Lei Complementar nº 195/2022)
-- Emendas Parlamentares Federais e Estaduais para Cultura em Viamão/RS
-- Editais Municipais da Secretaria de Cultura de Viamão/RS
 
-DIRETRIZES DE ATUAÇÃO E METODOLOGIA ITERATIVA:
-1. Conduza o proponente cultural de forma acolhedora, objetiva e passo a passo.
-2. Faça perguntas em blocos curtos (1 ou 2 por vez) para coletar:
-   - OBJETO & LOCAL: Qual a ideia do projeto? Formato (oficina comunitária, show, festival, mostra, audiovisual, livro, artes visuais)? Onde será realizado em Viamão/RS (bairros como Santa Isabel, Centro, Itapuã, Águas Claras, Viamópolis, etc.)?
-   - JUSTIFICATIVA: Relevância cultural, impacto social e descentralização territorial.
-   - ACESSIBILIDADE & DEMOCRATIZAÇÃO:
-     * Acessibilidade física/arquitetônica (rampas, sanitários adaptados, assentos prioritários)
-     * Acessibilidade comunicacional (Intérprete de Libras, audiodescrição, legendagem)
-     * Democratização (gratuidade total ou preços populares, contrapartida social comunitária)
-   - METAS E CRONOGRAMA: Etapas (Pré-produção, Produção, Execução, Pós-produção e Prestação de contas)
-   - PLANILHA ORÇAMENTÁRIA: Rubricas com valores unitários, quantidades e estimativa global compatível com os tetos dos editais.
-   - REGULARIDADE FISCAL: Lembre o usuário das certidões obrigatórias (CND Federal, Estadual RS, Municipal de Viamão, CNDT e FGTS para PJ).
+def normalizar_uma_pergunta(texto: str) -> str:
+    """Garante a regra inegociável de no máximo uma pergunta (no máximo um '?')."""
+    if not texto or texto.count('?') <= 1:
+        return texto
 
-GATILHO DE CONSOLIDAÇÃO DO PROJETO FINAL:
-Quando o usuário solicitar a consolidação ("terminei", "finalizar", "gerar projeto", "consolidar", "exportar", "concluir") ou tiver fornecido os elementos essenciais:
-Você DEVE gerar o projeto cultural completo, estruturado e formal em Markdown, INICIANDO OBRIGATORIAMENTE COM A TAG:
-[PROJETO_FINAL]
+    # Divide em sentenças preservando os delimitadores de pontuação
+    frases = re.split(r'([.!?]+)', texto)
+    partes = []
+    total_interrogacoes = texto.count('?')
+    vistas = 0
+    i = 0
+    while i < len(frases):
+        pedaco = frases[i]
+        delimitador = frases[i+1] if i + 1 < len(frases) else ""
+        i += 2
+        if '?' in delimitador:
+            vistas += 1
+            if vistas < total_interrogacoes:
+                delimitador = delimitador.replace('?', '.')
+        partes.append(pedaco + delimitador)
 
-Estrutura obrigatória dentro do [PROJETO_FINAL]:
-# PROJETO CULTURAL: [Nome do Projeto baseado na conversa]
-## Edital Alvo: [PNAB Viamão / LPG Viamão / Emenda Parlamentar / Municipal Viamão]
-## Proponente: [Nome ou Coletivo do usuário] | Viamão/RS
-
-### 1. IDENTIFICAÇÃO E RESUMO EXECUTIVO
-- **Objeto**: ...
-- **Linguagem / Segmento**: ...
-- **Público Estimado**: ...
-- **Local de Realização**: ...
-- **Período de Execução**: ...
-
-### 2. JUSTIFICATIVA E RELEVÂNCIA CULTURAL
-...
-
-### 3. OBJETIVOS E METAS
-- **Objetivo Geral**: ...
-- **Objetivos Específicos**: ...
-- **Metas Quantitativas e Qualitativas**: ...
-
-### 4. PLANO DE DEMOCRATIZAÇÃO DE ACESSO E CONTRAPARTIDA SOCIAL
-...
-
-### 5. MEDIDAS DE ACESSIBILIDADE (Lei nº 13.146/2015)
-- **Acessibilidade Física**: ...
-- **Acessibilidade Comunicacional**: ...
-- **Acessibilidade Atitudinal**: ...
-
-### 6. CRONOGRAMA DE EXECUÇÃO (Tabela em Markdown com Etapa, Ação, Período e Responsável)
-
-### 7. PLANILHA ORÇAMENTÁRIA DETALHADA (Tabela com Item, Rubrica, Unid., Qtd, Valor Unit. R$ e Total R$)
-**VALOR TOTAL DO PROJETO: R$ [Valor Global]**
-
-### 8. EQUIPE PRINCIPAL E FICHA TÉCNICA
-...
-
-### 9. PLANO DE DIVULGAÇÃO E COMUNICAÇÃO
-...
-
-### 10. CHECKLIST DE CERTIDÕES E DOCUMENTOS DE HABILITAÇÃO
-- [ ] CND Federal / PGFN
-- [ ] CND Estadual RS (Receita Estadual)
-- [ ] CND Municipal de Viamão
-- [ ] CNDT (Débitos Trabalhistas)
-- [ ] Certificado de Regularidade FGTS (se PJ)
-- [ ] Comprovante de Residência/Atuação em Viamão/RS
-- [ ] Portfólio Artístico / Comprovantes de Atuação
-"""
+    return "".join(partes).strip()
 
 
 def obter_contexto_factual_viamao(user_query: str = "") -> str:
     """
     Coleta dados factuais em tempo real das APIs públicas integradas
-    (PNAB, LPG Transferegov e Emendas) para enriquecer o contexto do Gemini.
+    (PNAB, LPG Transferegov e Emendas) sem nenhum valor numérico fixo ou fallback fictício.
     """
     context_parts = []
     user_query_lower = (user_query or "").lower()
 
     # Contexto PNAB
-    if any(k in user_query_lower for k in ["pnab", "aldir blanc", "fomento", "14.399", "projeto", "edital"]):
+    if any(k in user_query_lower for k in ["pnab", "aldir blanc", "14.399", "projeto", "edital"]):
         context_parts.append(
-            "- PNAB Viamão (Lei nº 14.399/2022): Valor Global de R$ 1.756.598,00 alocado pelo Ministério da Cultura "
-            "ao Fundo Municipal de Cultura de Viamão (Termo de Adesão 0514/2023, Conta Fiduciária Banco do Brasil 42000-X). "
-            "Destinado a fomento direto a coletivos culturais, premiações e subsídios a espaços artísticos."
+            "- PNAB Viamão (Lei nº 14.399/2022): Os valores e termos de adesão oficiais de Viamão devem ser consultados diretamente no Painel Oficial do Ministério da Cultura (MinC) integrado a esta plataforma."
         )
 
-    # Contexto LPG (Consulta Transferegov)
+    # Contexto LPG (Consulta Transferegov real)
     if any(k in user_query_lower for k in ["lpg", "paulo gustavo", "audiovisual", "195", "cinema", "vídeo"]):
         try:
             api_lpg = TransferegovApi()
             plano = api_lpg.buscar_plano_acao_lpg(cnpj="88000914000101")
-            if plano and isinstance(plano, dict):
-                v_total = plano.get("valor_total", 2029083.72)
+            if plano and isinstance(plano, dict) and plano.get("valor_total_repasse") is not None:
+                v_repasse = plano["valor_total_repasse"]
                 context_parts.append(
-                    f"- Lei Paulo Gustavo Viamão (LPG - LC nº 195/2022): Plano de Ação homologado no valor de R$ {v_total:,.2f} "
-                    "(Meta Audiovisual Art. 6º: ~R$ 1.444.301,79; Demais Áreas Culturais Art. 8º: ~R$ 584.781,93)."
+                    f"- Lei Paulo Gustavo Viamão (LPG - LC nº 195/2022): Plano de Ação Transferegov com valor total de repasse registrado de R$ {v_repasse:,.2f}."
                 )
             else:
                 context_parts.append(
-                    "- Lei Paulo Gustavo Viamão (LPG - LC nº 195/2022): Plano de Ação Transferegov de R$ 2.029.083,72 "
-                    "distribuído entre produção audiovisual, salas de cinema e demais linguagens culturais."
+                    "- Lei Paulo Gustavo Viamão (LPG - LC nº 195/2022): Informação sobre valor total de repasse não disponível no momento na consulta do Transferegov."
                 )
         except Exception as e:
-            logger.warning(f"Não foi possível extrair dados adicionais de LPG: {e}")
+            logger.warning(f"Consulta de LPG no Transferegov falhou: {e}")
             context_parts.append(
-                "- Lei Paulo Gustavo Viamão (LPG - LC nº 195/2022): R$ 2.029.083,72 alocados no município."
+                "- Lei Paulo Gustavo Viamão (LPG - LC nº 195/2022): Informação sobre valor total de repasse não disponível no momento na consulta do Transferegov."
             )
 
-    # Contexto Emendas Parlamentares
+    # Contexto Emendas Parlamentares (consulta real com filtro territorial de Viamão)
     if any(k in user_query_lower for k in ["emenda", "parlamentar", "deputad", "verba", "recurso", "orçamento"]):
-        context_parts.append(
-            "- Emendas Parlamentares em Viamão/RS: Monitoradas pelo Portal da Transparência CGU e CAGE/RS, "
-            "com repasses federais e estaduais direcionados a projetos sociais, infraestrutura comunitária e ações culturais."
-        )
+        try:
+            from backend.apis import CguEmendasApi
+            cgu = CguEmendasApi()
+            emendas = cgu.buscar_emendas_municipio(codigo_ibge="4323002", funcao="13")
+            if emendas and len(emendas) > 0:
+                total_emendas = sum(e.get("valor_pago", 0) or e.get("valor_empenhado", 0) for e in emendas)
+                context_parts.append(
+                    f"- Emendas Parlamentares para Cultura em Viamão/RS: {len(emendas)} emenda(s) monitorada(s) pela CGU para o território de Viamão na Função Cultura, somando R$ {total_emendas:,.2f}."
+                )
+            else:
+                context_parts.append(
+                    "- Emendas Parlamentares para Cultura em Viamão/RS: Nenhuma emenda específica para Cultura localizada no momento para o município no Portal da Transparência."
+                )
+        except Exception as e:
+            logger.warning(f"Consulta de emendas da CGU falhou: {e}")
 
     if not context_parts:
-        # Contexto base padrão de Viamão
         context_parts.append(
-            "- Base Territorial: Município de Viamão/RS (População ~224 mil hab., Região Metropolitana de Porto Alegre). "
-            "Políticas ativas monitoradas: PNAB (R$ 1,75M) e LPG (R$ 2,02M)."
+            "- Base Territorial: Município de Viamão/RS. Políticas culturais acompanhadas: PNAB, LPG, Emendas Parlamentares e Editais Municipais."
         )
 
     return (
-        "\n\n=== DADOS FACTUAIS AUDITADOS DE VIAMÃO/RS (Fontes: MinC, Transferegov e CGU) ===\n"
+        "\n\n=== DADOS FACTUAIS REAIS DO SISTEMA DE VIAMÃO/RS ===\n"
         + "\n".join(context_parts)
-        + "\nUtilize estes dados factuais para auxiliar no dimensionamento orçamentário e fundamentação legal do projeto quando oportuno.\n"
+        + "\nAVISO FUNDAMENTAL: Estes valores representam o montante global de recursos transferidos ao ente público municipal e NÃO indicam quanto cada projeto cultural individual pode ou deve receber. Você NÃO deve sugerir nem arbitrar valores de projetos para o proponente.\n"
     )
 
 
 def obter_contexto_factual_com_timeout(user_query: str = "", timeout: float = 2.0) -> str:
-    """Executa a coleta de contexto com limite estrito de timeout (máximo 2.0s).
-    Se exceder o prazo, segue sem contexto em vez de travar a resposta.
-    """
+    """Executa a coleta de contexto com limite estrito de timeout (máximo 2.0s)."""
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(obter_contexto_factual_viamao, user_query)
         try:
@@ -187,7 +303,64 @@ def obter_contexto_factual_com_timeout(user_query: str = "", timeout: float = 2.
             return ""
 
 
+def validar_e_extrair_resposta_estruturada(raw_text: str) -> Optional[Dict[str, Any]]:
+    """Valida se o texto retornado pelo modelo é um JSON compatível com o schema do assistente."""
+    if not raw_text or not raw_text.strip():
+        return None
+
+    limpo = raw_text.strip()
+    if limpo.startswith("```"):
+        limpo = re.sub(r"^```(?:json)?\s*", "", limpo, flags=re.IGNORECASE)
+        limpo = re.sub(r"\s*```$", "", limpo)
+        limpo = limpo.strip()
+
+    try:
+        data = json.loads(limpo)
+    except Exception:
+        match = re.search(r'\{.*\}', limpo, re.DOTALL)
+        if match:
+            try:
+                data = json.loads(match.group(0))
+            except Exception:
+                return None
+        else:
+            return None
+
+    if not isinstance(data, dict):
+        return None
+
+    if "mensagem" not in data or not isinstance(data["mensagem"], str):
+        return None
+
+    etapa = data.get("etapa_atual", 1)
+    try:
+        etapa_int = int(etapa)
+        if etapa_int < 1:
+            etapa_int = 1
+        elif etapa_int > 11:
+            etapa_int = 11
+        data["etapa_atual"] = etapa_int
+    except (ValueError, TypeError):
+        data["etapa_atual"] = 1
+
+    if "secoes_atualizadas" not in data or not isinstance(data["secoes_atualizadas"], dict):
+        data["secoes_atualizadas"] = {}
+
+    if "fontes_citadas" not in data or not isinstance(data["fontes_citadas"], list):
+        data["fontes_citadas"] = []
+
+    if "pendencias" not in data or not isinstance(data["pendencias"], list):
+        data["pendencias"] = []
+
+    data["mensagem"] = normalizar_uma_pergunta(data["mensagem"])
+    return data
+
+
 class handler(BaseHTTPRequestHandler):
+    def log_message(self, format, *args):
+        # Suprime logs padrão do BaseHTTPRequestHandler para usar o logger customizado
+        pass
+
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -203,24 +376,17 @@ class handler(BaseHTTPRequestHandler):
             "endpoint": "/api/chat",
             "status": "online",
             "metodo_esperado": "POST",
-            "payload_esperado": {
-                "messages": [
-                    {"role": "user", "content": "Quero inscrever um projeto na PNAB em Viamão"}
-                ]
-            }
+            "etapas_suportadas": len(ROTEIRO_ETAPAS),
+            "regras": [
+                "Uma pergunta por mensagem",
+                "Sem valores inventados",
+                "Sem cache em memória (privacidade LGPD)"
+            ]
         }
-        payload = json.dumps(status_info, ensure_ascii=False, indent=2).encode("utf-8")
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Cache-Control", "no-store")
-        self.send_header("Content-Length", str(len(payload)))
-        self.end_headers()
-        self.wfile.write(payload)
+        self.send_json_response(200, status_info)
 
     def do_POST(self):
         start_time = time.time()
-        # Prazos configuráveis via variáveis de ambiente
         try:
             deadline_seconds = float(os.environ.get("CHAT_DEADLINE_SECONDS", "55"))
         except (ValueError, TypeError):
@@ -255,27 +421,36 @@ class handler(BaseHTTPRequestHandler):
                 })
                 return
 
-            # Verificação de Cache por Hash das mensagens
-            prompt_hash = hashlib.sha256(json.dumps(messages, sort_keys=True).encode("utf-8")).hexdigest()
-            cache_key = f"chat_gemini:{prompt_hash}"
-            cached_text = cache.get(cache_key)
+            # NOTA DE PRIVACIDADE LGPD: Cache de respostas foi desativado propositalmente,
+            # pois cada conversa contém dados autorais e específicos do projeto da pessoa.
 
-            if cached_text:
-                self.send_json_response(200, {
-                    "success": True,
-                    "text": cached_text,
-                    "cached": True
-                })
-                return
-
-            # Extração de contexto de todas as mensagens do usuário (com timeout estrito de 2s)
+            # Coleta textos do usuário para contextualização factual e conhecimento oficial
             user_texts = [m.get("content", "") for m in messages if m.get("role") == "user"]
             combined_user_text = " ".join(user_texts)
+
+            politica_identificada = identificar_politica(combined_user_text)
+
+            # Estima a etapa atual com base no histórico
+            etapa_estimada = 1
+            if len(user_texts) >= 1:
+                etapa_estimada = min(11, len(user_texts) + 1)
+
+            contexto_conhecimento = extrair_contexto_conhecimento(
+                politica=politica_identificada,
+                etapa_atual=etapa_estimada,
+                user_query=combined_user_text,
+                limite_total_caracteres=18000
+            )
+
             contexto_factual = obter_contexto_factual_com_timeout(combined_user_text, timeout=2.0)
 
-            system_instruction_completa = CULTURAL_SYSTEM_PROMPT + contexto_factual
+            system_instruction_completa = (
+                CULTURAL_SYSTEM_PROMPT
+                + contexto_conhecimento
+                + contexto_factual
+            )
 
-            # Formatação dos conteúdos para a API Gemini REST
+            # Formatação para REST da API Gemini
             formatted_contents = []
             for m in messages:
                 role = m.get("role")
@@ -289,36 +464,20 @@ class handler(BaseHTTPRequestHandler):
             if not formatted_contents:
                 formatted_contents = [{"role": "user", "parts": [{"text": "Olá!"}]}]
 
-            # Calibração do nível de raciocínio (thinkingConfig):
-            # 'low' em mensagens normais; 'medium' somente quando solicitado consolidação do projeto final
-            last_user_content = ""
-            for m in reversed(messages):
-                if m.get("role") == "user":
-                    last_user_content = m.get("content", "").lower()
-                    break
-
-            is_consolidation_request = any(term in last_user_content for term in [
-                "consolidar projeto",
-                "projeto final",
-                "[projeto_final]",
-                "estruturar projeto final",
-                "gerar projeto final"
-            ])
-            thinking_level = "medium" if is_consolidation_request else "low"
-
+            # Payload estruturado com JSON obrigatório
             req_payload = {
                 "systemInstruction": {
                     "parts": [{"text": system_instruction_completa}]
                 },
                 "contents": formatted_contents,
                 "generationConfig": {
+                    "responseMimeType": "application/json",
                     "thinkingConfig": {
-                        "thinkingLevel": thinking_level
+                        "thinkingLevel": "low"
                     }
                 }
             }
 
-            # Modelos Gemini 3.x em disponibilidade geral com suporte oficial ativo
             candidate_models = [
                 "gemini-3.6-flash",
                 "gemini-3.5-flash",
@@ -328,7 +487,8 @@ class handler(BaseHTTPRequestHandler):
             models_to_try = list(candidate_models)
             tried_models = set()
 
-            response_text = ""
+            valid_structured_data: Optional[Dict[str, Any]] = None
+            raw_response_text = ""
             model_attempts = []
 
             while models_to_try:
@@ -349,11 +509,9 @@ class handler(BaseHTTPRequestHandler):
                     })
                     break
 
-                # Timeout específico para cada tentativa respeitando o saldo restante e o teto por tentativa
                 attempt_timeout = max(0.5, min(time_left, attempt_cap_seconds))
 
                 try:
-                    # Chave enviada via cabeçalho x-goog-api-key, sem expor na URL
                     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
                     data_bytes = json.dumps(req_payload).encode("utf-8")
                     req = urllib.request.Request(
@@ -374,9 +532,12 @@ class handler(BaseHTTPRequestHandler):
                             if candidates and len(candidates) > 0:
                                 parts = candidates[0].get("content", {}).get("parts", [])
                                 if parts and len(parts) > 0:
-                                    response_text = parts[0].get("text", "")
-                                    if response_text:
+                                    raw_response_text = parts[0].get("text", "")
+                                    valid_structured_data = validar_e_extrair_resposta_estruturada(raw_response_text)
+                                    if valid_structured_data:
                                         break
+                                    else:
+                                        logger.warning(f"Modelo {model_name} retornou texto não compatível com o schema JSON; tentando próximo modelo.")
                 except urllib.error.HTTPError as http_err:
                     error_body = ""
                     try:
@@ -408,7 +569,6 @@ class handler(BaseHTTPRequestHandler):
                     logger.warning(f"Failover Gemini ({model_name}): {error_str}")
 
                     if is_timeout:
-                        # Se uma tentativa estourar o teto, a próxima prioriza o modelo mais rápido da lista (lite)
                         lite_models = [m for m in models_to_try if "lite" in m and m not in tried_models]
                         other_models = [m for m in models_to_try if "lite" not in m and m not in tried_models]
                         models_to_try = lite_models + other_models
@@ -421,7 +581,17 @@ class handler(BaseHTTPRequestHandler):
                     })
                     logger.warning(f"Failover Gemini ({model_name}): {error_str}")
 
-            if not response_text:
+            if not valid_structured_data:
+                # Se obtivemos texto mas falhou validação JSON após tentativas, retorna erro claro sem inventar conteúdo
+                if raw_response_text and not valid_structured_data:
+                    logger.error("Resposta do modelo não atendeu ao schema estruturado exigido.")
+                    self.send_json_response(200, {
+                        "success": False,
+                        "error": "A resposta do modelo de inteligência artificial não atendeu ao formato estruturado exigido pelo sistema.",
+                        "code": "INVALID_STRUCTURED_RESPONSE"
+                    })
+                    return
+
                 logger.error("Todos os modelos Gemini falharam ou tempo limite foi atingido.")
                 self.send_json_response(200, {
                     "success": False,
@@ -431,12 +601,11 @@ class handler(BaseHTTPRequestHandler):
                 })
                 return
 
-            # Armazena em cache por 30 minutos (1800s)
-            cache.set(cache_key, response_text, ttl_seconds=1800)
-
+            # Garante formato consistente de retorno estruturado e compatibilidade com campo text
             self.send_json_response(200, {
                 "success": True,
-                "text": response_text
+                "data": valid_structured_data,
+                "text": valid_structured_data.get("mensagem", "")
             })
 
         except Exception as e:

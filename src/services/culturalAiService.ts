@@ -1,137 +1,179 @@
+/**
+ * =============================================================================
+ * CULTURA TRANSPARENTE - SERVIÇO DE IA PARA PROJETOS CULTURAIS
+ * Módulo: src/services/culturalAiService.ts
+ * =============================================================================
+ * Comunica com o endpoint /api/chat que conduz o proponente pelas 11 etapas
+ * oficiais da elaboração de projetos culturais, com base exclusivamente em
+ * documentos legais e dados reais do sistema, sem valores inventados.
+ */
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
-  isProjectFinal?: boolean;
+  etapaAtual?: number;
+  secoesAtualizadas?: Record<string, string>;
+  fontesCitadas?: Array<{ documento: string; trecho: string }>;
+  pendencias?: string[];
+  isError?: boolean;
 }
 
-export const CULTURAL_CONSULTANT_SYSTEM_PROMPT = `
-Você é o Consultor Especialista de Elaboração de Projetos Culturais da plataforma Cultura Transparente de Viamão/RS.
-Sua missão é atuar como um consultor sênior em gestão cultural e elaboração técnica de propostas para editais públicos e instrumentos de fomento:
-- Política Nacional Aldir Blanc (PNAB - Lei nº 14.399/2022)
-- Lei Paulo Gustavo (LPG - Lei Complementar nº 195/2022)
-- Emendas Parlamentares Federais e Estaduais destinadas a Viamão/RS
-- Editais Municipais da Secretaria de Cultura de Viamão e Região Metropolitana.
+export interface EtapaConfig {
+  etapa: number;
+  chave: string;
+  nome: string;
+  descricao: string;
+  perguntaPadrao: string;
+  sugestoes: string[];
+}
 
-DIRETRIZES DE ATUAÇÃO E METODOLOGIA ITERATIVA:
-1. Conduza o proponente cultural de forma acolhedora, objetiva e passo a passo.
-2. Não faça todas as perguntas de uma vez. Faça perguntas em blocos curtos (1 ou 2 por vez) para coletar:
-   - OBJETO & LOCAL: Qual a ideia do projeto? Formato (oficina, show, peça, mostra, audiovisual, livro, festival)? Onde será realizado em Viamão/RS? Público-alvo estimado?
-   - JUSTIFICATIVA: Qual a relevância artística, comunitária e impacto cultural para o município?
-   - ACESSIBILIDADE & DEMOCRATIZAÇÃO:
-     * Acessibilidade física/arquitetônica (rampas, sanitários adaptados, assentos)
-     * Acessibilidade comunicacional (Libras, audiodescrição, material ampliado/braile)
-     * Democratização (gratuidade total ou ingressos populares, contrapartida social em escolas ou comunidades periféricas)
-   - METAS E CRONOGRAMA: Quantidade de ações/produtos, etapas (Pré-produção, Produção, Pós-produção e Prestação de contas)
-   - ORÇAMENTO ESTIMADO: Rubricas principais (cachês artísticos, técnicos, logística, acessibilidade, divulgação) com valores aproximados e compatíveis com os tetos dos editais.
-   - REGULARIDADE FISCAL: Lembre o usuário das certidões obrigatórias (CND Federal, Estadual RS, Municipal de Viamão, CNDT e FGTS para PJ).
-
-GATILHO DE CONSOLIDAÇÃO DO PROJETO FINAL:
-Quando o usuário disser que terminou, solicitar a consolidação ("terminei", "finalizar", "gerar projeto", "consolidar", "exportar", "concluir") ou após responder aos pontos essenciais:
-Você DEVE gerar o projeto cultural completo, estruturado e formal em Markdown, INICIANDO OBRIGATORIAMENTE COM A TAG:
-[PROJETO_FINAL]
-
-Estrutura obrigatória dentro do [PROJETO_FINAL]:
-# PROJETO CULTURAL: [Nome do Projeto]
-## Edital Alvo: [PNAB Viamão / LPG Viamão / Emenda Parlamentar / Municipal Viamão]
-## Proponente: [Nome ou Coletivo Cultural] | Viamão/RS
-
-### 1. IDENTIFICAÇÃO E RESUMO EXECUTIVO
-- **Objeto**: ...
-- **Linguagem / Segmento**: ...
-- **Público Estimado**: ...
-- **Local de Realização**: ...
-- **Período de Execução**: ...
-
-### 2. JUSTIFICATIVA E RELEVÂNCIA CULTURAL
-...
-
-### 3. OBJETIVOS E METAS
-- **Objetivo Geral**: ...
-- **Objetivos Específicos**: ...
-- **Metas Quantitativas e Qualitativas**: ...
-
-### 4. PLANO DE DEMOCRATIZAÇÃO DE ACESSO E CONTRAPARTIDA SOCIAL
-...
-
-### 5. MEDIDAS DE ACESSIBILIDADE (Lei nº 13.146/2015)
-- **Acessibilidade Física**: ...
-- **Acessibilidade Comunicacional**: ...
-- **Acessibilidade Atitudinal**: ...
-
-### 6. CRONOGRAMA DE EXECUÇÃO
-| Etapa | Atividade / Ação | Período / Mês | Responsável |
-|---|---|---|---|
-...
-
-### 7. PLANILHA ORÇAMENTÁRIA DETALHADA
-| Item | Descrição da Rubrica | Unid. | Qtd | Valor Unit. (R$) | Valor Total (R$) |
-|---|---|---|---|---|---|
-...
-**VALOR TOTAL DO PROJETO: R$ [Valor Global]**
-
-### 8. EQUIPE PRINCIPAL E FICHA TÉCNICA
-...
-
-### 9. PLANO DE DIVULGAÇÃO E COMUNICAÇÃO
-...
-
-### 10. CHECKLIST DE CERTIDÕES E DOCUMENTOS DE HABILITAÇÃO
-- [ ] CND Federal / PGFN
-- [ ] CND Estadual RS (Receita Estadual)
-- [ ] CND Municipal de Viamão
-- [ ] CNDT (Débitos Trabalhistas)
-- [ ] Certificado de Regularidade FGTS (se PJ)
-- [ ] Comprovante de Residência em Viamão/RS
-- [ ] Portfólio Artístico / Currículo Comprovado
-- [ ] Cartas de Anuência e Cessão de Direitos
-`;
-
-export const PROJETOS_EXEMPLO = [
+export const ROTEIRO_ETAPAS: EtapaConfig[] = [
   {
-    titulo: 'Oficinas de Hip-Hop e Rima Periférica',
-    edital: 'PNAB Viamão - Fomento Direto',
-    segmento: 'Cultura Urbana / Música',
-    orcamento: 'R$ 25.000,00',
-    promptInicial: 'Quero inscrever um projeto no edital da PNAB em Viamão para realizar 8 oficinas gratuitas de Hip-Hop, rima e composição para jovens na Vila Elza e Santa Isabel, com uma batalha final aberta ao público.',
+    etapa: 1,
+    chave: 'edital_politica',
+    nome: 'Edital ou Política',
+    descricao: 'Escolha do instrumento: PNAB, LPG, Emendas ou Edital Municipal',
+    perguntaPadrao: 'Para qual edital ou política cultural você deseja preparar seu projeto (PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão)?',
+    sugestoes: ['PNAB Viamão (Lei 14.399/2022)', 'Lei Paulo Gustavo (LPG)', 'Emenda Parlamentar', 'Edital Municipal de Viamão'],
   },
   {
-    titulo: 'Documentário e Memória Viva das Comunidades Tradicionais',
-    edital: 'LPG Viamão - Audiovisual',
-    segmento: 'Audiovisual / Patrimônio Imaterial',
-    orcamento: 'R$ 40.000,00',
-    promptInicial: 'Preciso estruturar uma proposta audiovisual para edital da Lei Paulo Gustavo em Viamão para gravar um minidocumentário sobre mestres da cultura popular e memórias de Itapuã e Águas Claras com audiodescrição e Libras.',
+    etapa: 2,
+    chave: 'ideia_projeto',
+    nome: 'Ideia do Projeto',
+    descricao: 'Ideia central e formato da proposta artística',
+    perguntaPadrao: 'Qual é a ideia central do seu projeto cultural em poucas palavras?',
+    sugestoes: ['Oficinas de música e hip-hop', 'Mostra audiovisual comunitária', 'Circulação teatral em escolas', 'Exposição fotográfica e memória'],
   },
   {
-    titulo: 'Circulação Teatral nas Escolas Públicas',
-    edital: 'PNAB Viamão - Difusão e Circulação',
-    segmento: 'Teatro / Artes Cênicas',
-    orcamento: 'R$ 30.000,00',
-    promptInicial: 'Gostaria de montar uma proposta para circular um espetáculo teatral infantojuvenil sobre educação ambiental por 6 escolas municipais de Viamão com audiodescrição e material didático acessível.',
+    etapa: 3,
+    chave: 'tipo_proponente',
+    nome: 'Tipo de Proponente',
+    descricao: 'Pessoa física, coletivo informal, MEI ou organização/associação',
+    perguntaPadrao: 'Você vai inscrever o projeto como pessoa física, coletivo sem CNPJ, MEI ou organização/associação?',
+    sugestoes: ['Pessoa Física', 'Coletivo Cultural (sem CNPJ)', 'MEI Cultural', 'Associação / OSC (com CNPJ)'],
   },
   {
-    titulo: 'Mostra Fotográfica & Painéis Táteis de Viamão',
-    edital: 'PNAB Viamão - Memória e Patrimônio',
-    segmento: 'Artes Visuais / Fotografia',
-    orcamento: 'R$ 20.000,00',
-    promptInicial: 'Quero propor uma exposição fotográfica e catálogo digital sobre patrimônio histórico de Viamão, com painéis táteis para pessoas com deficiência visual e oficinas práticas para a comunidade escolar.',
+    etapa: 4,
+    chave: 'objetivo_principal',
+    nome: 'Objetivo Principal',
+    descricao: 'Objetivo geral e impacto cultural para a comunidade',
+    perguntaPadrao: 'Qual é o objetivo principal que o seu projeto quer alcançar em Viamão?',
+    sugestoes: ['Capacitar jovens em linguagens artísticas', 'Difundir a cultura popular nas periferias', 'Preservar a memória histórica local'],
+  },
+  {
+    etapa: 5,
+    chave: 'publico_territorio',
+    nome: 'Público e Território',
+    descricao: 'Público-alvo prioritário e território de Viamão',
+    perguntaPadrao: 'Quem é o público-alvo prioritário e em qual bairro ou região de Viamão a ação será realizada?',
+    sugestoes: ['Vila Santa Isabel', 'Vila Elza / Tarumã', 'Itapuã / Zona Rural', 'Centro de Viamão'],
+  },
+  {
+    etapa: 6,
+    chave: 'atividades_metodologia',
+    nome: 'Atividades e Execução',
+    descricao: 'Atividades práticas e metodologia de trabalho',
+    perguntaPadrao: 'Quais são as principais atividades do projeto e como elas serão realizadas na prática?',
+    sugestoes: ['Oficinas práticas semanais', 'Ensaios e apresentação aberta', 'Gravação, edição e exibição'],
+  },
+  {
+    etapa: 7,
+    chave: 'acessibilidade',
+    nome: 'Medidas de Acessibilidade',
+    descricao: 'Acessibilidade física, comunicacional (Libras/Audiodescrição) e atitudinal',
+    perguntaPadrao: 'Quais medidas de acessibilidade física ou comunicacional (como Libras ou audiodescrição) serão adotadas no projeto?',
+    sugestoes: ['Intérprete de Libras nas apresentações', 'Audiodescrição das peças e mostras', 'Local térreo com rampa e sanitário adaptado'],
+  },
+  {
+    etapa: 8,
+    chave: 'contrapartida_social',
+    nome: 'Contrapartida Social',
+    descricao: 'Ação gratuita de retorno social para a comunidade',
+    perguntaPadrao: 'Qual será a contrapartida social gratuita oferecida pelo projeto à comunidade de Viamão?',
+    sugestoes: ['Apresentação gratuita em praça pública', 'Oficina gratuita em escola municipal', 'Distribuição gratuita de catálogos/livros'],
+  },
+  {
+    etapa: 9,
+    chave: 'cronograma',
+    nome: 'Cronograma',
+    descricao: 'Fases de pré-produção, produção e pós-produção',
+    perguntaPadrao: 'Em quantos meses você planeja executar o projeto e quais os prazos das principais fases?',
+    sugestoes: ['Execução em 3 meses', 'Execução em 6 meses', 'Fase 1: Preparação (Mês 1) • Fase 2: Ações (Mês 2-3)'],
+  },
+  {
+    etapa: 10,
+    chave: 'orcamento',
+    nome: 'Orçamento',
+    descricao: 'Itens de custo e valores estimados informados pelo proponente',
+    perguntaPadrao: 'Quais são os principais itens de custo do seu projeto e quais os valores estimados para cada um?',
+    sugestoes: ['Cachês de artistas e oficineiros', 'Locação de som, iluminação e espaço', 'Despesas com acessibilidade e divulgação'],
+  },
+  {
+    etapa: 11,
+    chave: 'revisao_final',
+    nome: 'Revisão Final',
+    descricao: 'Revisão consolidada e conferência para exportação',
+    perguntaPadrao: 'Você deseja fazer algum ajuste no texto do seu projeto antes de gerar o documento final para download?',
+    sugestoes: ['Tudo certo, quero baixar o documento .docx', 'Quero ajustar o orçamento', 'Quero revisar as medidas de acessibilidade'],
   },
 ];
 
-interface ModelAttempt {
-  model?: string;
-  status?: number;
-  error?: string;
+export interface ExemploTema {
+  titulo: string;
+  editalSugerido: string;
+  segmento: string;
+  ideiaInicial: string;
+}
+
+/**
+ * Exemplos temáticos de propostas sem valores fixos arbitrários,
+ * em total conformidade com o princípio de que o orçamento é definido pelo proponente.
+ */
+export const PROJETOS_EXEMPLO: ExemploTema[] = [
+  {
+    titulo: 'Oficinas de Hip-Hop e Rima Periférica',
+    editalSugerido: 'PNAB Viamão',
+    segmento: 'Cultura Urbana / Música',
+    ideiaInicial: 'Realização de ciclo de oficinas de rima, produção musical e poesia falada para jovens, culminando em uma mostra artística aberta à comunidade.',
+  },
+  {
+    titulo: 'Documentário e Memória das Comunidades Tradicionais',
+    editalSugerido: 'LPG Viamão (Audiovisual)',
+    segmento: 'Audiovisual / Patrimônio Imaterial',
+    ideiaInicial: 'Gravação de minidocumentário sobre memórias orais, mestres da cultura popular e tradições de Viamão, com audiodescrição e tradução em Libras.',
+  },
+  {
+    titulo: 'Circulação Teatral nas Escolas Públicas',
+    editalSugerido: 'PNAB Viamão',
+    segmento: 'Teatro / Artes Cênicas',
+    ideiaInicial: 'Circulação de espetáculo teatral infantojuvenil em escolas municipais de Viamão, com debate pedagógico e material didático acessível.',
+  },
+  {
+    titulo: 'Mostra Fotográfica & Painéis Táteis',
+    editalSugerido: 'Edital Municipal / PNAB',
+    segmento: 'Artes Visuais / Patrimônio',
+    ideiaInicial: 'Exposição fotográfica retratando o patrimônio histórico e ambiental de Viamão, com painéis em relevo para pessoas cegas e visitas guiadas.',
+  },
+];
+
+export interface AssistantTurnResult {
+  text: string;
+  etapaAtual: number;
+  secoesAtualizadas: Record<string, string>;
+  fontesCitadas: Array<{ documento: string; trecho: string }>;
+  pendencias: string[];
+  isError?: boolean;
 }
 
 export function translateAiFailure(data: {
   code?: string;
   error?: string;
-  details?: Array<ModelAttempt> | string;
+  details?: Array<{ model?: string; status?: number; error?: string }> | string;
 }): string {
   if (data.code === 'MISSING_GEMINI_API_KEY') {
-    return 'A chave de inteligência artificial (GEMINI_API_KEY) não está configurada no ambiente de produção. Por favor, configure a variável de ambiente para habilitar o assistente.';
+    return 'A chave de inteligência artificial (GEMINI_API_KEY) não está configurada no ambiente. Configure a variável de ambiente para habilitar o assistente.';
   }
 
   const details = data.details;
@@ -154,22 +196,9 @@ export function translateAiFailure(data: {
         isTimeout = true;
       }
     }
-  } else if (typeof details === 'string') {
-    const matches = details.match(/\b(400|403|404|408|429|500|503)\b/g);
-    if (matches) {
-      matches.forEach(m => statuses.push(Number(m)));
-    }
-    if (
-      details.toLowerCase().includes('timeout') ||
-      details.toLowerCase().includes('timed out') ||
-      details.toLowerCase().includes('tempo limite')
-    ) {
-      isTimeout = true;
-    }
   }
 
-  // Priorização dos motivos reais de falha conforme especificação
-  if (data.code === 'AI_PROCESS_TIMEOUT') {
+  if (data.code === 'AI_PROCESS_TIMEOUT' || isTimeout || statuses.includes(408)) {
     return 'a IA demorou demais para responder';
   }
   if (statuses.includes(429)) {
@@ -181,21 +210,15 @@ export function translateAiFailure(data: {
   if (statuses.includes(404)) {
     return 'modelo de IA descontinuado';
   }
-  if (isTimeout || statuses.includes(408)) {
-    return 'a IA demorou demais para responder';
-  }
 
-  // Mensagem genérica quando não houver código identificável
-  const fallback = data.error || 'Os servidores de inteligência artificial estão temporariamente indisponíveis. Por favor, tente novamente em alguns instantes.';
-  // Garante que nenhuma chave seja vazada
-  return fallback.replace(/AIza[0-9A-Za-z-_]{35}/g, '[CHAVE_OCULTA]').replace(/key=[^&\s"']+/g, 'key=[CHAVE_OCULTA]');
+  return data.error || 'Os servidores de inteligência artificial estão temporariamente indisponíveis. Por favor, tente novamente em alguns instantes.';
 }
 
 export async function sendMessageToAssistant(
   messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>
-): Promise<{ text: string; hasFinalProject: boolean; finalProjectMarkdown?: string; isError?: boolean }> {
+): Promise<AssistantTurnResult> {
   const abortController = new AbortController();
-  const timeoutId = setTimeout(() => abortController.abort(), 70000); // 70s no navegador (acima dos 65s do processo)
+  const timeoutId = setTimeout(() => abortController.abort(), 70000);
 
   try {
     const res = await fetch('/api/chat', {
@@ -207,28 +230,42 @@ export async function sendMessageToAssistant(
     clearTimeout(timeoutId);
 
     if (res.ok) {
-      const data = await res.json();
-      const rawText = data.text || '';
-      if (data.success && rawText.trim().length > 0) {
-        return parseAssistantResponse(rawText);
-      }
-      if (!data.success) {
-        const errorMsg = translateAiFailure(data);
+      const json = await res.json();
+      if (json.success && json.data) {
+        const d = json.data;
         return {
-          text: `⚠️ **Aviso do Assistente de IA:** ${errorMsg}`,
-          hasFinalProject: false,
+          text: d.mensagem || json.text || '',
+          etapaAtual: typeof d.etapa_atual === 'number' ? d.etapa_atual : 1,
+          secoesAtualizadas: d.secoes_atualizadas || {},
+          fontesCitadas: d.fontes_citadas || [],
+          pendencias: d.pendencias || [],
+          isError: false,
+        };
+      }
+
+      if (!json.success) {
+        const errorMsg = translateAiFailure(json);
+        return {
+          text: `⚠️ **Aviso do Consultor de Projetos:** ${errorMsg}`,
+          etapaAtual: 1,
+          secoesAtualizadas: {},
+          fontesCitadas: [],
+          pendencias: [],
           isError: true,
         };
       }
     } else {
-      let errText = 'Os servidores de inteligência artificial estão temporariamente indisponíveis.';
+      let errText = 'Servidor de IA indisponível.';
       try {
         const errJson = await res.json();
         errText = translateAiFailure(errJson);
       } catch {}
       return {
         text: `⚠️ **Erro na comunicação com a IA:** ${errText}`,
-        hasFinalProject: false,
+        etapaAtual: 1,
+        secoesAtualizadas: {},
+        fontesCitadas: [],
+        pendencias: [],
         isError: true,
       };
     }
@@ -236,45 +273,30 @@ export async function sendMessageToAssistant(
     clearTimeout(timeoutId);
     if (err?.name === 'AbortError') {
       return {
-        text: '⚠️ **Aviso do Assistente de IA:** a IA demorou demais para responder',
-        hasFinalProject: false,
+        text: '⚠️ **Aviso do Consultor de Projetos:** a IA demorou demais para responder',
+        etapaAtual: 1,
+        secoesAtualizadas: {},
+        fontesCitadas: [],
+        pendencias: [],
         isError: true,
       };
     }
     return {
-      text: '⚠️ **Indisponibilidade de Conexão:** Não foi possível conectar ao assistente de IA no momento. Por favor, verifique sua conexão ou tente novamente.',
-      hasFinalProject: false,
+      text: '⚠️ **Indisponibilidade de Conexão:** Não foi possível conectar ao consultor no momento. Por favor, verifique sua conexão ou tente novamente.',
+      etapaAtual: 1,
+      secoesAtualizadas: {},
+      fontesCitadas: [],
+      pendencias: [],
       isError: true,
     };
   }
 
   return {
-    text: '⚠️ O assistente de IA não pôde gerar uma resposta no momento. Por favor, tente novamente.',
-    hasFinalProject: false,
+    text: '⚠️ O assistente de IA não pôde gerar uma resposta no momento.',
+    etapaAtual: 1,
+    secoesAtualizadas: {},
+    fontesCitadas: [],
+    pendencias: [],
     isError: true,
   };
 }
-
-export function parseAssistantResponse(rawText: string): {
-  text: string;
-  hasFinalProject: boolean;
-  finalProjectMarkdown?: string;
-} {
-  const tag = '[PROJETO_FINAL]';
-  if (rawText.includes(tag)) {
-    const parts = rawText.split(tag);
-    const chatText = parts[0].trim();
-    const finalProjectMarkdown = parts[1].trim();
-    return {
-      text: chatText || '🎉 Seu projeto cultural foi estruturado e consolidado com sucesso! Confira na aba ao lado os detalhes formatados e baixe em PDF.',
-      hasFinalProject: true,
-      finalProjectMarkdown,
-    };
-  }
-
-  return {
-    text: rawText,
-    hasFinalProject: false,
-  };
-}
-

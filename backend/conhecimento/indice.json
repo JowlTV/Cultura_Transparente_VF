@@ -1,0 +1,90 @@
+[
+  {
+    "id": "lei_14399_2022_pnab",
+    "arquivo": "lei_14399_2022_pnab.txt",
+    "titulo": "Lei nº 14.399, de 8 de julho de 2022 (Política Nacional Aldir Blanc de Fomento à Cultura - PNAB)",
+    "tipo": "lei",
+    "politica": "PNAB",
+    "data": "2022-07-08",
+    "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14399.htm",
+    "data_coleta": "2026-09-21",
+    "status": "disponivel"
+  },
+  {
+    "id": "decreto_11740_2023_pnab",
+    "arquivo": "decreto_11740_2023_pnab.txt",
+    "titulo": "Decreto nº 11.740, de 18 de outubro de 2023 (Regulamenta a Lei nº 14.399/2022 - PNAB)",
+    "tipo": "decreto",
+    "politica": "PNAB",
+    "data": "2023-10-18",
+    "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11740.htm",
+    "data_coleta": "2026-09-21",
+    "status": "disponivel"
+  },
+  {
+    "id": "lc_195_2022_lpg",
+    "arquivo": "lc_195_2022_lpg.txt",
+    "titulo": "Lei Complementar nº 195, de 8 de julho de 2022 (Lei Paulo Gustavo - LPG)",
+    "tipo": "lei",
+    "politica": "LPG",
+    "data": "2022-07-08",
+    "url_oficial": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp195.htm",
+    "data_coleta": "2026-09-21",
+    "status": "disponivel"
+  },
+  {
+    "id": "decreto_11525_2023_lpg",
+    "arquivo": "decreto_11525_2023_lpg.txt",
+    "titulo": "Decreto nº 11.525, de 11 de maio de 2023 (Regulamenta a Lei Complementar nº 195/2022 - LPG)",
+    "tipo": "decreto",
+    "politica": "LPG",
+    "data": "2023-05-11",
+    "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11525.htm",
+    "data_coleta": "2026-09-21",
+    "status": "disponivel"
+  },
+  {
+    "id": "lei_14903_2024_marco_fomento",
+    "arquivo": "lei_14903_2024_marco_fomento.txt",
+    "titulo": "Lei nº 14.903, de 27 de junho de 2024 (Marco Regulatório do Fomento à Cultura)",
+    "tipo": "lei",
+    "politica": "Fomento Cultural",
+    "data": "2024-06-27",
+    "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/lei/l14903.htm",
+    "data_coleta": "2026-09-21",
+    "status": "disponivel"
+  },
+  {
+    "id": "lei_13019_2014_mrosc_fomento",
+    "arquivo": "lei_13019_2014_mrosc_fomento.txt",
+    "titulo": "Lei nº 13.019, de 31 de julho de 2014 (MROSC - Marco Regulatório das Organizações da Sociedade Civil - Trechos sobre Termo de Fomento e Parcerias)",
+    "tipo": "lei",
+    "politica": "Emendas / Parcerias MROSC",
+    "data": "2014-07-31",
+    "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l13019.htm",
+    "data_coleta": "2026-09-21",
+    "status": "disponivel"
+  },
+  {
+    "id": "edital_pnab_viamao_vigente",
+    "arquivo": "edital_pnab_viamao_vigente.txt",
+    "titulo": "Edital(is) PNAB Viamão/RS em vigência",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2024-01-01",
+    "url_oficial": "https://www.viamao.rs.gov.br/pagina/editais-de-cultura",
+    "data_coleta": "2026-09-21",
+    "status": "pendente_adicao_manual"
+  },
+  {
+    "id": "editais_municipais_viamao_vigentes",
+    "arquivo": "editais_municipais_viamao_vigentes.txt",
+    "titulo": "Editais e Chamadas Públicas Municipais da Secretaria de Cultura de Viamão/RS",
+    "tipo": "edital",
+    "politica": "Edital Municipal",
+    "data": "2024-01-01",
+    "url_oficial": "https://www.viamao.rs.gov.br/noticias?categoria=cultura",
+    "data_coleta": "2026-09-21",
+    "status": "pendente_adicao_manual"
+  }
+]

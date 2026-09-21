@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Pause, Play, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play, ExternalLink } from './Icon';
 
 export interface MincNewsItem {
   id: string;

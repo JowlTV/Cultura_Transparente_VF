@@ -9,7 +9,7 @@ import {
   Cpu,
   Download,
   ShieldCheck,
-} from 'lucide-react';
+} from './Icon';
 import { API_DOCUMENTATION } from '../data/initialData';
 import { ApiEndpointDoc } from '../types/culture';
 

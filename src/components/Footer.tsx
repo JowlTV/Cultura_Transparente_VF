@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from './Icon';
 import { CultCircuitoLogo } from './CultCircuitoLogo';
 
 export const Footer: React.FC = () => {

@@ -24,7 +24,7 @@ import {
   Calendar,
   Building2,
   Download,
-} from 'lucide-react';
+} from './Icon';
 import { Emenda } from '../types/culture';
 import { formatBRL } from '../utils/formatters';
 import { BUDGET_CHRONOLOGY } from '../data/initialData';

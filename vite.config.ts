@@ -20,12 +20,12 @@ const STATIC_PNAB_PAYLOAD = JSON.stringify({
   success: true,
   data: {
     id: 'pnab-viamao-01',
-    termo_adesao: '0514/2023',
+    termo_adesao: 'Consulte Painel Oficial MinC',
     municipio: 'Viamão',
     uf: 'RS',
     cnpj_proponente: '88.000.914/0001-01',
-    valor_global: 1756598.00,
-    banco_custodia: 'Banco do Brasil - Conta Fiduciária 42000-X',
+    valor_global: null,
+    banco_custodia: 'Consulte Painel Oficial MinC',
     fonte_auditada: 'Transferegov.br / MinC',
     status_etapa: 'Fase de Elaboração e Publicação de Editais',
     data_extracao: new Date().toISOString()
@@ -437,7 +437,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          lucide: ['lucide-react'],
         },
       },
     },

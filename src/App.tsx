@@ -21,7 +21,7 @@ import {
 import { Emenda, NewsItem, LpgPlanoAcao } from './types/culture';
 import { apiClient } from './services/apiClient';
 import { sortNewsByDateDesc } from './utils/formatters';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from './components/Icon';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('visao-geral');

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, AlertTriangle, AlertCircle, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, AlertCircle, Copy, Check, ChevronDown, ChevronUp } from './Icon';
 import { validateCNPJ, OFFICIAL_VIAMAO_CNPJ } from '../utils/institutionalValidation';
 
 interface InstitutionalValidationBadgeProps {
