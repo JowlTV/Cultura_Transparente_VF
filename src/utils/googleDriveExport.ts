@@ -7,9 +7,16 @@
  * com o escopo não-sensível 'https://www.googleapis.com/auth/drive.file'.
  * Cria o arquivo via Drive API com conversão automática para Google Docs nativo.
  * O token permanece estritamente em memória durante a sessão.
+ * Suporta o formato padrão (11 seções) e Lei Rouanet (12 seções com conferência de regras).
  */
 
-import { ProjectDraftSections } from './docxExport';
+import {
+  ProjectDraftSections,
+  SECTION_METADATA_PADRAO,
+  SECTION_METADATA_ROUANET,
+  isRouanetPolicy,
+  ConferenciaRegrasResult,
+} from './docxExport';
 
 declare global {
   interface Window {
@@ -41,38 +48,33 @@ export function isGoogleDriveConfigured(): boolean {
 export function convertProjectToHtml(
   title: string,
   sections: ProjectDraftSections,
-  fontesCitadas?: Array<{ documento: string; trecho: string }>
+  fontesCitadas?: Array<{ documento: string; trecho: string }>,
+  politica?: string,
+  conferenciaRegras?: ConferenciaRegrasResult
 ): string {
+  const isRouanet = isRouanetPolicy(sections, politica);
   const dataHoje = new Date().toLocaleDateString('pt-BR');
-  const edital = sections.edital_politica || 'Instrumento a Definir';
-  const proponente = sections.tipo_proponente || '[Proponente / Coletivo]';
-  const territorio = sections.publico_territorio || 'Viamão/RS';
+  const edital = sections.edital_politica || (isRouanet ? 'Lei Rouanet (IN MinC nº 29/2026 - Salic)' : 'Instrumento a Definir');
+  const proponente = sections.perfil_proponente?.slice(0, 80) || sections.tipo_proponente || '[Proponente / Coletivo]';
+  const territorio = sections.local_cronograma || sections.publico_territorio || 'Viamão/RS e Região';
 
-  const sectionDefs = [
-    { key: 'edital_politica', num: '1', title: 'Edital ou Política Cultural' },
-    { key: 'ideia_projeto', num: '2', title: 'Ideia Central e Síntese da Proposta' },
-    { key: 'tipo_proponente', num: '3', title: 'Identificação e Perfil do Proponente' },
-    { key: 'objetivo_principal', num: '4', title: 'Objetivo Principal e Justificativa de Impacto Cultural' },
-    { key: 'publico_territorio', num: '5', title: 'Público-Alvo e Abrangência Territorial em Viamão' },
-    { key: 'atividades_metodologia', num: '6', title: 'Atividades e Metodologia de Execução' },
-    { key: 'acessibilidade', num: '7', title: 'Plano de Acessibilidade (Física, Comunicacional e Atitudinal)' },
-    { key: 'contrapartida_social', num: '8', title: 'Contrapartida Social Gratuita para a Comunidade' },
-    { key: 'cronograma', num: '9', title: 'Cronograma de Execução' },
-    { key: 'orcamento', num: '10', title: 'Planilha Orçamentária Detalhada' },
-    { key: 'revisao_final', num: '11', title: 'Revisão Final e Documentos de Habilitação' },
-  ];
+  const sectionDefs = isRouanet ? SECTION_METADATA_ROUANET : SECTION_METADATA_PADRAO;
 
   let bodyHtml = `
   <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222; max-width: 800px; margin: 0 auto; padding: 20px;">
     <div style="text-align: center; border-bottom: 2px solid #6A0DAD; padding-bottom: 15px; margin-bottom: 25px;">
-      <h3 style="margin: 0; color: #2D0652; text-transform: uppercase; letter-spacing: 1px;">Município de Viamão / RS</h3>
-      <p style="margin: 4px 0 0; color: #6A0DAD; font-weight: bold; font-size: 13px;">Plataforma Cultura Transparente · Apoio ao Fomento Cultural</p>
+      <h3 style="margin: 0; color: #2D0652; text-transform: uppercase; letter-spacing: 1px;">
+        ${isRouanet ? 'MINISTÉRIO DA CULTURA · GOVERNO FEDERAL' : 'MUNICÍPIO DE VIAMÃO / RS'}
+      </h3>
+      <p style="margin: 4px 0 0; color: #6A0DAD; font-weight: bold; font-size: 13px;">
+        ${isRouanet ? 'PROGRAMA NACIONAL DE APOIO À CULTURA (PRONAC) · LEI ROUANET (IN MINC Nº 29/2026)' : 'Plataforma Cultura Transparente · Apoio ao Fomento Cultural'}
+      </p>
       <h1 style="margin: 15px 0 5px; color: #2D0652; font-size: 24px;">${title}</h1>
     </div>
 
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13px;">
       <tr>
-        <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; width: 30%; background-color: #f9f6fd; color: #2D0652;">Instrumento / Edital</td>
+        <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; width: 30%; background-color: #f9f6fd; color: #2D0652;">Mecanismo / Edital</td>
         <td style="border: 1px solid #ddd; padding: 8px;">${edital}</td>
       </tr>
       <tr>
@@ -91,7 +93,17 @@ export function convertProjectToHtml(
   `;
 
   sectionDefs.forEach(sec => {
-    const val = sections[sec.key] || '<p style="color: #888; font-style: italic;">[Seção pendente de preenchimento]</p>';
+    let rawVal = sections[sec.key];
+    if (!rawVal && (sec as any).fallbackKeys) {
+      for (const fk of (sec as any).fallbackKeys) {
+        if (sections[fk] && sections[fk]!.trim()) {
+          rawVal = sections[fk];
+          break;
+        }
+      }
+    }
+
+    const val = rawVal || (isRouanet ? '<p style="color: #666; font-style: italic;">[a preencher]</p>' : '<p style="color: #888; font-style: italic;">[Seção pendente de preenchimento]</p>');
     const formattedVal = val.includes('<p>') ? val : val.split('\n\n').map(p => `<p style="margin: 6px 0;">${p.replace(/\n/g, '<br/>')}</p>`).join('');
 
     bodyHtml += `
@@ -106,6 +118,48 @@ export function convertProjectToHtml(
     `;
   });
 
+  // Seção de Conferência de Regras
+  if (isRouanet || conferenciaRegras) {
+    bodyHtml += `
+      <div style="margin-top: 30px; padding: 15px; background-color: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px;">
+        <h2 style="font-size: 16px; color: #2D0652; margin: 0 0 10px 0; border-bottom: 1px solid #CBD5E1; padding-bottom: 6px;">
+          Conferência de Regras Objetivas (IN MinC nº 29/2026)
+        </h2>
+    `;
+
+    if (conferenciaRegras) {
+      if (conferenciaRegras.aprovacoes && conferenciaRegras.aprovacoes.length > 0) {
+        bodyHtml += `<h4 style="color: #166534; margin: 10px 0 5px;">✔ Itens Conformes:</h4><ul style="margin: 0; padding-left: 20px; font-size: 13px;">`;
+        conferenciaRegras.aprovacoes.forEach(ap => {
+          bodyHtml += `<li><strong>${ap.descricao}:</strong> ${ap.referencia} - <em>"${ap.citacao}"</em></li>`;
+        });
+        bodyHtml += `</ul>`;
+      }
+      if (conferenciaRegras.infracoes && conferenciaRegras.infracoes.length > 0) {
+        bodyHtml += `<h4 style="color: #B91C1C; margin: 10px 0 5px;">⚠ Limites Excedidos:</h4><ul style="margin: 0; padding-left: 20px; font-size: 13px;">`;
+        conferenciaRegras.infracoes.forEach(inf => {
+          bodyHtml += `<li><strong>${inf.descricao}:</strong> ${inf.referencia} - <em>"${inf.citacao}"</em></li>`;
+        });
+        bodyHtml += `</ul>`;
+      }
+      if (conferenciaRegras.pendencias && conferenciaRegras.pendencias.length > 0) {
+        bodyHtml += `<h4 style="color: #D97706; margin: 10px 0 5px;">ℹ Informações Pendentes:</h4><ul style="margin: 0; padding-left: 20px; font-size: 13px;">`;
+        conferenciaRegras.pendencias.forEach(pen => {
+          bodyHtml += `<li><strong>${pen.descricao}:</strong> ${pen.pendencia} (${pen.referencia})</li>`;
+        });
+        bodyHtml += `</ul>`;
+      }
+    } else {
+      bodyHtml += `
+        <p style="font-size: 13px; color: #475569;">
+          Esta proposta foi estruturada respeitando os limites da IN MinC nº 29/2026: custos administrativos até 15% (Art. 19), captação de recursos até 10% ou R$ 150 mil (Art. 23), cachê individual até R$ 25 mil (Art. 26) e cota de gratuidade social de no mínimo 10% com ingressos populares de no mínimo 20% (Art. 41).
+        </p>
+      `;
+    }
+
+    bodyHtml += `</div>`;
+  }
+
   if (fontesCitadas && fontesCitadas.length > 0) {
     bodyHtml += `
       <div style="margin-top: 30px; padding: 15px; background-color: #FAF4EB; border-left: 4px solid #6A0DAD;">
@@ -117,9 +171,13 @@ export function convertProjectToHtml(
     `;
   }
 
+  const avisoFinal = isRouanet
+    ? 'AVISO INSTITUCIONAL (LEI ROUANET · IN MINC Nº 29/2026): A estruturação orientada do projeto não garante aprovação pelo Ministério da Cultura nem pela CNIC (Arts. 45 a 50). A aprovação no Pronac autoriza a captação de recursos junto a patrocinadores, e a execução depende do sucesso dessa captação (Arts. 47 e 48). A submissão da proposta é feita diretamente pelo próprio proponente no Salic (https://salic.cultura.gov.br).'
+    : 'Documento gerado com auxílio do assistente de IA da plataforma Cultura Transparente de Viamão/RS. Nenhuma informação pessoal sensível é gravada em servidor; complete os dados cadastrais antes de submeter ao edital.';
+
   bodyHtml += `
     <div style="margin-top: 35px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 10px; color: #666; font-style: italic;">
-      Documento gerado com auxílio do assistente de IA da plataforma Cultura Transparente de Viamão/RS. Nenhuma informação pessoal sensível é gravada em servidor; complete os dados cadastrais antes de submeter ao edital.
+      ${avisoFinal}
     </div>
   </div>`;
 
@@ -130,47 +188,50 @@ export async function exportToGoogleDrive(options: {
   title: string;
   sections: ProjectDraftSections;
   fontesCitadas?: Array<{ documento: string; trecho: string }>;
+  politica?: string;
+  conferenciaRegras?: ConferenciaRegrasResult;
 }): Promise<{ fileId: string; webViewLink: string }> {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   if (!clientId) {
     throw new Error('VITE_GOOGLE_CLIENT_ID não está configurado.');
   }
 
-  // Verifica se o SDK do Google está carregado
   if (!window.google?.accounts?.oauth2) {
-    await new Promise<void>((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Não foi possível carregar o Google Identity Services.'));
-      document.head.appendChild(script);
-    });
+    throw new Error('Biblioteca Google Identity Services (GIS) ainda não foi carregada no navegador.');
   }
 
   return new Promise((resolve, reject) => {
     try {
-      const tokenClient = window.google!.accounts!.oauth2!.initTokenClient({
+      const oauth2 = window.google?.accounts?.oauth2;
+      if (!oauth2) {
+        throw new Error('Biblioteca Google Identity Services (GIS) ainda não foi carregada no navegador.');
+      }
+      const tokenClient = oauth2.initTokenClient({
         client_id: clientId,
         scope: 'https://www.googleapis.com/auth/drive.file',
-        callback: async (tokenResponse) => {
-          if (tokenResponse.error) {
-            reject(new Error(tokenResponse.error_description || tokenResponse.error));
+        callback: async response => {
+          if (response.error) {
+            reject(new Error(response.error_description || response.error));
             return;
           }
 
-          const accessToken = tokenResponse.access_token;
+          const accessToken = response.access_token;
           if (!accessToken) {
-            reject(new Error('Token de acesso do Google não fornecido.'));
+            reject(new Error('Nenhum token de acesso retornado pelo Google.'));
             return;
           }
 
           try {
-            const htmlContent = convertProjectToHtml(options.title, options.sections, options.fontesCitadas);
+            const htmlContent = convertProjectToHtml(
+              options.title,
+              options.sections,
+              options.fontesCitadas,
+              options.politica,
+              options.conferenciaRegras
+            );
 
             const metadata = {
-              name: `Projeto Cultural - ${options.title}`,
+              name: `${options.title || 'Projeto_Cultural_Viamao'}_${new Date().toISOString().slice(0, 10)}`,
               mimeType: 'application/vnd.google-apps.document',
             };
 
@@ -187,7 +248,7 @@ export async function exportToGoogleDrive(options: {
               htmlContent +
               closeDelimiter;
 
-            const res = await fetch(
+            const uploadRes = await fetch(
               'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',
               {
                 method: 'POST',
@@ -199,16 +260,15 @@ export async function exportToGoogleDrive(options: {
               }
             );
 
-            if (!res.ok) {
-              const errBody = await res.text();
-              throw new Error(`Falha ao salvar no Google Drive: ${errBody}`);
+            if (!uploadRes.ok) {
+              const errBody = await uploadRes.text();
+              throw new Error(`Erro ao enviar para Google Drive: ${uploadRes.status} ${errBody}`);
             }
 
-            const data = await res.json();
-            const link = data.webViewLink || `https://docs.google.com/document/d/${data.id}/edit`;
+            const driveFile = await uploadRes.json();
             resolve({
-              fileId: data.id,
-              webViewLink: link,
+              fileId: driveFile.id,
+              webViewLink: driveFile.webViewLink,
             });
           } catch (uploadErr) {
             reject(uploadErr);
@@ -216,9 +276,9 @@ export async function exportToGoogleDrive(options: {
         },
       });
 
-      tokenClient.requestAccessToken({ prompt: 'consent' });
-    } catch (clientErr) {
-      reject(clientErr);
+      tokenClient.requestAccessToken({ prompt: '' });
+    } catch (err) {
+      reject(err);
     }
   });
 }

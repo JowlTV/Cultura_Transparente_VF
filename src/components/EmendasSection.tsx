@@ -287,7 +287,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-pill bg-[#FF4500]"></span>
-              <h2 className="text-xl sm:text-2xl font-bold text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+              <h2 className="text-xl sm:text-2xl font-normal text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
                 <span>Planilha & Painel de Emendas Parlamentares</span>
                 <span className="text-xs bg-[#EFE6FD] text-[#6A0DAD] border border-[#6A0DAD]/20 font-bold px-2.5 py-0.5 rounded-pill">
                   {emendasFiltradas.length} emendas
@@ -458,7 +458,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
           <div className="flex items-center justify-between pb-2 border-b border-[#2D0652]/10">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-[#FF4500]" />
-              <h3 className="text-sm font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+              <h3 className="text-sm font-normal text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
                 Painel Orçamentário Resumido
               </h3>
               <span className="text-[10px] bg-[#EFE6FD] text-[#6A0DAD] font-bold px-2.5 py-0.5 rounded-pill border border-[#6A0DAD]/20">
@@ -868,7 +868,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                                   <span className="text-[10px] font-bold text-[#6A0DAD]">
                                     Auditoria e Detalhamento Fiscal • ID: {emenda.id}
                                   </span>
-                                  <h4 className="text-sm font-bold text-[#2D0652] mt-0.5" style={{ fontFamily: 'var(--font-display)' }}>
+                                  <h4 className="text-sm font-normal text-[#2D0652] mt-0.5" style={{ fontFamily: 'var(--font-display)' }}>
                                     {emenda.subprojeto}
                                   </h4>
                                 </div>

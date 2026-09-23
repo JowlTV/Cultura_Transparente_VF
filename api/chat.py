@@ -6,6 +6,7 @@ Conduz o proponente na construção do seu projeto cultural passo a passo,
 com base estrita em informação oficial (legislação federal, decretos e editais),
 sem inventar informações, sem definir valores para o proponente, com uma
 pergunta por mensagem e com resposta estruturada em JSON.
+Inteligência especializada em PNAB, Lei Paulo Gustavo, Lei Rouanet e Emendas Parlamentares.
 """
 
 from http.server import BaseHTTPRequestHandler
@@ -27,17 +28,25 @@ from backend.conhecimento_retriever import (
     extrair_contexto_conhecimento,
     identificar_politica
 )
+from backend.regras_rouanet import (
+    validar_orcamento_rouanet,
+    carregar_regras_rouanet,
+    calcular_custos_vinculados_e_cenarios,
+    identificar_pendencias_salic,
+    tratar_casos_especiais_rouanet
+)
 from backend.utils import setup_logger
 
 logger = setup_logger("VercelApiChat")
 
-ROTEIRO_ETAPAS = [
+# Roteiro Padrão (PNAB, LPG, Emendas, Municipal) - 11 etapas
+ROTEIRO_ETAPAS_PADRAO = [
     {
         "etapa": 1,
         "chave": "edital_politica",
         "nome": "Edital ou Política",
-        "descricao": "Escolha do instrumento: PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão",
-        "pergunta_padrao": "Para qual edital ou política cultural você deseja preparar seu projeto (PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão)?"
+        "descricao": "Escolha do instrumento: Lei Rouanet, PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão",
+        "pergunta_padrao": "Para qual edital ou política cultural você deseja preparar seu projeto (Lei Rouanet, PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão)?"
     },
     {
         "etapa": 2,
@@ -111,7 +120,112 @@ ROTEIRO_ETAPAS = [
     }
 ]
 
+# Roteiro Específico da Lei Rouanet (Pronac / Salic - IN MinC nº 29/2026) - 12 etapas
+ROTEIRO_ETAPAS_ROUANET = [
+    {
+        "etapa": 1,
+        "chave": "edital_politica",
+        "nome": "Política e Instrumento",
+        "descricao": "Lei Rouanet (Pronac / Mecenato - Lei nº 8.313/1991 e IN MinC nº 29/2026)",
+        "pergunta_padrao": "Confirmamos a elaboração da sua proposta cultural para a Lei Rouanet (Pronac via Salic). Qual é a sua proposta?",
+        "fundamentacao_legal": "Arts. 1º, 4º e 5º da IN MinC nº 29/2026; Lei nº 8.313/1991"
+    },
+    {
+        "etapa": 2,
+        "chave": "perfil_proponente",
+        "nome": "Perfil do Proponente",
+        "descricao": "Pessoa física (até 2 projetos / R$ 500 mil), MEI (até 4 projetos / R$ 1,5 milhão) ou PJ (até 10 projetos / R$ 15 milhões)",
+        "pergunta_padrao": "Você vai apresentar a proposta no Salic como Pessoa Física, MEI ou Pessoa Jurídica, e qual é a sua área de atuação cultural comprovada?",
+        "fundamentacao_legal": "Art. 4º, §§ 1º a 5º, Art. 10, Art. 11 e Anexo II da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 3,
+        "chave": "enquadramento_artigo",
+        "nome": "Enquadramento Legal",
+        "descricao": "Enquadramento no Artigo 18 (100% de dedução fiscal) ou Artigo 26 da Lei nº 8.313/1991 conforme segmento",
+        "pergunta_padrao": "Em qual área ou segmento cultural sua ação se enquadra (ex: artes cênicas, música erudita/instrumental, patrimônio, artes visuais, livros) para definição do Artigo 18 ou 26?",
+        "fundamentacao_legal": "Arts. 18 e 26 da Lei nº 8.313/1991; Anexo IV da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 4,
+        "chave": "sintese_produto",
+        "nome": "Síntese e Produto Principal",
+        "descricao": "Síntese da proposta cultural e definição do produto cultural principal e secundários exigidos no Salic",
+        "pergunta_padrao": "Qual é a síntese da sua proposta cultural e qual será o produto cultural principal gerado (ex: espetáculo, festival, livro, exposição)?",
+        "fundamentacao_legal": "Art. 4º, § 1º e Anexo I (itens LXX e LXXVIII) da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 5,
+        "chave": "objetivos_justificativa",
+        "nome": "Objetivos e Justificativa",
+        "descricao": "Objetivos gerais e específicos e justificativa de interesse público e impacto cultural",
+        "pergunta_padrao": "Quais são os objetivos do projeto e qual a justificativa de interesse público para a sua realização?",
+        "fundamentacao_legal": "Art. 1º da Lei nº 8.313/1991; Art. 4º da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 6,
+        "chave": "local_cronograma",
+        "nome": "Local e Cronograma",
+        "descricao": "Local de realização e cronograma em fases (pré-produção, produção e pós-produção em até 36 meses)",
+        "pergunta_padrao": "Onde o projeto será realizado e qual é o cronograma previsto para as fases de pré-produção, produção e pós-produção (até 36 meses)?",
+        "fundamentacao_legal": "Art. 4º, § 2º e Art. 17 da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 7,
+        "chave": "plano_distribuicao_democratizacao",
+        "nome": "Distribuição e Democratização",
+        "descricao": "Plano de distribuição de produtos/ingressos com cotas gratuitas sociais (mín. 10%) e ingressos populares até R$ 50 (mín. 20%)",
+        "pergunta_padrao": "Como será o plano de distribuição de ingressos ou produtos culturais (considerando a cota mínima de 10% gratuita para fins sociais e 20% populares de até R$ 50,00)?",
+        "fundamentacao_legal": "Art. 41 da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 8,
+        "chave": "medidas_acessibilidade",
+        "nome": "Medidas de Acessibilidade",
+        "descricao": "Acessibilidade arquitetônica, comunicacional (Libras, audiodescrição) e atitudinal, com limite de 20% do orçamento",
+        "pergunta_padrao": "Quais medidas de acessibilidade arquitetônica e comunicacional (como Libras e audiodescrição) serão adotadas para garantir o acesso de pessoas com deficiência ou mobilidade reduzida?",
+        "fundamentacao_legal": "Arts. 20, 38 a 40 e Anexo III da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 9,
+        "chave": "divulgacao_marcas",
+        "nome": "Divulgação e Marcas Pronac",
+        "descricao": "Plano de comunicação e inserção obrigatória das marcas Pronac, Lei Rouanet, MinC e Governo Federal",
+        "pergunta_padrao": "Como será feita a divulgação do projeto e a inserção das marcas oficiais obrigatórias do Pronac, Lei Rouanet, Ministério da Cultura e Governo Federal?",
+        "fundamentacao_legal": "Art. 21 da IN MinC nº 29/2026 e Manual do Uso das Marcas do Pronac"
+    },
+    {
+        "etapa": 10,
+        "chave": "ficha_tecnica",
+        "nome": "Ficha Técnica e Equipe",
+        "descricao": "Profissionais principais, qualificação técnica/currículos e respeito a direitos autorais e conexos (limite 10%)",
+        "pergunta_padrao": "Quem são os principais profissionais da ficha técnica (artistas e produtores) e qual a qualificação ou histórico de atuação de cada um?",
+        "fundamentacao_legal": "Art. 27 e Anexo II da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 11,
+        "chave": "planilha_orcamentaria",
+        "nome": "Planilha Orçamentária e Limites",
+        "descricao": "Orçamento analítico respeitando limites objetivos da IN 29/2026 (administração máx. 15%, captação máx. 10%/R$ 150 mil, cachês máx. R$ 25 mil/R$ 50 mil)",
+        "pergunta_padrao": "Quais são os itens e valores estimados do seu orçamento analítico (incluindo custos de produção, custos administrativos e remunerações)?",
+        "fundamentacao_legal": "Arts. 11, 16, 19, 20, 22, 23, 24, 26 e 27 da IN MinC nº 29/2026"
+    },
+    {
+        "etapa": 12,
+        "chave": "conferencia_regras_revisao",
+        "nome": "Conferência de Regras e Revisão",
+        "descricao": "Conferência de regras por código e orientações para cadastramento da proposta no Salic",
+        "pergunta_padrao": "Deseja revisar algum ponto da sua proposta antes de gerar o documento consolidado com o relatório de conferência das regras da Lei Rouanet?",
+        "fundamentacao_legal": "Arts. 4º, 5º, 45, 47, 48 e 69 da IN MinC nº 29/2026"
+    }
+]
+
+# Alias padrão de etapas
+ROTEIRO_ETAPAS = ROTEIRO_ETAPAS_PADRAO
+
 CULTURAL_SYSTEM_PROMPT = """Você é o Consultor Oficial de Projetos Culturais da plataforma Cultura Transparente de Viamão/RS.
+Subtítulo do assistente: Inteligência especializada em PNAB, Lei Paulo Gustavo, Lei Rouanet e Emendas Parlamentares.
+
 Sua missão é conduzir a pessoa na construção do próprio projeto cultural, etapa por etapa, com base unicamente na documentação oficial e nos dados reais do sistema, gerando um documento estruturado.
 
 PRINCÍPIOS INEGOCIÁVEIS:
@@ -122,7 +236,9 @@ PRINCÍPIOS INEGOCIÁVEIS:
 
 2. NÃO INVENTAR INFORMAÇÃO:
    - Toda afirmação sobre regras, prazos, requisitos, critérios ou valores de um edital ou política deve vir EXCLUSIVAMENTE dos documentos oficiais fornecidos na BASE DE CONHECIMENTO OFICIAL anexa ou dos dados reais do sistema, com citação expressa do documento e item/artigo.
-   - Se a informação não estiver disponível nos documentos fornecidos, diga expressamente: "Não encontrei essa informação nos documentos oficiais disponíveis" e oriente a pessoa a confirmar no edital oficial publicado.
+   - Se a informação não estiver disponível nos documentos fornecidos, diga expressamente: "Não encontrei essa informação nos documentos oficiais disponíveis" e oriente a pessoa a confirmar no edital ou portal oficial.
+   - A Instrução Normativa MinC nº 23/2025 foi revogada pela Instrução Normativa MinC nº 29, de 29 de janeiro de 2026 (publicada no DOU em 30/01/2026). A base usa exclusivamente a IN 29/2026. A IN 23/2025 está excluída.
+   - O Fundo de Apoio à Cultura (FAC) continua expressamente fora do assistente; se alguém perguntar por FAC, esclareça que o sistema abrange PNAB, LPG, Lei Rouanet e Emendas Parlamentares.
 
 3. NÃO DEFINIR VALORES PARA A PESSOA:
    - Você NÃO sugere quanto a pessoa deve pedir, quanto cobrar de cachê nem preenche valores de orçamento por conta própria.
@@ -143,18 +259,40 @@ PRINCÍPIOS INEGOCIÁVEIS:
    - No documento, essas informações aparecem como campos entre colchetes para preenchimento posterior pela pessoa (ex: "[CPF do proponente]", "[Endereço do proponente]", "[Conta Bancária]").
    - Se a pessoa digitar dados pessoais no chat, avise educadamente que não é necessário enviá-los e JAMAIS os repita na resposta.
 
-ROTEIRO FIXO DE ETAPAS (1 a 11):
-1. edital_politica: Qual edital ou política (PNAB, Lei Paulo Gustavo, emenda parlamentar, edital municipal de Viamão)
-2. ideia_projeto: Ideia do projeto, em poucas palavras
-3. tipo_proponente: Tipo de proponente (pessoa física, coletivo, MEI, organização)
-4. objetivo_principal: Objetivo principal e justificativa de impacto em Viamão
-5. publico_territorio: Público-alvo prioritário e território/bairro de Viamão onde acontece
-6. atividades_metodologia: Atividades e como serão realizadas na prática
-7. acessibilidade: Medidas de acessibilidade (física, comunicacional com Libras/audiodescrição, e atitudinal)
-8. contrapartida_social: Contrapartida social gratuita para a comunidade
-9. cronograma: Cronograma de execução por etapas
-10. orcamento: Orçamento (itens e valores informados pela pessoa)
-11. revisao_final: Revisão final consolidada
+7. HONESTIDADE SOBRE O RESULTADO NA LEI ROUANET (IN MinC nº 29/2026):
+   Sempre que a política escolhida for a Lei Rouanet, deixe claro no início do roteiro e na revisão final:
+   a) O assistente ajuda a estruturar uma proposta técnica aderente às exigências da IN MinC nº 29/2026, mas NÃO garante aprovação: a admissibilidade e a análise técnica são de competência exclusiva do Ministério da Cultura e da Comissão Nacional de Incentivo à Cultura - CNIC (Arts. 45 a 50 da IN 29/2026);
+   b) A aprovação da proposta autoriza a captação de recursos junto a patrocinadores e incentivadores fiscais, e a realização do projeto depende da efetivação dessa captação (Arts. 47 e 48 da IN 29/2026);
+   c) A submissão da proposta é feita diretamente pela própria pessoa no Sistema de Apoio às Leis de Incentivo à Cultura (Salic - https://salic.cultura.gov.br), e o assistente não envia nem cadastra dados externamente (Art. 4º da IN 29/2026);
+   d) Quando algo não estiver nos documentos da base, diga isso e indique a fonte oficial.
+
+ROTEIROS DE ETAPAS:
+Se o usuário escolheu Lei Rouanet (Pronac), use o ROTEIRO ROUANET (1 a 12 etapas):
+1. edital_politica (Lei Rouanet - IN MinC nº 29/2026 / Salic)
+2. perfil_proponente (PF, MEI ou PJ - Art. 10 da IN 29/2026)
+3. enquadramento_artigo (Artigo 18 ou Artigo 26 da Lei 8.313/1991 e Anexo IV da IN 29/2026)
+4. sintese_produto (Síntese da proposta e produto cultural principal - Art. 4º, § 1º da IN 29/2026)
+5. objetivos_justificativa (Objetivos e justificativa de interesse público - Art. 1º da Lei 8.313/1991)
+6. local_cronograma (Local de realização e cronograma em fases até 36 meses - Art. 4º, § 2º da IN 29/2026)
+7. plano_distribuicao_democratizacao (Plano de distribuição, gratuidade social mín. 10%, ingressos populares mín. 20% até R$ 50 - Art. 41 da IN 29/2026)
+8. medidas_acessibilidade (Acessibilidade física, comunicacional e atitudinal, teto 20% - Arts. 20 e 38 a 40 da IN 29/2026)
+9. divulgacao_marcas (Plano de comunicação e marcas Pronac/MinC, envio prévio em 5 dias úteis - Art. 21 da IN 29/2026)
+10. ficha_tecnica (Ficha técnica da equipe e direitos autorais até 10% - Art. 27 e Anexo II da IN 29/2026)
+11. planilha_orcamentaria (Orçamento analítico: admin máx. 15%, captação máx. 10%/R$ 150 mil, cachê máx. R$ 25 mil/R$ 50 mil - Arts. 19, 22, 23, 26 da IN 29/2026)
+12. conferencia_regras_revisao (Conferência de conformidade e orientações de submissão no Salic - Arts. 4º, 45, 47, 48 da IN 29/2026)
+
+Se o usuário escolheu PNAB, LPG, Emendas ou Municipal, use o ROTEIRO PADRÃO (1 a 11 etapas):
+1. edital_politica
+2. ideia_projeto
+3. tipo_proponente
+4. objetivo_principal
+5. publico_territorio
+6. atividades_metodologia
+7. acessibilidade
+8. contrapartida_social
+9. cronograma
+10. orcamento
+11. revisao_final
 
 CONDUÇÃO DA CONVERSA:
 - Se a resposta da pessoa for incompleta para a etapa atual, peça o que falta com UMA ÚNICA pergunta.
@@ -167,17 +305,7 @@ Sua resposta DEVE ser EXCLUSIVAMENTE um objeto JSON válido, sem texto fora do J
   "mensagem": "texto acolhedor exibido no chat, contendo NO MÁXIMO UMA pergunta ('?')",
   "etapa_atual": 1,
   "secoes_atualizadas": {
-    "edital_politica": "texto redigido...",
-    "ideia_projeto": "texto redigido...",
-    "tipo_proponente": "...",
-    "objetivo_principal": "...",
-    "publico_territorio": "...",
-    "atividades_metodologia": "...",
-    "acessibilidade": "...",
-    "contrapartida_social": "...",
-    "cronograma": "...",
-    "orcamento": "...",
-    "revisao_final": "..."
+    "chave_da_secao": "texto redigido..."
   },
   "fontes_citadas": [
     { "documento": "Nome oficial do documento", "trecho": "Artigo ou item" }
@@ -187,6 +315,72 @@ Sua resposta DEVE ser EXCLUSIVAMENTE um objeto JSON válido, sem texto fora do J
   ]
 }
 """
+
+
+def extrair_valores_orcamento_texto(texto: str) -> Dict[str, Any]:
+    """
+    Extrai números e itens de custo mencionados pelo usuário para alimentar
+    a checagem matemática do orçamento por código.
+    """
+    dados: Dict[str, Any] = {}
+    txt = texto.lower()
+
+    # Detecta tipo de proponente se mencionado
+    if "pessoa física" in txt or "pessoa fisica" in txt or re.search(r'\bpf\b', txt):
+        dados["tipo_proponente"] = "pf"
+    elif "mei" in txt or "microempreendedor" in txt:
+        dados["tipo_proponente"] = "mei"
+    elif "pessoa jurídica" in txt or "pessoa juridica" in txt or re.search(r'\bpj\b', txt) or "associação" in txt or "empresa" in txt:
+        dados["tipo_proponente"] = "pj"
+
+    # Busca valores em reais expressos no texto: R$ X.XXX,XX ou R$ XXXXX
+    valores_encontrados = []
+    padrao_reais = re.findall(r'r\$\s*([\d\.,]+)', txt)
+    for v in padrao_reais:
+        v_limpo = v.strip().replace(".", "").replace(",", ".")
+        try:
+            val_float = float(v_limpo)
+            if val_float > 0:
+                valores_encontrados.append(val_float)
+        except ValueError:
+            continue
+
+    if valores_encontrados:
+        # Se encontrou valores, atribui o maior como estimativa provável de valor total se houver indicação
+        if any(k in txt for k in ["total", "global", "orçamento de", "projeto de"]):
+            dados["valor_total"] = max(valores_encontrados)
+
+    # Identifica rubricas específicas de despesas
+    padrao_admin = re.search(r'(?:administra[çc][ãa]o|gest[ãa]o)\s*(?:de|:)?\s*r\$\s*([\d\.,]+)', txt)
+    if padrao_admin:
+        try:
+            dados["custos_administrativos"] = float(padrao_admin.group(1).replace(".", "").replace(",", "."))
+        except ValueError:
+            pass
+
+    padrao_captacao = re.search(r'(?:capta[çc][ãa]o)\s*(?:de|:)?\s*r\$\s*([\d\.,]+)', txt)
+    if padrao_captacao:
+        try:
+            dados["remuneracao_captacao"] = float(padrao_captacao.group(1).replace(".", "").replace(",", "."))
+        except ValueError:
+            pass
+
+    padrao_acess = re.search(r'(?:acessibilidade|divulga[çc][ãa]o)\s*(?:de|:)?\s*r\$\s*([\d\.,]+)', txt)
+    if padrao_acess:
+        try:
+            dados["acessibilidade_divulgacao"] = float(padrao_acess.group(1).replace(".", "").replace(",", "."))
+        except ValueError:
+            pass
+
+    padrao_cache = re.search(r'(?:cach[êe]|artista)\s*(?:de|:)?\s*r\$\s*([\d\.,]+)', txt)
+    if padrao_cache:
+        try:
+            val_c = float(padrao_cache.group(1).replace(".", "").replace(",", "."))
+            dados["caches_individuais"] = [val_c]
+        except ValueError:
+            pass
+
+    return dados
 
 
 def sanitize_api_key(text: str, api_key: str = "") -> str:
@@ -206,7 +400,6 @@ def normalizar_uma_pergunta(texto: str) -> str:
     if not texto or texto.count('?') <= 1:
         return texto
 
-    # Divide em sentenças preservando os delimitadores de pontuação
     frases = re.split(r'([.!?]+)', texto)
     partes = []
     total_interrogacoes = texto.count('?')
@@ -259,7 +452,7 @@ def obter_contexto_factual_viamao(user_query: str = "") -> str:
                 "- Lei Paulo Gustavo Viamão (LPG - LC nº 195/2022): Informação sobre valor total de repasse não disponível no momento na consulta do Transferegov."
             )
 
-    # Contexto Emendas Parlamentares (consulta real com filtro territorial de Viamão)
+    # Contexto Emendas Parlamentares
     if any(k in user_query_lower for k in ["emenda", "parlamentar", "deputad", "verba", "recurso", "orçamento"]):
         try:
             from backend.apis import CguEmendasApi
@@ -279,7 +472,7 @@ def obter_contexto_factual_viamao(user_query: str = "") -> str:
 
     if not context_parts:
         context_parts.append(
-            "- Base Territorial: Município de Viamão/RS. Políticas culturais acompanhadas: PNAB, LPG, Emendas Parlamentares e Editais Municipais."
+            "- Base Territorial: Município de Viamão/RS. Políticas culturais acompanhadas: Lei Rouanet, PNAB, LPG, Emendas Parlamentares e Editais Municipais."
         )
 
     return (
@@ -303,7 +496,7 @@ def obter_contexto_factual_com_timeout(user_query: str = "", timeout: float = 2.
             return ""
 
 
-def validar_e_extrair_resposta_estruturada(raw_text: str) -> Optional[Dict[str, Any]]:
+def validar_e_extrair_resposta_estruturada(raw_text: str, is_rouanet: bool = False) -> Optional[Dict[str, Any]]:
     """Valida se o texto retornado pelo modelo é um JSON compatível com o schema do assistente."""
     if not raw_text or not raw_text.strip():
         return None
@@ -332,13 +525,14 @@ def validar_e_extrair_resposta_estruturada(raw_text: str) -> Optional[Dict[str, 
     if "mensagem" not in data or not isinstance(data["mensagem"], str):
         return None
 
+    max_etapas = 12 if is_rouanet else 11
     etapa = data.get("etapa_atual", 1)
     try:
         etapa_int = int(etapa)
         if etapa_int < 1:
             etapa_int = 1
-        elif etapa_int > 11:
-            etapa_int = 11
+        elif etapa_int > max_etapas:
+            etapa_int = max_etapas
         data["etapa_atual"] = etapa_int
     except (ValueError, TypeError):
         data["etapa_atual"] = 1
@@ -358,7 +552,6 @@ def validar_e_extrair_resposta_estruturada(raw_text: str) -> Optional[Dict[str, 
 
 class handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
-        # Suprime logs padrão do BaseHTTPRequestHandler para usar o logger customizado
         pass
 
     def do_OPTIONS(self):
@@ -376,10 +569,12 @@ class handler(BaseHTTPRequestHandler):
             "endpoint": "/api/chat",
             "status": "online",
             "metodo_esperado": "POST",
-            "etapas_suportadas": len(ROTEIRO_ETAPAS),
+            "subtitulo": "Inteligência especializada em PNAB, Lei Paulo Gustavo, Lei Rouanet e Emendas Parlamentares",
+            "politicas_suportadas": ["Lei Rouanet (IN MinC nº 29/2026)", "PNAB", "Lei Paulo Gustavo", "Emendas Parlamentares", "Edital Municipal de Viamão"],
             "regras": [
                 "Uma pergunta por mensagem",
                 "Sem valores inventados",
+                "Validação orçamentária por código",
                 "Sem cache em memória (privacidade LGPD)"
             ]
         }
@@ -421,19 +616,36 @@ class handler(BaseHTTPRequestHandler):
                 })
                 return
 
-            # NOTA DE PRIVACIDADE LGPD: Cache de respostas foi desativado propositalmente,
-            # pois cada conversa contém dados autorais e específicos do projeto da pessoa.
-
-            # Coleta textos do usuário para contextualização factual e conhecimento oficial
             user_texts = [m.get("content", "") for m in messages if m.get("role") == "user"]
             combined_user_text = " ".join(user_texts)
 
-            politica_identificada = identificar_politica(combined_user_text)
+            # Interceptação determinística para casos legais específicos da Lei 8.313/1991
+            ultimo_texto_usuario = user_texts[-1] if user_texts else ""
+            caso_especial = tratar_casos_especiais_rouanet(ultimo_texto_usuario)
+            if caso_especial:
+                self.send_json_response(200, {
+                    "success": True,
+                    "data": {
+                        "mensagem": caso_especial.get("mensagem"),
+                        "etapa_atual": caso_especial.get("etapa_atual", 1),
+                        "secoes_atualizadas": {},
+                        "fontes_citadas": caso_especial.get("fontes_citadas", []),
+                        "pendencias": []
+                    },
+                    "metadata": {
+                        "politica": "ROUANET",
+                        "caso_especial": caso_especial.get("caso")
+                    }
+                })
+                return
 
-            # Estima a etapa atual com base no histórico
+            politica_identificada = identificar_politica(combined_user_text)
+            is_rouanet = (politica_identificada == "ROUANET")
+
+            max_etapas = 12 if is_rouanet else 11
             etapa_estimada = 1
             if len(user_texts) >= 1:
-                etapa_estimada = min(11, len(user_texts) + 1)
+                etapa_estimada = min(max_etapas, len(user_texts) + 1)
 
             contexto_conhecimento = extrair_contexto_conhecimento(
                 politica=politica_identificada,
@@ -444,11 +656,29 @@ class handler(BaseHTTPRequestHandler):
 
             contexto_factual = obter_contexto_factual_com_timeout(combined_user_text, timeout=2.0)
 
+            # Se for Rouanet e houver dados orçamentários, adiciona checagem matemática por código
+            conferencia_orcamento_rouanet = None
+            if is_rouanet:
+                dados_orc = extrair_valores_orcamento_texto(combined_user_text)
+                if dados_orc.get("valor_total"):
+                    conferencia_orcamento_rouanet = validar_orcamento_rouanet(dados_orc)
+
             system_instruction_completa = (
                 CULTURAL_SYSTEM_PROMPT
                 + contexto_conhecimento
                 + contexto_factual
             )
+
+            if conferencia_orcamento_rouanet:
+                system_instruction_completa += (
+                    "\n\n=== CONFERÊNCIA DE REGRAS ORÇAMENTÁRIAS DA LEI ROUANET (CÁLCULO AUTOMÁTICO POR CÓDIGO) ===\n"
+                    f"Status da conferência: {'APROVADO' if conferencia_orcamento_rouanet['valido'] else 'IRREGULAR / INFRAÇÕES ENCONTRADAS'}\n"
+                    f"Resumo da checagem: {conferencia_orcamento_rouanet['resumo']}\n"
+                    f"Aprovações: {json.dumps(conferencia_orcamento_rouanet['aprovacoes'], ensure_ascii=False)}\n"
+                    f"Infrações aos limites legais: {json.dumps(conferencia_orcamento_rouanet['infracoes'], ensure_ascii=False)}\n"
+                    f"Pendências de dados: {json.dumps(conferencia_orcamento_rouanet['pendencias'], ensure_ascii=False)}\n"
+                    "INSTRUÇÃO DE RESPOSTA: Comunique ao proponente estritamente o resultado desta conferência calculada pelo sistema, citando os artigos e percentuais legais correspondentes. NÃO altere nem invente valores de orçamento.\n"
+                )
 
             # Formatação para REST da API Gemini
             formatted_contents = []
@@ -464,7 +694,6 @@ class handler(BaseHTTPRequestHandler):
             if not formatted_contents:
                 formatted_contents = [{"role": "user", "parts": [{"text": "Olá!"}]}]
 
-            # Payload estruturado com JSON obrigatório
             req_payload = {
                 "systemInstruction": {
                     "parts": [{"text": system_instruction_completa}]
@@ -533,7 +762,7 @@ class handler(BaseHTTPRequestHandler):
                                 parts = candidates[0].get("content", {}).get("parts", [])
                                 if parts and len(parts) > 0:
                                     raw_response_text = parts[0].get("text", "")
-                                    valid_structured_data = validar_e_extrair_resposta_estruturada(raw_response_text)
+                                    valid_structured_data = validar_e_extrair_resposta_estruturada(raw_response_text, is_rouanet=is_rouanet)
                                     if valid_structured_data:
                                         break
                                     else:
@@ -582,7 +811,6 @@ class handler(BaseHTTPRequestHandler):
                     logger.warning(f"Failover Gemini ({model_name}): {error_str}")
 
             if not valid_structured_data:
-                # Se obtivemos texto mas falhou validação JSON após tentativas, retorna erro claro sem inventar conteúdo
                 if raw_response_text and not valid_structured_data:
                     logger.error("Resposta do modelo não atendeu ao schema estruturado exigido.")
                     self.send_json_response(200, {
@@ -601,7 +829,11 @@ class handler(BaseHTTPRequestHandler):
                 })
                 return
 
-            # Garante formato consistente de retorno estruturado e compatibilidade com campo text
+            # Anexa metadados da política e eventual conferência matemática de regras
+            valid_structured_data["politica"] = "ROUANET" if is_rouanet else (politica_identificada or "PADRAO")
+            if conferencia_orcamento_rouanet:
+                valid_structured_data["conferencia_regras"] = conferencia_orcamento_rouanet
+
             self.send_json_response(200, {
                 "success": True,
                 "data": valid_structured_data,

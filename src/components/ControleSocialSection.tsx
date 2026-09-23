@@ -131,7 +131,7 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
             <Scale className="w-3.5 h-3.5 text-[#FF4500]" />
             Exercício Democrático da Cidadania Ativa
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+          <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
             Controle Social & Pedidos de Informação (LAI)
           </h2>
           <p className="text-xs sm:text-sm text-[#2D0652]/80 leading-relaxed font-medium">
@@ -145,7 +145,7 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
       <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2D2BC]">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+            <h3 className="text-base sm:text-lg font-normal text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
               <FileCheck2 className="w-5 h-5 text-[#FF4500]" />
               Gerador Automático de Pedido de Informação (e-SIC Viamão)
             </h3>
@@ -248,7 +248,7 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
 
       {/* Official Audit & Reporting Channels */}
       <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs space-y-4">
-        <h3 className="text-base sm:text-lg font-bold text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+        <h3 className="text-base sm:text-lg font-normal text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
           <Building className="w-4 h-4 text-[#FF4500]" />
           Canais Oficiais de Ouvidoria, Denúncia e Controle Externo
         </h3>

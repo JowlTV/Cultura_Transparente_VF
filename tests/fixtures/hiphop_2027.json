@@ -1,0 +1,53 @@
+{
+  "titulo": "Hip Hop 2027",
+  "valor_informado": 400000.00,
+  "periodo_atividades": "fevereiro a novembro de 2027",
+  "cronograma": [
+    { "mes": "FEV", "atividades": ["1º Slam Viamão"] },
+    { "mes": "MAR", "atividades": ["Hip Hop no Bairro"] },
+    { "mes": "ABR", "atividades": ["2º Slam Viamão"] },
+    { "periodo": "MAR a MAI", "atividades": ["Hip Hop Ação (1º ciclo)"] },
+    { "mes": "JUN", "atividades": ["3º Slam Viamão"] },
+    { "periodo": "JUN a JUL", "atividades": ["Gravação do Podcast"] },
+    { "mes": "JUL", "atividades": ["Hip Hop no Bairro"] },
+    { "mes": "AGO", "atividades": ["Edição e finalização do Podcast", "4º Slam Viamão"] },
+    { "mes": "SET", "atividades": ["Hip Hop no Bairro", "Lançamento do Podcast"] },
+    { "periodo": "AGO a OUT", "atividades": ["Hip Hop Ação (2º ciclo)"] },
+    { "mes": "OUT", "atividades": ["Diversificando", "5º Slam Viamão"] },
+    { "mes": "NOV", "atividades": ["Semana do HHP", "Final do Slam"] }
+  ],
+  "itens_orcamento": [
+    { "item": "Hip Hop Ação (1º ciclo)", "valor": 30000.00, "etapa": "Execução" },
+    { "item": "Hip Hop no Bairro (março)", "valor": 50000.00, "etapa": "Execução" },
+    { "item": "Hip Hop no Bairro (julho)", "valor": 50000.00, "etapa": "Execução" },
+    { "item": "Hip Hop no Bairro (setembro)", "valor": 50000.00, "etapa": "Execução" },
+    { "item": "Hip Hop Ação (2º ciclo)", "valor": 30000.00, "etapa": "Execução" },
+    { "item": "Podcast (gravação, edição e lançamento)", "valor": 30000.00, "etapa": "Execução" },
+    { "item": "Diversificando", "valor": 10000.00, "etapa": "Execução" },
+    { "item": "Semana do HHP", "valor": 100000.00, "etapa": "Execução" },
+    { "item": "Slam Viamão (cinco edições e final)", "valor": 50000.00, "etapa": "Execução" }
+  ],
+  "soma_itens": 400000.00,
+  "perguntas_especificas": {
+    "natureza_valor": "Pergunta se R$ 400.000,00 é o custo das atividades ou o total do projeto com os custos vinculados, calculando ambos os cenários."
+  },
+  "pendencias_esperadas": [
+    "local_atividades",
+    "publico_estimado",
+    "sinopses",
+    "classificacao_indicativa",
+    "especificacao_tecnica_podcast_duracao",
+    "especificacao_tecnica_hip_hop_acao_carga_horaria",
+    "acessibilidade_fisica",
+    "acessibilidade_conteudo",
+    "forma_distribuicao_democratizacao",
+    "ficha_tecnica_dirigente",
+    "ficha_tecnica_curriculos",
+    "duracao_pre_producao",
+    "duracao_pos_producao",
+    "produto_principal",
+    "significado_hhp",
+    "conteudo_diversificando",
+    "produto_area_segmento_selecionar_no_salic"
+  ]
+}

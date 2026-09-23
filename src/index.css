@@ -60,6 +60,12 @@
     font-family: var(--font-display);
     letter-spacing: -0.015em;
     color: #2D0652;
+    font-weight: 400;
+  }
+
+  /* Garante peso regular sem negrito em títulos e tipografia de exibição */
+  .font-display, [style*="--font-display"], [style*="font-display"] {
+    font-weight: 400;
   }
 
   /* Foco de teclado visível e consistente com a paleta */

@@ -121,7 +121,7 @@ export const ApiDocumentationSection: React.FC = () => {
             <Server className="w-3.5 h-3.5 text-[#FF4500]" />
             Arquitetura de Dados Abertos & Vercel Serverless
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+          <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
             Central de APIs & Catálogo de Dados Abertos
           </h2>
           <p className="text-xs sm:text-sm text-[#2D0652]/80 leading-relaxed font-medium">
@@ -149,7 +149,7 @@ export const ApiDocumentationSection: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Cpu className="w-4 h-4 text-[#FF4500]" />
-            <h3 className="text-base font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+            <h3 className="text-base font-normal text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
               Monitor de Pipelines de Dados Públicos & Serverless
             </h3>
           </div>
@@ -185,7 +185,7 @@ export const ApiDocumentationSection: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Endpoint Selector */}
         <div className="bg-[#FAF4EB] rounded-3xl p-5 border border-[#E2D2BC] shadow-xs space-y-3">
-          <h3 className="font-bold text-[#2D0652] text-sm flex items-center gap-1.5" style={{ fontFamily: 'var(--font-display)' }}>
+          <h3 className="font-normal text-[#2D0652] text-sm flex items-center gap-1.5" style={{ fontFamily: 'var(--font-display)' }}>
             <Database className="w-4 h-4 text-[#FF4500]" />
             Endpoints Catalogados
           </h3>
@@ -238,7 +238,7 @@ export const ApiDocumentationSection: React.FC = () => {
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#EFE6FD] text-[#6A0DAD] font-mono border border-[#DCC7FB]">
                   {selectedApi.metodo}
                 </span>
-                <h4 className="text-base font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+                <h4 className="text-base font-normal text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
                   {selectedApi.nome}
                 </h4>
               </div>

@@ -219,7 +219,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
               <BarChart3 className="w-3.5 h-3.5 text-[#FF4500]" />
               Observatório Orçamentário da Cultura de Viamão / RS
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+            <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
               Painel Interativo de Orçamentos e Execução Financeira
             </h2>
             <p className="text-xs sm:text-sm text-[#2D0652]/80 leading-relaxed font-medium">
@@ -387,7 +387,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
         <div className="lg:col-span-7 bg-[#FAF4EB] p-6 sm:p-7 rounded-3xl border border-[#E2D2BC] shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#E2D2BC]">
             <div>
-              <h3 className="font-bold text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+              <h3 className="font-normal text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
                 <BarChart3 className="w-4 h-4 text-[#FF4500]" />
                 Orçamento Alocado vs. Gastos por Secretaria
               </h3>
@@ -448,7 +448,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
         <div className="lg:col-span-5 bg-[#FAF4EB] p-6 sm:p-7 rounded-3xl border border-[#E2D2BC] shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#E2D2BC]">
             <div>
-              <h3 className="font-bold text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+              <h3 className="font-normal text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
                 <PieIcon className="w-4 h-4 text-[#FF4500]" />
                 Distribuição por Segmento Cultural
               </h3>
@@ -512,7 +512,7 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({
       <div className="bg-[#FAF4EB] p-6 sm:p-7 rounded-3xl border border-[#E2D2BC] shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E2D2BC]">
           <div>
-            <h3 className="font-bold text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+            <h3 className="font-normal text-[#2D0652] text-sm sm:text-base flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
               <TrendingUp className="w-4 h-4 text-[#FF4500]" />
               Evolução Cronológica: Orçamentos Alocados vs. Gastos Realizados
             </h3>

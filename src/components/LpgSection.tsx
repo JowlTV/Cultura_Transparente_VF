@@ -55,7 +55,7 @@ export const LpgSection: React.FC<LpgSectionProps> = ({ lpgData, isLoading }) =>
               <Film className="w-3.5 h-3.5 text-[#FF4500]" />
               {lpgData.base_legal}
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display)' }}>
+            <h2 className="text-2xl sm:text-3xl font-normal tracking-tight text-white" style={{ fontFamily: 'var(--font-display)' }}>
               Lei Paulo Gustavo em Viamão/RS
             </h2>
             <p className="text-xs sm:text-sm text-purple-100/90 leading-relaxed font-medium">
@@ -220,7 +220,7 @@ export const LpgSection: React.FC<LpgSectionProps> = ({ lpgData, isLoading }) =>
                     Plano nº {lpgData.codigo_plano_acao}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-[#2D0652] pt-1" style={{ fontFamily: 'var(--font-display)' }}>
+                <h3 className="text-lg font-normal text-[#2D0652] pt-1" style={{ fontFamily: 'var(--font-display)' }}>
                   {meta.descricao_meta_plano_acao}
                 </h3>
               </div>

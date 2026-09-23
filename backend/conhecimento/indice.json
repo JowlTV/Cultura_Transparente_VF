@@ -7,7 +7,7 @@
     "politica": "PNAB",
     "data": "2022-07-08",
     "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14399.htm",
-    "data_coleta": "2026-09-21",
+    "data_coleta": "2026-09-23",
     "status": "disponivel"
   },
   {
@@ -18,7 +18,7 @@
     "politica": "PNAB",
     "data": "2023-10-18",
     "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11740.htm",
-    "data_coleta": "2026-09-21",
+    "data_coleta": "2026-09-23",
     "status": "disponivel"
   },
   {
@@ -29,7 +29,7 @@
     "politica": "LPG",
     "data": "2022-07-08",
     "url_oficial": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp195.htm",
-    "data_coleta": "2026-09-21",
+    "data_coleta": "2026-09-23",
     "status": "disponivel"
   },
   {
@@ -40,7 +40,7 @@
     "politica": "LPG",
     "data": "2023-05-11",
     "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11525.htm",
-    "data_coleta": "2026-09-21",
+    "data_coleta": "2026-09-23",
     "status": "disponivel"
   },
   {
@@ -51,7 +51,7 @@
     "politica": "Fomento Cultural",
     "data": "2024-06-27",
     "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/lei/l14903.htm",
-    "data_coleta": "2026-09-21",
+    "data_coleta": "2026-09-23",
     "status": "disponivel"
   },
   {
@@ -62,8 +62,63 @@
     "politica": "Emendas / Parcerias MROSC",
     "data": "2014-07-31",
     "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l13019.htm",
-    "data_coleta": "2026-09-21",
+    "data_coleta": "2026-09-23",
     "status": "disponivel"
+  },
+  {
+    "id": "lei_8313_1991_rouanet",
+    "arquivo": "lei_8313_1991_rouanet.txt",
+    "titulo": "Lei nº 8.313, de 23 de dezembro de 1991 (Lei Federal de Incentivo à Cultura - Lei Rouanet / Pronac - Texto Compilado)",
+    "tipo": "lei",
+    "politica": "ROUANET",
+    "data": "1991-12-23",
+    "url_oficial": "https://www.planalto.gov.br/ccivil_03/leis/l8313cons.htm",
+    "data_coleta": "2026-09-23",
+    "status": "disponivel"
+  },
+  {
+    "id": "decreto_11453_2023_fomento",
+    "arquivo": "decreto_11453_2023_fomento.txt",
+    "titulo": "Decreto nº 11.453, de 23 de março de 2023 (Regulamenta os Mecanismos de Fomento do Sistema de Financiamento à Cultura - Base do Pronac)",
+    "tipo": "decreto",
+    "politica": "ROUANET",
+    "data": "2023-03-23",
+    "url_oficial": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11453.htm",
+    "data_coleta": "2026-09-23",
+    "status": "disponivel"
+  },
+  {
+    "id": "in_minc_29_2026_rouanet",
+    "arquivo": "in_minc_29_2026_rouanet.txt",
+    "titulo": "Instrução Normativa MinC nº 29, de 29 de janeiro de 2026 (Regulamenta o Pronac e os procedimentos de apresentação, execução e prestação de contas no Salic - Compilada com IN MinC nº 34/2026)",
+    "tipo": "instrucao_normativa",
+    "politica": "ROUANET",
+    "data": "2026-01-29",
+    "url_oficial": "https://www.gov.br/cultura/pt-br/acesso-a-informacao/legislacao-e-normativas/instrucao-normativa-minc-no-29-de-29-de-janeiro-de-2026",
+    "data_coleta": "2026-09-23",
+    "status": "disponivel"
+  },
+  {
+    "id": "manual_marcas_pronac",
+    "arquivo": "manual_marcas_pronac.txt",
+    "titulo": "Manual de Uso das Marcas do Programa Nacional de Apoio à Cultura (Pronac) / Lei Rouanet",
+    "tipo": "manual",
+    "politica": "ROUANET",
+    "data": "2026-01-01",
+    "url_oficial": "https://www.gov.br/cultura/pt-br/assuntos/fomento-e-incentivo-a-cultura/pronac/marca-pronac",
+    "data_coleta": "2026-09-23",
+    "status": "disponivel"
+  },
+  {
+    "id": "in_minc_23_2025_revogada",
+    "arquivo": "",
+    "titulo": "Instrução Normativa MinC nº 23, de 5 de fevereiro de 2025 (REVOGADA expressamente pelo Art. 101 da IN MinC nº 29/2026)",
+    "tipo": "instrucao_normativa",
+    "politica": "ROUANET",
+    "data": "2025-02-05",
+    "url_oficial": "https://www.gov.br/cultura/pt-br",
+    "data_coleta": "2026-09-23",
+    "status": "revogada"
   },
   {
     "id": "edital_pnab_viamao_vigente",

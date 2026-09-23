@@ -5,6 +5,8 @@ Módulo: backend/conhecimento_retriever.py
 Carrega os documentos oficiais da base de conhecimento (backend/conhecimento/),
 indexados por política e tipo, e seleciona os trechos regulamentares oficiais
 pertinentes para alimentar o contexto do assistente de IA.
+Garante que normas revogadas (como a IN MinC nº 23/2025) NUNCA sejam
+enviadas ao modelo.
 """
 
 import os
@@ -30,6 +32,8 @@ def carregar_indice() -> List[Dict[str, Any]]:
 
 def carregar_conteudo_documento(nome_arquivo: str) -> str:
     """Lê o conteúdo textual de um documento da base oficial."""
+    if not nome_arquivo:
+        return ""
     caminho = os.path.join(CONHECIMENTO_DIR, nome_arquivo)
     if not os.path.exists(caminho):
         return ""
@@ -43,6 +47,8 @@ def carregar_conteudo_documento(nome_arquivo: str) -> str:
 def identificar_politica(texto_usuario: str) -> Optional[str]:
     """Identifica se o usuário já mencionou ou escolheu uma política específica."""
     txt = (texto_usuario or "").lower()
+    if any(k in txt for k in ["rouanet", "pronac", "8.313", "8313", "salic", "in 29", "in29", "mecenato", "incentivo a projetos culturais"]):
+        return "ROUANET"
     if any(k in txt for k in ["pnab", "aldir blanc", "14.399", "14399"]):
         return "PNAB"
     if any(k in txt for k in ["lpg", "paulo gustavo", "195", "audiovisual"]):
@@ -55,16 +61,24 @@ def identificar_politica(texto_usuario: str) -> Optional[str]:
 
 
 def obter_documentos_por_politica(politica: Optional[str]) -> List[Dict[str, Any]]:
-    """Retorna os metadados dos documentos do índice correspondentes à política escolhida."""
+    """
+    Retorna os metadados dos documentos do índice correspondentes à política escolhida.
+    NUNCA inclui documentos com status 'revogada' (ex: IN 23/2025).
+    """
     indice = carregar_indice()
+    # Filtro de segurança absoluto: exclui qualquer documento revogado
+    docs_ativos = [doc for doc in indice if str(doc.get("status", "")).lower() != "revogada"]
+
     if not politica:
-        return indice
+        return docs_ativos
 
     politica_norm = politica.upper()
     docs_filtrados = []
-    for doc in indice:
+    for doc in docs_ativos:
         p = doc.get("politica", "").upper()
-        if politica_norm == "PNAB" and ("PNAB" in p or "FOMENTO CULTURAL" in p):
+        if politica_norm == "ROUANET" and ("ROUANET" in p or "FOMENTO CULTURAL" in p):
+            docs_filtrados.append(doc)
+        elif politica_norm == "PNAB" and ("PNAB" in p or "FOMENTO CULTURAL" in p):
             docs_filtrados.append(doc)
         elif politica_norm == "LPG" and ("LPG" in p or "FOMENTO CULTURAL" in p):
             docs_filtrados.append(doc)
@@ -73,7 +87,7 @@ def obter_documentos_por_politica(politica: Optional[str]) -> List[Dict[str, Any
         elif politica_norm == "MUNICIPAL" and ("MUNICIPAL" in p or "FOMENTO CULTURAL" in p):
             docs_filtrados.append(doc)
 
-    return docs_filtrados if docs_filtrados else indice
+    return docs_filtrados if docs_filtrados else docs_ativos
 
 
 def extrair_trechos_relevantes(
@@ -90,7 +104,7 @@ def extrair_trechos_relevantes(
     bloco_atual = []
 
     for linha in linhas:
-        if re.match(r'^(#|Art\.|CAPÍTULO|Seção)', linha.strip(), re.IGNORECASE) and bloco_atual:
+        if re.match(r'^(#|Art\.|CAPÍTULO|Seção|ANEXO)', linha.strip(), re.IGNORECASE) and bloco_atual:
             blocos.append("\n".join(bloco_atual))
             bloco_atual = [linha]
         else:
@@ -110,7 +124,6 @@ def extrair_trechos_relevantes(
             caracteres_acumulados += len(b)
 
     if not blocos_selecionados:
-        # Se nenhuma palavra-chave pontual bateu, retorna os primeiros N caracteres (cabeçalho + disposições iniciais)
         return texto_doc[:tamanho_max_caracteres]
 
     return "\n---\n".join(blocos_selecionados)
@@ -125,24 +138,41 @@ def extrair_contexto_conhecimento(
     """
     Monta o contexto oficial a ser injetado no prompt de sistema do Gemini,
     filtrando pelos documentos da política e tópicos da etapa do projeto.
+    Garante que documentos com status 'revogada' jamais sejam carregados.
     """
     docs = obter_documentos_por_politica(politica)
     if not docs:
         return ""
 
-    palavras_por_etapa = {
-        1: ["objeto", "finalidade", "institui", "abrangência", "recurso"],
-        2: ["projeto", "ação", "linguagem", "iniciativa"],
-        3: ["proponente", "pessoa física", "coletivo", "sociedade civil", "vedação", "inscrição"],
-        4: ["objetivo", "finalidade", "interesse público", "impacto"],
-        5: ["descentralização", "território", "periferia", "comunidade", "acesso"],
-        6: ["execução", "atividades", "plano de trabalho", "etapas"],
-        7: ["acessibilidade", "libras", "audiodescrição", "deficiência", "mobilidade"],
-        8: ["contrapartida", "democratização", "gratuito", "escola pública"],
-        9: ["cronograma", "vigência", "prazo", "fases"],
-        10: ["orçamento", "despesas", "rubrica", "vedação", "prestação de contas"],
-        11: ["documento", "certidão", "prestação de contas", "comprovação"]
-    }
+    if (politica or "").upper() == "ROUANET":
+        palavras_por_etapa = {
+            1: ["rouanet", "pronac", "8.313", "salic", "in 29", "apresentação", "período"],
+            2: ["proponente", "pessoa física", "microempreendedor", "pessoa jurídica", "cnae", "portfólio", "carteira", "limite"],
+            3: ["artigo 18", "artigo 26", "enquadramento", "segmento", "área cultural", "dedução fiscal"],
+            4: ["produto principal", "produto secundário", "proposta", "ação cultural", "sintese"],
+            5: ["objetivos", "justificativa", "interesse público", "impacto cultural", "difusão"],
+            6: ["local", "município", "cronograma", "36 meses", "fases", "pré-produção", "produção", "pós-produção"],
+            7: ["distribuição", "gratuita", "democratização", "social", "educativo", "ingressos", "50,00", "250,00", "cota"],
+            8: ["acessibilidade", "libras", "audiodescrição", "guia de acessibilidade", "deficiência", "mobilidade reduzida", "anexo iii"],
+            9: ["marcas", "pronac", "lei rouanet", "manual", "ministério da cultura", "governo federal", "5 dias úteis"],
+            10: ["ficha técnica", "currículo", "direitos autorais", "equipe", "anexo ii"],
+            11: ["administração", "15%", "captação", "10%", "150.000", "acessibilidade", "20%", "cachês", "25.000", "50.000", "orçamento analítico"],
+            12: ["admissibilidade", "portaria de autorização", "captação", "salic", "prestação de contas", "conferência"]
+        }
+    else:
+        palavras_por_etapa = {
+            1: ["objeto", "finalidade", "institui", "abrangência", "recurso"],
+            2: ["projeto", "ação", "linguagem", "iniciativa"],
+            3: ["proponente", "pessoa física", "coletivo", "sociedade civil", "vedação", "inscrição"],
+            4: ["objetivo", "finalidade", "interesse público", "impacto"],
+            5: ["descentralização", "território", "periferia", "comunidade", "acesso"],
+            6: ["execução", "atividades", "plano de trabalho", "etapas"],
+            7: ["acessibilidade", "libras", "audiodescrição", "deficiência", "mobilidade"],
+            8: ["contrapartida", "democratização", "gratuito", "escola pública"],
+            9: ["cronograma", "vigência", "prazo", "fases"],
+            10: ["orçamento", "despesas", "rubrica", "vedação", "prestação de contas"],
+            11: ["documento", "certidão", "prestação de contas", "comprovação"]
+        }
 
     keywords = palavras_por_etapa.get(etapa_atual, ["artigo", "edital", "regra"])
     if user_query:
@@ -152,6 +182,9 @@ def extrair_contexto_conhecimento(
     caracteres_restantes = limite_total_caracteres
 
     for doc in docs:
+        if str(doc.get("status", "")).lower() == "revogada":
+            continue
+
         conteudo = carregar_conteudo_documento(doc.get("arquivo", ""))
         if not conteudo:
             continue

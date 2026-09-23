@@ -1,11 +1,10 @@
-# DOCUMENTO OFICIAL: Decreto nº 11.740, de 18 de outubro de 2023 (Regulamenta a Lei nº 14.399/2022 - PNAB)
-# TIPO: decreto
+# DOCUMENTO OFICIAL: Decreto nº 11.740, de 18 de outubro de 2023 (Regulamenta a PNAB)
 # POLÍTICA: PNAB
-# DATA DA NORMA: 2023-10-18
 # URL OFICIAL DE ORIGEM: https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11740.htm
-# DATA DE COLETA: 2026-09-21
+# DATA DE COLETA: 2026-09-23
 # STATUS: disponivel
 ================================================================================
+
 D11740
 Presidência
 da República
@@ -15,14 +14,14 @@ DECRETO Nº 11.740, DE 18 DE OUTUBRO DE 2023
 Regulamenta a Lei nº
 14.399, de 8 de julho de 2022, que institui a Política Nacional Aldir Blanc
 de Fomento à Cultura.
-O PRESIDENTE DA REPÚBLICA ,
-no uso da atribuição que lhe confere o art. 84, caput , inciso IV, da
+O PRESIDENTE DA REPÚBLICA,
+no uso da atribuição que lhe confere o art. 84, caput, inciso IV, da
 Constituição, e tendo em vista o disposto na Lei nº 14.399, de 8 de julho de
 2022,
-DECRETA :
+DECRETA:
 CAPÍTULO I
 DISPOSIÇÕES GERAIS
-Art. 1º  Este Decreto regulamenta a
+Art. 1º Este Decreto regulamenta a
 Lei nº 14.399, de 8 de
 julho de 2022, que institui, no âmbito do Sistema Nacional de Cultura, a
 Política Nacional Aldir Blanc de Fomento à Cultura, baseada na parceria da
@@ -37,12 +36,7 @@ recursos financeiros da União aos Estados, aos Municípios e ao Distrito
 Federal, observados os critérios e os percentuais estabelecidos na
 legislação, de acordo com o cronograma de pagamentos a ser divulgado pelo
 Ministério da Cultura.
-§ 1º
-Os recursos repassados, oriundos do Fundo Nacional da Cultura - FNC, serão
-executados pelos Estados, pelos Municípios e pelo Distrito Federal mediante
-editais, chamadas públicas, prêmios, aquisição de bens e serviços vinculados
-ao setor cultural e a suas áreas técnicas e outros instrumentos destinados:
-§ 1º  Os recursos repassados, oriundos do Fundo
+§ 1º Os recursos repassados, oriundos do Fundo
 Nacional da Cultura  FNC, serão executados pelos Estados, pelos Municípios
 e pelo Distrito Federal mediante a concessão de prêmios e bolsas culturais,
 a execução de ações culturais e a aquisição de bens e serviços vinculados ao
@@ -62,28 +56,17 @@ a manifestações culturais; e
 V -
 à realização de ações, projetos, programas e atividades artísticas, do
 patrimônio cultural e de memória.
-§ 2º
-Nos editais de fomento de que trata o § 1º, será observado o disposto no
-Decreto nº 11.453, de 23 de março de 2023 , quanto
-aos procedimentos de seleção, execução e prestação de contas de projetos e
-iniciativas culturais, permitida a aplicação subsidiária da legislação local
-de cultura quando compatível com o referido Decreto.
-§ 2º  Nos editais de fomento de que trata o § 1º,
+§ 2º Nos editais de fomento de que trata o § 1º,
 será observado o disposto na
-Lei nº 14.903, de 27 de junho de 2024 ,
-e no Decreto nº 11.453, de 23 de março de 2023 ,
+Lei nº 14.903, de 27 de junho de 2024,
+e no Decreto nº 11.453, de 23 de março de 2023,
 quanto aos procedimentos de seleção, execução e prestação de contas de
 projetos e iniciativas culturais, permitida a aplicação subsidiária da
 legislação estadual e municipal de cultura, quando compatível com a Lei e o
 Decreto referidos.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-§ 3º
-O disposto no § 2º não se aplica aos editais de fomento de que tratam a
-Lei nº 13.018, de 22 de
-julho de 2014 , e a
-Lei nº 13.019, de 31 de julho de 2014.
-§ 3º  O disposto no § 2º não se aplica aos editais de
+§ 3º O disposto no § 2º não se aplica aos editais de
 fomento de que trata a
 Lei nº 13.019, de 31 de
 julho de 2014.
@@ -94,14 +77,7 @@ Na execução dos recursos de que trata este Decreto, os entes federativos
 priorizarão o repasse dos recursos aos agentes culturais locais de modo a
 valorizar práticas, saberes, fazeres, linguagens, produção, fruição
 artística, patrimônio, memória, diversidade, cidadania e cultura local.
-§ 5º
-Agentes culturais que executem atividades de natureza itinerante, a exemplo
-de artistas circenses, nômades e ciganos, poderão concorrer nos editais de
-fomento dos entes federativos onde exerçam atividades culturais ou estejam
-estabelecidos formal ou informalmente, permitida a dispensa da apresentação
-do comprovante de residência, nos termos do disposto no
-§ 7º do art. 19 do Decreto nº 11.453, de 2023.
-§ 5º  Agentes culturais que executem atividades de
+§ 5º Agentes culturais que executem atividades de
 natureza itinerante, a exemplo de artistas circenses, nômades e ciganos,
 poderão concorrer nos editais de fomento dos entes federativos onde exerçam
 atividades culturais ou estejam estabelecidos formal ou informalmente,
@@ -111,14 +87,8 @@ art. 10, § 8º, da Lei nº 14.903,
 de 27 de junho de 2024.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-§ 6º
-Os editais de fomento de que trata o
-Decreto nº 11.453, de 2023 , possuem natureza
-jurídica distinta das contratações previstas na
-Lei nº 14.133, de 1º de
-abril de 2021.
-§ 6º  Os editais de fomento de que trata a
-Lei nº 14.903, de 27 de junho de 2024 ,
+§ 6º Os editais de fomento de que trata a
+Lei nº 14.903, de 27 de junho de 2024,
 possuem natureza jurídica distinta das contratações previstas na
 Lei nº 14.133, de 1º de
 abril de 2021.
@@ -127,96 +97,50 @@ abril de 2021.
 CAPÍTULO II
 DOS
 PROCEDIMENTOS PARA RECEBIMENTO DE RECURSOS PELOS ENTES FEDERATIVOS
-Art. 3º Nos termos do disposto no
-art. 6º da Lei
-nº 14.399, de 2022 , a União entregará aos Estados, ao Distrito Federal e
-aos Municípios o valor correspondente a R$ 3.000.000.000,00 (três bilhões de
-reais), em cada um dos seguintes exercícios:
 Art. 3º Nos
 termos do disposto no
 art. 6º da Lei
-nº 14.399, de 8 de julho de 2022 ,
+nº 14.399, de 8 de julho de 2022,
 a partir do exercício de 2023, a União entregará aos Estados, ao Distrito
 Federal e aos Municípios o valor total de R$ 15.000.000.000,00 (quinze
 bilhões de reais).
 (Redação dada pelo Decreto nº
 12.257, de 2024)
-I -
-2023 ;
+;
 (Revogado pelo Decreto nº
 12.257, de 2024)
-II -
-2024;
 (Redação dada pelo Decreto nº
 12.257, de 2024)
-III
-- 2025;
 (Redação dada pelo Decreto nº
 12.257, de 2024)
-IV -
-2026; e
 (Redação dada pelo Decreto nº
 12.257, de 2024)
-V -
-2027.
 (Redação dada pelo Decreto nº
 12.257, de 2024)
-§ 1º
-Para o recebimento dos recursos, os Estados, o Distrito Federal, os
-Municípios e os consórcios públicos intermunicipais cadastrarão seus
-respectivos planos de ação no prazo de trinta a noventa dias, contado da
-data de publicação de ato anual do Ministério da Cultura.
 § 1º A cada ano, a programação orçamentária será de
 até R$ 3.000.000.000,00 (três bilhões de reais), constituindo-se como
 diretriz o saldo total remanescente nas contas específicas dos Estados, do
 Distrito Federal e dos Municípios.
 (Redação dada pelo Decreto nº
 12.257, de 2024)
-§ 1º-A Para o recebimento dos recursos, os Estados, o
-Distrito Federal, os Municípios e os consórcios públicos intermunicipais
-cadastrarão seus planos de ação no prazo de, no mínimo, trinta dias a, no
-máximo, noventa dias, contado da data de publicação de ato a ser publicado
-anualmente pelo Ministro de Estado da Cultura.
-(Incluído pelo Decreto nº
-12.257, de 2024)
 (Revogado pelo Decreto nº
 12.409, de 2025)
-§ 2º
-O plano de ação constitui documento a ser preenchido pelo ente federativo na
-plataforma oficial de transferências da União, para fins de solicitação de
-recursos, e conterá:
-I -
-a agência de relacionamento da instituição bancária para geração de contas
-específicas para as quais os recursos serão transferidos; e
 (Revogado pelo Decreto nº
 12.409, de 2025)
-II -
-as metas e as ações previstas, que servirão de base para o seu Plano Anual
-de Aplicação dos Recursos - PAAR.
 (Revogado pelo Decreto nº
 12.409, de 2025)
-§ 2º  Os entes federativos que cumprirem os
+§ 2º Os entes federativos que cumprirem os
 requisitos estabelecidos neste Decreto e em ato da Ministra de Estado da
 Cultura receberão anualmente o valor integral a que têm direito, observados
 os limites e as condicionantes estabelecidos na legislação.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-§ 3º
-O PAAR conterá o detalhamento do planejamento referente às ações para a
-execução dos recursos de que trata este Decreto e será solicitado nas
-condições e nos prazos estabelecidos pelo Ministério da Cultura em ato
-normativo.
-§ 3º  Para
+§ 3º Para
 fins do cumprimento do disposto no § 2º, o Ministério da Cultura encaminhará
 as informações pertinentes ao Ministério do Planejamento e Orçamento, com
 vistas à elaboração de programação orçamentária, observado o disposto no §
 1º.
 (Redação dada pelo Decreto nº 12.409, de 2025)
-§ 4º
-O PAAR será elaborado pelo ente federativo, após a aprovação do plano de
-ação, ouvida a sociedade civil, preferencialmente por intermédio de seus
-representantes nos conselhos de cultura ou, na ausência destes, em
-assembleias gerais junto aos agentes e fazedores de cultura do território.
 § 4º
 Para receber anualmente os recursos de que trata este Decreto, os Estados,
 o Distrito Federal e os Municípios deverão, nos termos do disposto em ato da
@@ -227,29 +151,15 @@ II -
 a execução de, no mínimo, 60% (sessenta por cento) dos recursos repassados
 anteriormente pela União.
 § 5º
-O recebimento e a execução de recursos de que trata este Decreto que
-ocorrerem no âmbito dos Centros de Artes e Esportes Unificados, modalidade
-do Programa Territórios da Cultura, seguirão procedimentos próprios
-estabelecidos em ato normativo do Ministério da Cultura.
-§ 5º
 Para fins de comprovação do requisito de que trata o inciso II do § 4º,
 será considerado o saldo em conta existente na data de aferição dos
 recursos.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
 § 6º
-Para receber os recursos, anualmente, os Estados, os Municípios e o Distrito
-Federal garantirão a destinação de recursos orçamentários próprios para a
-cultura, em montante não inferior à média dos valores consignados nos
-últimos três exercícios.
-§ 6º
 A aferição do saldo de que trata o § 5º ocorrerá uma vez ao ano.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-§ 7º
-O Ministério da Cultura divulgará anualmente listagem integral dos entes
-federativos, com a indicação daqueles que solicitaram os recursos da
-Política Nacional Aldir Blanc de Fomento à Cultura.
 § 7º
 O disposto no inciso II do § 4º não se aplica no primeiro ano de adesão do
 ente federativo solicitante.
@@ -269,7 +179,7 @@ da aferição seguinte, desde que os referidos requisitos sejam atendidos.
 (Incluído pelo Decreto nº
 12.409, de 2025)
 §
-10.  O recebimento e a execução de recursos destinados a obras vinculadas ao
+10. O recebimento e a execução de recursos destinados a obras vinculadas ao
 Programa de Aceleração do Crescimento  Novo PAC, nos termos do disposto no
 art. 18, § 2º, da Lei nº 14.719, de 1º
 de novembro de 2023, não serão considerados no cálculo de que trata o
@@ -277,67 +187,42 @@ inciso II do § 4º e seguirão procedimentos próprios estabelecidos em ato da
 Ministra de Estado da Cultura.
 (Incluído pelo Decreto nº
 12.409, de 2025)
-Art. 3º-A  Os Estados, o Distrito Federal e os
+Art. 3º-A Os Estados, o Distrito Federal e os
 Municípios solicitarão os recursos por meio da apresentação de plano de ação
 de caráter plurianual, a ser preenchido na plataforma oficial de
 transferências da União, conforme os prazos e os procedimentos estabelecidos
 em ato da Ministra de Estado da Cultura.
 (Incluído pelo Decreto nº
 12.409, de 2025)
-Parágrafo único.  O Ministério da Cultura divulgará anualmente listagem
+Parágrafo único. O Ministério da Cultura divulgará anualmente listagem
 integral dos entes federativos, com a indicação daqueles que solicitaram os
 recursos da Política Nacional Aldir Blanc de Fomento à Cultura.
 (Incluído pelo Decreto nº
 12.409, de 2025)
 Art. 4º Os recursos repassados aos entes federativos
 serão depositados e geridos em contas específicas, abertas automaticamente
-em banco público integrado na plataforma oficial de transferências da União,
-por meio da qual todas as movimentações de recursos serão classificadas e
-identificadas.
-Parágrafo único.  As contas bancárias de que trata o caput serão
-isentas de tarifas e terão aplicação automática, que gerará rendimentos de
-ativos financeiros, os quais poderão ser aplicados para a consecução do
-objeto do plano de ação, dispensada a necessidade de autorização prévia do
-Ministério da Cultura.
-Art. 4º  Os recursos repassados aos entes federativos
-serão depositados e geridos em contas específicas, abertas automaticamente
 em banco público integrado na plataforma oficial de transferências da União.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-§ 1º  As contas bancárias de que trata o caput serão
+§ 1º As contas bancárias de que trata o caput serão
 isentas de tarifas e terão aplicação automática, que gerará rendimentos de
 ativos financeiros, os quais poderão ser aplicados para a consecução do
 objeto do plano de ação, dispensada a necessidade de autorização prévia do
 Ministério da Cultura.
 (Incluído pelo Decreto nº
 12.409, de 2025)
-§ 2º  As movimentações de saída de recursos das contas
+§ 2º As movimentações de saída de recursos das contas
 bancárias serão classificadas e identificadas pelos entes durante a execução
 dos recursos.
 (Incluído pelo Decreto nº
 12.409, de 2025)
+(Revogado pelo Decreto nº
+12.409, de 2025)
+(Revogado pelo Decreto nº
+12.409, de 2025)
+(Revogado pelo Decreto nº
+12.409, de 2025)
 Art. 5º No período em que a plataforma oficial de
-transferências da União estiver aberta para o cadastro de planos de ação, os
-Municípios poderão optar por executar os recursos por meio de consórcio
-público intermunicipal que preveja, em seu instrumento administrativo
-constitutivo, atuação na área da cultura, observadas as seguintes condições:
-I -
-o valor solicitado pelo conjunto de Municípios que sejam integrantes de um
-mesmo consórcio corresponderá ao somatório dos valores atribuídos a cada
-Município consorciado solicitante;
-(Revogado pelo Decreto nº
-12.409, de 2025)
-II -
-a opção de que trata o caput implicará a desistência da solicitação
-individual de recursos pelo Município; e
-(Revogado pelo Decreto nº
-12.409, de 2025)
-III
-- os Municípios que submeterão planos de ação por meio de consórcio
-informarão ao Ministério da Cultura a anuência formal dos seus Prefeitos.
-(Revogado pelo Decreto nº
-12.409, de 2025)
-Art. 5º  No período em que a plataforma oficial de
 transferências da União estiver aberta para o cadastro de planos de ação, os
 Municípios poderão optar por executar os recursos por meio de consórcio
 público intermunicipal que preveja, em seu instrumento administrativo
@@ -345,12 +230,7 @@ constitutivo, atuação na área da cultura, observadas as condições
 estabelecidas em ato da Ministra de Estado da Cultura.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-Art. 6º Os recursos que não forem repassados aos Estados,
-ao Distrito Federal e aos Municípios, em razão de descumprimento de
-procedimentos e de prazos exigidos, serão redistribuídos pela União segundo
-os critérios de partilha estabelecidos pela
-Lei nº 14.399, de 2022.
-Art. 6º  Os recursos que não forem solicitados pelos
+Art. 6º Os recursos que não forem solicitados pelos
 Estados, pelo Distrito Federal e pelos Municípios nos termos do disposto no
 art. 3º-A serão redistribuídos pela União, observados os critérios de
 partilha estabelecidos na
@@ -360,21 +240,21 @@ julho 2022, nos seguintes termos:
 12.409, de 2025)
 I -
 os recursos de que trata o
-art. 8º, caput ,
-inciso I, da Lei nº 14.399, de 8 de julho de 2022 , serão redistribuídos
+art. 8º, caput,
+inciso I, da Lei nº 14.399, de 8 de julho de 2022, serão redistribuídos
 ao Distrito Federal e aos Estados; e
 (Incluído pelo Decreto nº
 12.409, de 2025)
 II -
 os recursos de que trata o
 art. 8º,
-caput , inciso II, da Lei nº 14.399, de 8 de julho de 2022 , serão
+caput, inciso II, da Lei nº 14.399, de 8 de julho de 2022, serão
 redistribuídos aos Municípios do mesmo Estado.
 (Incluído pelo Decreto nº
 12.409, de 2025)
 § 1º
 Na hipótese de não existirem Municípios aptos ou interessados no
-recebimento de recursos redistribuídos nos termos do inciso II do caput ,
+recebimento de recursos redistribuídos nos termos do inciso II do caput,
 os recursos serão repassados aos respectivos Estados.
 (Incluído pelo Decreto nº
 12.409, de 2025)
@@ -385,55 +265,21 @@ recursos e preencher as condições estabelecidas em ato da Ministra de Estado
 da Cultura.
 (Incluído pelo Decreto nº
 12.409, de 2025)
-Art. 7º Todos os recursos repassados serão objeto de
-adequação orçamentária pelos entes federativos no prazo de cento e oitenta
-dias, contado da data de recebimento dos recursos.
-Art. 7º Os recursos repassados aos Municípios serão
-objeto de adequação orçamentária.
-(Redação dada pelo Decreto nº
-12.257, de 2024)
 (Revogado pelo Decreto nº
 12.409, de 2025)
-Parágrafo único.
-A destinação de recursos por meio de consórcio público
-intermunicipal suprirá a necessidade de adequação orçamentária de que trata
-o caput , observado o disposto na
-Lei nº 11.107, de 6 de
-abril de 2005 , e no
-Decreto nº 6.017, de
-17 de janeiro de 2007.
-§ 1º  A destinação de recursos por meio de consórcio público
-intermunicipal suprirá a necessidade de adequação orçamentária de que trata
-o caput , observado o disposto na
-Lei nº 11.107, de 6 de
-abril de 2005 , e no
-Decreto nº 6.017, de
-17 de janeiro de 2007.
 (Redação dada pelo Decreto nº
 12.257, de 2024) (Revogado
 pelo Decreto nº 12.409, de 2025)
-§ 2º A destinação de recursos na Lei Orçamentária Anual
-em valores iguais ou superiores ao recebido pelo Município suprirá a
-necessidade de adequação orçamentária de que trata o caput .
-(Incluído pelo Decreto nº
-12.257, de 2024)
 (Revogado pelo Decreto nº
 12.409, de 2025)
-Art. 8º Os recursos recebidos que não tenham sido objeto
-de programação publicada pelos Municípios no prazo de cento e oitenta dias
-serão revertidos para a conta bancária específica criada automaticamente
-pela plataforma oficial de transferências da União, vinculada ao fundo
-estadual de cultura do Estado onde o Município se localiza, ou ao órgão ou à
-entidade estadual pública responsável pela gestão desses recursos, até dez
-dias após o encerramento do prazo previsto neste artigo.
-Art. 8º  O Plano de Aplicação dos Recursos consiste em
+Art. 8º O Plano de Aplicação dos Recursos consiste em
 documento que detalha as metas e ações previstas no plano de ação cadastrado
 na plataforma oficial de transferências da União e será solicitado nas
 condições e nos prazos estabelecidos em ato da Ministra de Estado da
 Cultura.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-Parágrafo único.  O Plano de Aplicação dos Recursos será elaborado pelo ente
+Parágrafo único. O Plano de Aplicação dos Recursos será elaborado pelo ente
 federativo, consultada a sociedade civil, preferencialmente por intermédio
 de seus representantes nos conselhos de cultura ou, na ausência destes, em
 assembleias gerais junto aos agentes e fazedores de cultura do seu
@@ -448,13 +294,9 @@ Aldir Blanc de Fomento à Cultura, serão realizadas as ações e as atividades
 de que trata o
 art. 5º da Lei nº
 14.399, de 2022, por meio de:
-I -
-processos públicos de seleção para execução de ações que visem ao fomento
-cultural de que trata o
-art. 8º do Decreto nº 11.453, de 2023;
 I - processos públicos de seleção para execução de
 ações que visem ao fomento cultural de que trata a
-Lei nº 14.903, de 27 de junho de 2024 ;
+Lei nº 14.903, de 27 de junho de 2024;
 (Redação dada pelo Decreto nº
 12.409, de 2025)
 II -
@@ -485,23 +327,7 @@ Os processos públicos de seleção serão pautados por procedimentos claros,
 objetivos, simplificados e acessíveis, e será dada preferência ao uso de
 linguagem simples e de formatos visuais que objetivem o acesso dos agentes
 culturais.
-§ 3º
-Os processos públicos de seleção de que trata o inciso I do caput
-preverão expressamente a assinatura de documento compatível com a modalidade
-de fomento adotada, nos seguintes termos:
-I -
-termo de execução cultural de que trata o
-art. 23 do Decreto nº 11.453, de 2023, nos
-editais de fomento à execução de ações culturais ou de apoio a espaços
-culturais;
-II -
-recibo de que trata o
-art. 42 do Decreto nº 11.453, de 2023 , nos
-editais de premiação; ou
-III
-- termo de concessão de bolsas, nas políticas, nos programas ou nos editais
-que concedam bolsas culturais.
-§ 3º  Os processos públicos de seleção de que trata o
+§ 3º Os processos públicos de seleção de que trata o
 inciso I do caput deverão prever expressamente a formalização de
 instrumento jurídico compatível com a modalidade de fomento adotada, nos
 seguintes termos:
@@ -510,14 +336,14 @@ seguintes termos:
 I -
 termo de execução cultural de que trata o
 art. 12 da Lei nº 14.903, de 27 de
-junho de 2024 , nos editais de fomento à execução de ações culturais ou
+junho de 2024, nos editais de fomento à execução de ações culturais ou
 de apoio a espaços culturais;
 (Redação dada pelo Decreto nº
 12.409, de 2025)
 II -
 termo de premiação cultural de que trata o
 art. 22 da Lei nº 14.903, de 27 de
-junho de 2024 , nos editais de premiação; ou
+junho de 2024, nos editais de premiação; ou
 (Redação dada pelo Decreto nº
 12.409, de 2025)
 III
@@ -558,13 +384,13 @@ compartilhamento das informações a que se refere o § 6º, de acordo com o
 disposto na Lei nº
 13.709, de 14 de agosto de 2018 - Lei Geral de Proteção de Dados
 Pessoais.
-Art. 10.  Diretrizes complementares para aplicação dos
+Art. 10. Diretrizes complementares para aplicação dos
 recursos de que trata este Decreto serão definidas em atos próprios e
 publicadas periodicamente pelo Ministério da Cultura, observados os
 componentes e os preceitos do Sistema Nacional de Cultura, em consonância
 com as políticas nacionais estabelecidas pelo Ministério da Cultura em
 diálogo com os entes federativos e a sociedade civil.
-Art. 11.  Na realização dos procedimentos públicos de
+Art. 11. Na realização dos procedimentos públicos de
 seleção de fomento serão asseguradas medidas de democratização,
 desconcentração, descentralização, regionalização, diversificação e
 ampliação quantitativa de destinatários, linguagens culturais e regiões
@@ -572,7 +398,7 @@ geográficas, com a implementação de ações afirmativas e de acessibilidade,
 nos termos do disposto no
 § 4º do art. 8º
 da Lei nº 14.399, de 2022.
-Parágrafo único.  Os parâmetros para a adoção das medidas a que se refere o
+Parágrafo único. Os parâmetros para a adoção das medidas a que se refere o
 caput serão estabelecidos em ato normativo do Ministério da Cultura,
 considerados:
 I -
@@ -591,18 +417,18 @@ IV -
 a garantia de cotas com reserva de vagas específicas nos editais de fomento
 financiados com recursos de que trata este Decreto, conforme definições e
 percentuais previstos em ato normativo do Ministério da Cultura.
-Art. 12.  Os recursos de que trata a
+Art. 12. Os recursos de que trata a
 Lei nº 14.399, de 2022,
 não poderão ser destinados para pagamento de pessoal ativo ou inativo de
 órgãos ou entidades da administração pública direta ou indireta; empresas
 terceirizadas contratadas por órgãos ou entidades da administração pública
 direta ou indireta, nem para custeio da estrutura e de ações administrativas
 públicas da gestão local, ressalvado o disposto no art. 13 deste Decreto.
-Art. 13.  Os Estados, o Distrito Federal e os Municípios
+Art. 13. Os Estados, o Distrito Federal e os Municípios
 poderão utilizar até cinco por cento dos recursos recebidos para a
 operacionalização das ações de que trata este Decreto, observado o teto de
 R$6.000.000,00 (seis milhões de reais).
-Art. 14.  O percentual a que se refere o art. 13 poderá
+Art. 14. O percentual a que se refere o art. 13 poderá
 ser utilizado para o fortalecimento do Sistema Nacional de Cultura, de seus
 sistemas setoriais e de suas instâncias locais, com o objetivo de qualificar
 a implementação e o funcionamento territorial da Política Nacional Aldir
@@ -633,17 +459,17 @@ VII
 monitoramento, cadastro e inscrição de propostas, transparência, integração
 e compartilhamento de dados de gestão da política de fomento no âmbito do
 Sistema Nacional de Informações e Indicadores Culturais - Sniic.
-Parágrafo único.  Na execução das ações de que trata este artigo, será
+Parágrafo único. Na execução das ações de que trata este artigo, será
 garantida a titularidade do Poder Público em relação aos dados de execução,
 com acesso permanente aos sistemas, inclusive após o término da parceria ou
 da contratação.
 CAPÍTULO IV
 DO
 SUBSÍDIO AOS ESPAÇOS CULTURAIS
-Art. 15.  O subsídio mensal a espaços artísticos e a
+Art. 15. O subsídio mensal a espaços artísticos e a
 ambientes culturais previsto na
 alínea b do
-inciso I do caput do art. 7º da Lei nº 14.399, de 2022 , será
+inciso I do caput do art. 7º da Lei nº 14.399, de 2022, será
 cabível a espaços, ambientes e iniciativas artístico-culturais organizados e
 mantidos por pessoas, organizações da sociedade civil, microempresas
 culturais, organizações culturais comunitárias, cooperativas com finalidade
@@ -690,16 +516,7 @@ O gestor local, garantida a participação social de que trata o § 4º do art.
 9º, estabelecerá os critérios de priorização de espaços culturais,
 observados os princípios de descentralização, desconcentração,
 regionalização e implementação de ações afirmativas.
-§ 6º
-O valor de manutenção mensal dos espaços a que se refere o caput
-será de R$ 3.000,00 (três mil reais) a R$ 10.000,00 (dez mil reais),
-permitida a destinação ao uso em atividades-meio ou em atividades-fim, e o
-beneficiário do subsídio apresentará prestação de contas ao Estado, ao
-Município ou ao Distrito Federal, no prazo de cento e oitenta dias, contado
-do final do exercício financeiro em que se encerrou a aplicação dos recursos
-recebidos, conforme as normas de prestação de contas estabelecidas no
-Decreto nº 11.453, de 2023.
-§ 6º  O valor de manutenção mensal dos espaços a que
+§ 6º O valor de manutenção mensal dos espaços a que
 se refere o caput será de R$ 3.000,00 (três mil reais) a R$ 10.000,00
 (dez mil reais), permitida a destinação ao uso em atividades-meio ou em
 atividades-fim e o pagamento em parcela única.
@@ -709,18 +526,18 @@ atividades-fim e o pagamento em parcela única.
 A faixa de valores para os subsídios de que trata este Capítulo será
 corrigida anualmente, com base no Índice Nacional de Preços ao Consumidor
 Amplo - IPCA.
-§ 8º  O beneficiário do subsídio apresentará prestação
+§ 8º O beneficiário do subsídio apresentará prestação
 de contas ao Estado, ao Município ou ao Distrito Federal, no prazo de cento
 e oitenta dias, contado do final do exercício financeiro em que se encerrou
 a aplicação dos recursos recebidos, conforme as normas de prestação de
 contas estabelecidas na
-Lei nº 14.903, de 27 de junho de 2024 .
+Lei nº 14.903, de 27 de junho de 2024.
 (Incluído pelo Decreto nº
 12.409, de 2025)
 CAPÍTULO V
 DO
 MONITORAMENTO, DA TRANSPARÊNCIA E DA AVALIAÇÃO DE RESULTADOS
-Art. 16.  Observados os princípios da transparência e da
+Art. 16. Observados os princípios da transparência e da
 publicidade, as seleções e os instrumentos jurídicos de que trata o Capítulo
 III e os seus resultados serão publicados nos sítios eletrônicos dos
 respectivos entes federativos, em formato acessível e didático, e nos seus
@@ -739,63 +556,25 @@ O ente federativo publicará, preferencialmente em seu sítio eletrônico, no
 formato de dados abertos, as informações sobre os recursos que tenham sido
 empenhados e inscritos em restos a pagar, com a identificação do
 destinatário e do valor a ser executado.
-Art. 17.  Encerrado o prazo de execução dos recursos, os
-Estados, o Distrito Federal e os Municípios apresentarão, por meio de
-plataforma oficial de transferências da União, os relatórios de gestão,
-conforme modelo fornecido pelo Ministério da Cultura, com informações sobre
-a execução do PAAR, acompanhado dos seguintes documentos:
-I -
-lista dos editais lançados pelo ente federativo, com os respectivos links
-de publicação em diário oficial;
 (Revogado pelo Decreto nº
 12.409, de 2025)
-II -
-publicação da lista dos contemplados em diário oficial, com nome ou razão
-social, número de inscrição no Cadastro de Pessoas Físicas - CPF ou no
-Cadastro Nacional da Pessoa Jurídica - CNPJ, nome do projeto e valor do
-projeto; e
 (Revogado pelo Decreto nº
 12.409, de 2025)
-III
-- outros documentos solicitados pelo Ministério da Cultura relativos à
-execução dos recursos.
 (Revogado pelo Decreto nº
 12.409, de 2025)
-Art. 17.  Os Estados, o Distrito Federal e os
+Art. 17. Os Estados, o Distrito Federal e os
 Municípios apresentarão os documentos solicitados pela União, por meio de
 plataforma específica, para fins de monitoramento, conforme os prazos e os
 procedimentos estabelecidos em ato da Ministra de Estado da Cultura.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-§ 1º
-Os Estados, o Distrito Federal e os Municípios terão o prazo até 31 de
-dezembro do ano subsequente ao da aprovação dos seus respectivos planos de
-ação para a execução dos recursos de que trata este Decreto.
-(Vide Decreto nº
-12.257, de 2024)
-(Vide Decreto nº
-12.257, de 2024)
 (Revogado pelo Decreto nº
 12.409, de 2025)
-§ 2º
-Compreende-se como execução de recursos de que trata o § 1º a liquidação e o
-pagamento ou o empenho e a inscrição em restos a pagar de compromissos
-orçamentários assumidos no ano de execução, nos termos do disposto no
-Decreto nº 93.872, de 23 de dezembro
-de 1986.
 (Revogado pelo Decreto nº
 12.409, de 2025)
-§ 3º
-Os Estados, o Distrito Federal e os Municípios terão o prazo de doze meses,
-contado da data final de execução dos recursos de que trata o § 1º, para o
-envio das informações relativas ao relatório de gestão.
 (Revogado pelo Decreto nº
 12.409, de 2025)
-§ 4º
-O Ministério da Cultura poderá dispensar, integral ou parcialmente, a
-apresentação, pelos entes federativos, de documentos já apresentados ou
-mapeados durante o processo de execução.
-§ 4º  O Ministério da Cultura poderá dispensar,
+§ 4º O Ministério da Cultura poderá dispensar,
 integral ou parcialmente, a apresentação, pelos entes federativos, de
 documentos já apresentados ou mapeados durante o processo de execução e
 monitoramento.
@@ -809,14 +588,7 @@ irregularidades e avaliação qualitativa das ações.
 O Ministério da Cultura editará comunicados e atos normativos com
 orientações para o monitoramento, o acompanhamento e a avaliação de
 resultados.
-§ 7º
-Compete aos Estados, ao Distrito Federal e aos Municípios o estabelecimento
-de prazos para a execução e a avaliação das prestações de contas dos agentes
-culturais destinatários finais dos recursos, inclusive quanto à aplicação de
-eventuais ressarcimentos, penalidades e medidas compensatórias, observado o
-disposto no
-Decreto nº 11.453, de 2023.
-§ 7º  Compete aos Estados, ao Distrito Federal e aos
+§ 7º Compete aos Estados, ao Distrito Federal e aos
 Municípios:
 (Redação dada pelo Decreto nº
 12.409, de 2025)
@@ -846,13 +618,13 @@ Lei nº 14.903, de 27 de junho de 2024.
 Os recursos provenientes de ressarcimentos, multas ou devoluções realizadas
 pelos agentes culturais destinatários finais dos recursos serão recolhidos
 pelo ente federativo responsável pela realização do chamamento público.
-Art. 18.  As informações relativas à execução da
+Art. 18. As informações relativas à execução da
 Política Nacional Aldir Blanc de Fomento à Cultura comporão e fortalecerão o
 Sniic.
 CAPÍTULO VI
 DAS
 COMPETÊNCIAS FEDERATIVAS
-Art. 19.  Para fins do disposto neste Decreto, compete
+Art. 19. Para fins do disposto neste Decreto, compete
 ao Ministério da Cultura:
 I -
 estabelecer as diretrizes complementares de aplicação da Política Nacional
@@ -867,60 +639,43 @@ e para a estruturação e o funcionamento do Sistema Nacional de Cultura;
 IV -
 promover a parametrização, a padronização e a consonância entre instrumentos
 legais, administrativos e de gestão do fomento à cultura;
-V -
-estabelecer critérios e prazos para submissão de planos de ação e PAARs e
-seus respectivos documentos, nos termos do disposto nos § 1º e § 3º do art.
-3º;
 V - estabelecer critérios para submissão de planos
 de ação e Planos de Aplicação dos Recursos e seus respectivos documentos;
 (Redação dada pelo Decreto nº
 12.409, de 2025)
 VI -
 analisar os planos de ação;
-VII
-- avaliar os PAARs;
 VII - avaliar os Planos de Aplicação dos Recursos;
 (Redação dada pelo Decreto nº
 12.409, de 2025)
 VIII
 - repassar os recursos financeiros aos entes federativos;
-IX -
-acompanhar, monitorar e avaliar a implementação dos planos de ação e dos
-PAARs;
 IX - acompanhar, monitorar e avaliar a implementação
 dos planos de ação e dos Planos de Aplicação dos Recursos;
 (Redação dada pelo Decreto nº
 12.409, de 2025)
 X -
 realizar a redistribuição de eventuais saldos de recursos;
-XI -
-solicitar relatórios e outros documentos necessários à comprovação da
-execução do plano de ação e do PAAR;
 XI - solicitar os documentos necessários à
 comprovação da execução do plano de ação e do Plano de Aplicação dos
 Recursos;
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-XII
-- analisar e manifestar-se sobre os relatórios de gestão apresentados pelos
-entes federativos;
 XII - analisar e manifestar-se sobre os documentos
 de que trata o inciso XI;
 (Redação dada pelo Decreto nº
 12.409, de 2025)
 XIII
 - consolidar e publicar informações sobre a execução da
-Lei nº 14.399, de 2022 ,
+Lei nº 14.399, de 2022,
 para fins de transparência e acompanhamento pela sociedade civil e pelos
 demais atores; e
 XIV
 - coordenar a implantação federativa de sistemas, inclusive digitais, com
 dados, informações e indicadores culturais referentes à execução dos
 recursos.
-Art. 20.  Para fins do disposto neste Decreto, compete
+Art. 20. Para fins do disposto neste Decreto, compete
 aos Estados, ao Distrito Federal e aos Municípios:
-I -
-apresentar o plano de ação e o PAAR ao Ministério da Cultura;
 I - apresentar o plano de ação e o Plano de
 Aplicação dos Recursos ao Ministério da Cultura;
 (Redação dada pelo Decreto nº
@@ -942,9 +697,6 @@ V -
 incentivar a profissionalização e apoiar o setor cultural local nas fases de
 inscrição de editais, de execução e de prestação de contas de projetos
 contemplados, por meio de oficinas e outras atividades formativas;
-VI -
-executar o plano de ação e o PAAR e informar e justificar eventuais
-remanejamentos no relatório de gestão;
 VI - executar o plano de ação e o Plano de Aplicação
 dos Recursos e informar e justificar eventuais remanejamentos ao Ministério
 da Cultura;
@@ -960,9 +712,6 @@ analisar e acompanhar a execução e a prestação de contas dos projetos
 selecionados;
 X -
 recolher dados relativos à execução dos recursos e aos seus destinatários;
-XI -
-encaminhar ao Ministério da Cultura relatórios de monitoramento e relatórios
-de gestão;
 XI - encaminhar ao Ministério da Cultura os
 documentos solicitados pela União, para fins de monitoramento, dentro das
 condições e prazos estabelecidos;
@@ -986,22 +735,14 @@ inclusive com a busca ativa de agentes culturais; e
 XVI
 - implementar e gerir sistemas, inclusive digitais, com dados, informações e
 indicadores culturais referentes à execução dos recursos.
-Art. 21.  Para fins do disposto neste Decreto, compete
+Art. 21. Para fins do disposto neste Decreto, compete
 aos Conselhos de Cultura dos entes federativos:
-I -
-participar da elaboração do PAAR do Estado, do Distrito Federal ou do
-Município para auxiliar na discussão e na consulta à comunidade cultural e
-aos demais atores da sociedade civil sobre a execução dos recursos de que
-trata este Decreto;
 I - participar da elaboração do Plano de Aplicação
 dos Recursos do Estado, do Distrito Federal ou do Município, para auxiliar
 na discussão e na consulta à comunidade cultural e aos demais atores da
 sociedade civil sobre a execução dos recursos de que trata este Decreto;
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-II -
-auxiliar, acompanhar e fiscalizar a implementação do plano de ação e do PAAR;
-e
 II - auxiliar, acompanhar e fiscalizar a
 implementação do plano de ação e do Plano de Aplicação dos Recursos; e
 (Redação dada pelo Decreto nº
@@ -1011,36 +752,32 @@ III
 ações relativas à Política Nacional Aldir Blanc de Fomento à Cultura.
 CAPÍTULO VII
 DISPOSIÇÕES FINAIS
-Art. 22.  É obrigatória a exibição das marcas do Governo
+Art. 22. É obrigatória a exibição das marcas do Governo
 federal e da Política Nacional Aldir Blanc de Fomento à Cultura em todas as
 atividades, publicações e comunicações e em todos os produtos
 artístico-culturais realizados pelos entes federativos e agentes culturais
 no âmbito da execução de ações relativas à Política, observadas as regras,
 diretrizes e orientações técnicas do manual de aplicação de marcas elaborado
 pelo Ministério da Cultura.
-Art. 23.  O Ministério da Cultura produzirá material de
-orientação e padronização de instrumentos técnicos e jurídicos para auxiliar
-na execução dos recursos de que trata este Decreto, sendo facultada aos
-Estados, ao Distrito Federal e aos Municípios a adoção de tais modelos.
-Art. 23.  O Ministério da Cultura produzirá material
+Art. 23. O Ministério da Cultura produzirá material
 de orientação e padronização de instrumentos técnicos e jurídicos para
 auxiliar na execução dos recursos de que trata este Decreto.
 (Redação dada pelo Decreto nº
 12.409, de 2025)
-Art. 23-A.  Até 31 de dezembro de 2026, no caso de
+Art. 23-A. Até 31 de dezembro de 2026, no caso de
 inexistência de fundos de cultura estaduais e municipais aptos a receber os
 recursos federais de que trata este Decreto, o repasse será direcionado para
 estrutura definida pela autoridade competente de cada ente federativo
 recebedor.
-(Incluído  pelo Decreto nº
+(Incluído pelo Decreto nº
 12.409, de 2025)
-Parágrafo único.  A partir de 1º de janeiro de 2027, somente receberão os
+Parágrafo único. A partir de 1º de janeiro de 2027, somente receberão os
 recursos previstos neste Decreto os entes federativos que dispuserem de
 fundo de cultura, conforme o disposto na
-Lei nº 14.835, de 4 de abril de 2024 .
-(Incluído  pelo Decreto nº
+Lei nº 14.835, de 4 de abril de 2024.
+(Incluído pelo Decreto nº
 12.409, de 2025)
-Art. 24.  Este Decreto entra em vigor na data de sua
+Art. 24. Este Decreto entra em vigor na data de sua
 publicação.
 Brasília, 18 de
 outubro de 2023; 202º da Independência e 135º da República.

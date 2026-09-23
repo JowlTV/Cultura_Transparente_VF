@@ -237,7 +237,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                 Consultor IA
               </span>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+            <h3 className="text-lg sm:text-xl font-normal text-white" style={{ fontFamily: 'var(--font-display)' }}>
               Auxílio ao Fazedor de Cultura · Estruturador de Projetos
             </h3>
             <p className="text-xs text-purple-100/80 max-w-2xl leading-relaxed">
@@ -261,7 +261,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
         <div className="bg-[#FAF4EB] rounded-container p-5 sm:p-6 border border-[#2D0652]/10 shadow-tint-sm space-y-4">
           <div className="border-hand-drawn-bottom pb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-[#2D0652]">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-[#FF4500] text-sm" style={{ fontFamily: 'var(--font-display)' }}>Gazeta Cultural de Viamão</span>
+              <span className="font-normal text-[#FF4500] text-sm" style={{ fontFamily: 'var(--font-display)' }}>Gazeta Cultural de Viamão</span>
               <span className="text-[#2D0652]/30">·</span>
               <span className="text-xs text-[#2D0652]/80 font-medium">Edição Semanal de Fomento, Notícias & Editais</span>
             </div>
@@ -276,7 +276,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                 <div className="p-1.5 rounded-card bg-[#6A0DAD] text-white">
                   <Newspaper className="w-4 h-4" />
                 </div>
-                <h3 className="font-bold text-[#2D0652] text-lg sm:text-xl" style={{ fontFamily: 'var(--font-display)' }}>
+                <h3 className="font-normal text-[#2D0652] text-lg sm:text-xl" style={{ fontFamily: 'var(--font-display)' }}>
                   Notícias, Editais & Fomento
                 </h3>
               </div>
@@ -524,7 +524,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                   </div>
                 )}
                 <div className="flex-1">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
+                  <h2 className="text-xl sm:text-2xl font-normal text-white leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
                     {manchete.titulo}
                   </h2>
                   <p className="mt-2 text-xs sm:text-sm text-purple-100/90 leading-relaxed max-w-4xl">
@@ -561,7 +561,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
               size={110}
             />
             <div className="space-y-1">
-              <h4 className="font-bold text-[#2D0652] text-lg" style={{ fontFamily: 'var(--font-display)' }}>
+              <h4 className="font-normal text-[#2D0652] text-lg" style={{ fontFamily: 'var(--font-display)' }}>
                 Nenhuma publicação encontrada para os filtros selecionados
               </h4>
               <p className="text-xs text-[#2D0652]/70 max-w-md mx-auto leading-relaxed">
@@ -637,7 +637,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                   {/* Corpo do Card */}
                   <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
                     <div className="space-y-2">
-                      <h4 className="font-bold text-[#2D0652] text-sm sm:text-base leading-snug group-hover:text-[#6A0DAD] transition-colors" style={{ fontFamily: 'var(--font-display)' }}>
+                      <h4 className="font-normal text-[#2D0652] text-sm sm:text-base leading-snug group-hover:text-[#6A0DAD] transition-colors" style={{ fontFamily: 'var(--font-display)' }}>
                         {item.titulo}
                       </h4>
 

@@ -198,7 +198,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
                     {selectedModalNews.data}
                   </span>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-[#2D0652] leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
+                <h3 className="text-base sm:text-lg text-[#2D0652] leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
                   {selectedModalNews.titulo}
                 </h3>
               </div>

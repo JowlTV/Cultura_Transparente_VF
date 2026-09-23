@@ -1,11 +1,10 @@
-# DOCUMENTO OFICIAL: Lei Complementar nº 195, de 8 de julho de 2022 (Lei Paulo Gustavo - LPG)
-# TIPO: lei
+# DOCUMENTO OFICIAL: Lei Complementar nº 195, de 8 de julho de 2022 (Lei Paulo Gustavo)
 # POLÍTICA: LPG
-# DATA DA NORMA: 2022-07-08
 # URL OFICIAL DE ORIGEM: https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp195.htm
-# DATA DE COLETA: 2026-09-21
+# DATA DE COLETA: 2026-09-23
 # STATUS: disponivel
 ================================================================================
+
 Lcp 195
 Presidência da República
 Secretaria-Geral
@@ -26,7 +25,7 @@ enfrentamento das consequências sociais e econômicas no setor cultural
 decorrentes de calamidades públicas ou pandemias; e altera a Lei nº 8.313, de 23
 de dezembro de 1991, para atribuir outras fontes de recursos ao Fundo Nacional
 da Cultura (FNC).
-O PRESIDENTE DA REPÚBLICA
+O PRESIDENTE DA REPÚBLICA
 Faço
 saber que o Congresso Nacional decreta e eu promulgo, nos termos do parágrafo 5º
 do art. 66 da Constituição Federal, a seguinte Lei Complementar:
@@ -44,18 +43,6 @@ Art. 2º Fica autorizada a utilização dos recursos originalmente arrecadados e
 destinados ao setor cultural identificados como superávit financeiro apurado em
 balanço das fontes de receita vinculadas ao Fundo Nacional da Cultura (FNC) para
 os fins desta Lei Complementar.
-Art. 3º A União entregará aos Estados, ao Distrito Federal e aos Municípios R$
-3.862.000.000,00 (três bilhões, oitocentos e sessenta e dois milhões de reais)
-para aplicação em ações emergenciais que visem a combater e mitigar os efeitos
-da pandemia da covid-19 sobre o setor cultural.
-Art. 3º  Fica a União autorizada a destinar, no exercício
-de 2023, aos Estados, ao Distrito Federal e aos Municípios, o montante máximo de
-R$ 3.862.000.000,00 (três bilhões, oitocentos e sessenta e dois milhões de
-reais) para aplicação em ações que visem combater e mitigar os efeitos da
-pandemia da covid-19 sobre o setor cultural, observada a disponibilidade
-orçamentária e financeira.
-(Redação dada
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
 Art. 3º A União entregará aos Estados, ao Distrito Federal e aos Municípios R$
@@ -70,8 +57,6 @@ Estados, ao Distrito Federal e aos Municípios.
 valor previsto no caput deste artigo aos Estados, ao Distrito Federal e
 aos Municípios deverá ocorrer em, no máximo, 90 (noventa) dias após a publicação
 desta Lei Complementar.
-(Revogado
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
 § 3º Os Estados, o
@@ -112,12 +97,6 @@ de contrato de repasse ou de outro instrumento congênere.
 § 10. A movimentação
 da conta bancária ocorrerá exclusivamente por meio eletrônico, de modo a
 permitir a rastreabilidade do uso dos recursos.
-§ 11.  Caso o montante global referido no caput não seja
-integralmente executado no exercício de 2023, sua execução poderá ser prorrogada
-para o exercício de 2024, exclusivamente, respeitadas as disponibilidades
-orçamentárias e financeiras de cada exercício, vedado o estabelecimento de
-limite mínimo de execução em ambos os exercícios.
-(Incluído pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
 Art. 4º Os Estados, o Distrito Federal e os Municípios que receberem recursos
@@ -355,7 +334,7 @@ pela internet.
 atividades abrangidas pelos instrumentos de seleção previstos no § 1º deste
 artigo as relacionadas a artes visuais, música popular, música erudita, teatro,
 dança, circo, livro, leitura e literatura, arte digital, artes clássicas,
-artesanato, dança, cultura hip-hop e funk , expressões artísticas
+artesanato, dança, cultura hip-hop e funk, expressões artísticas
 culturais afro-brasileiras, culturas dos povos indígenas, culturas dos povos
 nômades, culturas populares, capoeira, culturas quilombolas, culturas dos povos
 e comunidades tradicionais de matriz africana, coletivos culturais não
@@ -385,21 +364,13 @@ culturais comunitárias, cooperativas com finalidade cultural e instituições
 culturais, com ou sem fins lucrativos, que se dediquem a realizar atividades
 artísticas e culturais, conforme previsto nos regulamentos ou nos editais de
 cada ente da Federação.
-Parágrafo único.
-Serão consideradas como despesas de desenvolvimento do espaço ou das atividades
-culturais aquelas gerais e habituais, incluídas as vencidas ou vincendas, no
-período abrangido pelo Decreto Legislativo nº 6, de 20 de março de 2020, até a
-data de 31 de dezembro de 2022, relacionadas a serviços recorrentes, a
-transporte, a manutenção, a atividades artísticas e culturais, a tributos e
-encargos trabalhistas e sociais, além de outras despesas comprovadas pelos
-espaços.
 Parágrafo único. Serão consideradas como despesas de desenvolvimento do
 espaço ou das atividades culturais aquelas gerais e habituais, incluídas as
 vencidas ou vincendas, no período abrangido pelo Decreto Legislativo nº 6,
 de 20 de março de 2020, até 31 de dezembro de 2024, relacionadas a serviços
 recorrentes, a transporte, a manutenção, a atividades artísticas e culturais, a
 tributos e encargos trabalhistas e sociais, além de outras despesas comprovadas
-pelos espaços.    (Redação dada pela
+pelos espaços. (Redação dada pela
 Lei Complementar nº 202, de 2023)
 Art. 10. Os beneficiários das ações previstas no art. 8º desta Lei Complementar
 deverão garantir, como contrapartida, as seguintes medidas:
@@ -413,7 +384,7 @@ atividades em espaços públicos de sua comunidade, de forma gratuita; e
 II - sempre que
 possível, exibições com interação popular por meio da internet ou exibições
 públicas, quando aplicável, com distribuição gratuita de ingressos para os
-grupos referidos no inciso I deste caput , em intervalos regulares.
+grupos referidos no inciso I deste caput, em intervalos regulares.
 Parágrafo único. As
 contrapartidas previstas neste artigo deverão ocorrer em prazo determinado pelo
 respectivo ente da Federação, observadas a situação epidemiológica e as medidas
@@ -492,12 +463,6 @@ minutas padronizadas previstas em regulamento do ente da Federação, a
 verificação de adequação formal do edital e dos instrumentos jurídicos poderá
 ser realizada pelo órgão responsável pela publicação do edital, sem necessidade
 de análise individualizada pelo órgão de assessoramento jurídico.
-Art. 22. Os Estados, o Distrito Federal e os Municípios estão autorizados a
-executar os recursos oriundos desta Lei Complementar até 31 de dezembro de 2022.
-(Revogado
-pela Medida Provisória nº 1.135, de 2022)
-(Vigência
-encerrada)
 Art. 22. Os Estados, o Distrito Federal e os Municípios
 estão autorizados a executar os recursos oriundos desta Lei Complementar até 31
 de dezembro de 2024.
@@ -507,19 +472,6 @@ impedimento para a execução dos recursos oriundos desta Lei Complementar em
 função da legislação eleitoral, o prazo previsto no caput deste artigo
 fica automaticamente prorrogado por prazo equivalente ao do período em que não
 foi possível executar os recursos.
-(Revogado
-pela Medida Provisória nº 1.135, de 2022)
-(Vigência
-encerrada)
-§ 2º Encerrado o
-exercício de 2022, observado o disposto no § 1º deste artigo, o saldo
-remanescente das contas específicas que foram criadas para receber as
-transferências e gerir os recursos será restituído até 10 de janeiro de 2023
-pelos Estados, pelo Distrito Federal e pelos Municípios à conta única do Tesouro
-Nacional por meio da emissão e do pagamento de Guia de Recolhimento da União
-eletrônica.
-(Revogado
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
 § 2º Encerrado o prazo para a execução dos recursos,
@@ -532,7 +484,7 @@ pagamento de Guia de Recolhimento da União eletrônica.
 Art. 23. O beneficiário de recursos públicos oriundos desta Lei Complementar
 deve prestar contas à administração pública por meio das seguintes categorias:
 I - categoria de
-prestação de informações in loco ;
+prestação de informações in loco;
 II - categoria de
 prestação de informações em relatório de execução do objeto; ou
 III - categoria de
@@ -541,14 +493,14 @@ prestação de informações em relatório de execução financeira.
 categoria de prestação de informações aplicável ao caso concreto deve observar
 as condições objetivas previstas nos arts. 24 e 25 desta Lei Complementar.
 § 2º A adoção da
-categoria de prestação de informações in loco , prevista no inciso I do
+categoria de prestação de informações in loco, prevista no inciso I do
 caput deste artigo, está condicionada à avaliação de que há capacidade
 operacional da administração pública do ente da Federação para realizar a visita
 de verificação obrigatória.
 § 3º A documentação
 relativa à execução do objeto e financeira deve ser mantida pelo beneficiário
 pelo prazo de 5 (cinco) anos, contado do fim da vigência do instrumento.
-Art. 24. A prestação de informações in loco , prevista no inciso I do
+Art. 24. A prestação de informações in loco, prevista no inciso I do
 caput do art. 23 desta Lei Complementar, pode ser realizada quando o apoio
 recebido tiver valor inferior a R$ 200.000,00 (duzentos mil reais), nos casos em
 que o ente da Federação considerar que uma visita de verificação pode ser
@@ -670,8 +622,6 @@ e dos Municípios em relação à União.
 prorrogação de prazos de execução nos termos do § 1º do art. 22 desta Lei
 Complementar, os prazos de prestação de contas deverão ser prorrogados pelo
 mesmo prazo.
-(Revogado
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
 § 2º Os Estados, o
@@ -699,7 +649,7 @@ pandemias, desde que sejam autorizadas em acréscimo aos valores
 inicialmente previstos pelo Congresso Nacional na lei orçamentária
 anual.
 Art. 32. O caput do art. 5º da Lei nº 8.313,
-de 23 de dezembro de 1991 , passa a vigorar acrescido dos seguintes incisos
+de 23 de dezembro de 1991, passa a vigorar acrescido dos seguintes incisos
 XII-A e XII-B:
 Art. 5º
 ...............................................................................................................
@@ -712,7 +662,7 @@ apurados no balanço anual;
 ...................................................................................................................
 (NR)
 Art. 33. Esta Lei Complementar entra em vigor na data de sua publicação.
-Brasília, 8 de  julho
+Brasília, 8 de julho
 de 2022; 201º da Independência e 134º da República.
 JAIR MESSIAS
 BOLSONARO

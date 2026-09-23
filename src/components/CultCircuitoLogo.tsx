@@ -58,7 +58,7 @@ export const CultCircuitoLogo: React.FC<CultCircuitoLogoProps> = ({
           {/* Signature Lockup Text: "Cultura" & "Transparente" */}
           <div className="flex flex-col leading-tight">
             <span
-              className={`text-xs font-black tracking-wider uppercase ${
+              className={`text-xs font-normal tracking-wider uppercase ${
                 lockupTheme === 'dark' ? 'text-white' : 'text-[#2D0652]'
               }`}
               style={{ fontFamily: 'var(--font-sans)' }}
@@ -66,7 +66,7 @@ export const CultCircuitoLogo: React.FC<CultCircuitoLogoProps> = ({
               Cultura
             </span>
             <span
-              className={`text-[11px] font-extrabold tracking-wide uppercase ${
+              className={`text-[11px] font-normal tracking-wide uppercase ${
                 lockupTheme === 'dark' ? 'text-[#FF4500]' : 'text-[#6A0DAD]'
               }`}
               style={{ fontFamily: 'var(--font-sans)' }}

@@ -3,9 +3,11 @@
  * CULTURA TRANSPARENTE - SERVIÇO DE IA PARA PROJETOS CULTURAIS
  * Módulo: src/services/culturalAiService.ts
  * =============================================================================
- * Comunica com o endpoint /api/chat que conduz o proponente pelas 11 etapas
+ * Comunica com o endpoint /api/chat que conduz o proponente pelas etapas
  * oficiais da elaboração de projetos culturais, com base exclusivamente em
  * documentos legais e dados reais do sistema, sem valores inventados.
+ * Suporta o Roteiro Padrão (PNAB/LPG/Emendas/Municipal) e o Roteiro
+ * específico da Lei Rouanet (IN MinC nº 29/2026).
  */
 
 export interface ChatMessage {
@@ -17,6 +19,8 @@ export interface ChatMessage {
   secoesAtualizadas?: Record<string, string>;
   fontesCitadas?: Array<{ documento: string; trecho: string }>;
   pendencias?: string[];
+  conferenciaRegras?: any;
+  politica?: string;
   isError?: boolean;
 }
 
@@ -27,16 +31,18 @@ export interface EtapaConfig {
   descricao: string;
   perguntaPadrao: string;
   sugestoes: string[];
+  fundamentacaoLegal?: string;
 }
 
+// Roteiro Padrão (PNAB, LPG, Emendas, Municipal) - 11 etapas
 export const ROTEIRO_ETAPAS: EtapaConfig[] = [
   {
     etapa: 1,
     chave: 'edital_politica',
     nome: 'Edital ou Política',
-    descricao: 'Escolha do instrumento: PNAB, LPG, Emendas ou Edital Municipal',
-    perguntaPadrao: 'Para qual edital ou política cultural você deseja preparar seu projeto (PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão)?',
-    sugestoes: ['PNAB Viamão (Lei 14.399/2022)', 'Lei Paulo Gustavo (LPG)', 'Emenda Parlamentar', 'Edital Municipal de Viamão'],
+    descricao: 'Escolha do instrumento: Lei Rouanet, PNAB, LPG, Emendas ou Edital Municipal',
+    perguntaPadrao: 'Para qual edital ou política cultural você deseja preparar seu projeto (Lei Rouanet, PNAB, Lei Paulo Gustavo, emenda parlamentar ou edital municipal de Viamão)?',
+    sugestoes: ['Lei Rouanet (Lei 8.313/1991 - IN MinC 29/2026)', 'PNAB Viamão (Lei 14.399/2022)', 'Lei Paulo Gustavo (LPG)', 'Emenda Parlamentar', 'Edital Municipal de Viamão'],
   },
   {
     etapa: 2,
@@ -120,6 +126,118 @@ export const ROTEIRO_ETAPAS: EtapaConfig[] = [
   },
 ];
 
+// Roteiro Específico da Lei Rouanet (Pronac / Salic - IN MinC nº 29/2026) - 12 etapas fundamentadas
+export const ROTEIRO_ETAPAS_ROUANET: EtapaConfig[] = [
+  {
+    etapa: 1,
+    chave: 'edital_politica',
+    nome: 'Política e Salic',
+    descricao: 'Lei Rouanet (Pronac / Mecenato - Lei 8.313/1991 e IN MinC 29/2026)',
+    perguntaPadrao: 'Confirmamos a elaboração da sua proposta cultural para a Lei Rouanet (Pronac via Salic). Qual é a sua proposta?',
+    sugestoes: ['Lei Rouanet - Mecenato Federal (Salic)', 'Projeto de Circulação Artística', 'Projeto de Festival de Música / Teatro', 'Projeto Editorial / Patrimônio'],
+    fundamentacaoLegal: 'Arts. 1º, 4º e 5º da IN MinC nº 29/2026; Lei nº 8.313/1991',
+  },
+  {
+    etapa: 2,
+    chave: 'perfil_proponente',
+    nome: 'Perfil do Proponente',
+    descricao: 'Pessoa física (até 2 projetos / R$ 500 mil), MEI (até 4 / R$ 1,5 mi) ou PJ (até 10 / R$ 15 mi)',
+    perguntaPadrao: 'Você vai apresentar a proposta no Salic como Pessoa Física, MEI ou Pessoa Jurídica, e qual é a sua área de atuação cultural comprovada?',
+    sugestoes: ['Pessoa Física (limite R$ 500 mil)', 'MEI Cultural (limite R$ 1,5 milhão)', 'Pessoa Jurídica sem fins lucrativos (OSC)', 'Pessoa Jurídica LTDA'],
+    fundamentacaoLegal: 'Art. 4º, §§ 1º a 5º, Art. 10, Art. 11 e Anexo II da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 3,
+    chave: 'enquadramento_artigo',
+    nome: 'Enquadramento Legal',
+    descricao: 'Artigo 18 (100% de dedução fiscal do patrocinador) ou Artigo 26 da Lei 8.313/1991',
+    perguntaPadrao: 'Em qual área ou segmento cultural sua ação se enquadra (ex: artes cênicas, música instrumental, patrimônio, artes visuais, livros) para definição do Artigo 18 ou 26?',
+    sugestoes: ['Artigo 18 (Artes Cênicas / Teatro / Dança)', 'Artigo 18 (Música Erudita ou Instrumental)', 'Artigo 18 (Patrimônio Cultural e Museus)', 'Artigo 26 (Música Popular / Canto / Outros)'],
+    fundamentacaoLegal: 'Arts. 18 e 26 da Lei nº 8.313/1991; Anexo IV da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 4,
+    chave: 'sintese_produto',
+    nome: 'Síntese e Produto Principal',
+    descricao: 'Síntese da proposta cultural e produto cultural principal exigido no Salic',
+    perguntaPadrao: 'Qual é a síntese da sua proposta cultural e qual será o produto cultural principal gerado (ex: espetáculo, festival, livro, exposição)?',
+    sugestoes: ['Temporada de Espetáculo Teatral', 'Festival Musical Aberto ao Público', 'Livro de Memória e História Cultural', 'Oficinas e Mostra de Artes Visuais'],
+    fundamentacaoLegal: 'Art. 4º, § 1º e Anexo I (itens LXX e LXXVIII) da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 5,
+    chave: 'objetivos_justificativa',
+    nome: 'Objetivos e Justificativa',
+    descricao: 'Objetivos gerais e específicos e justificativa de interesse público e impacto',
+    perguntaPadrao: 'Quais são os objetivos do projeto e qual a justificativa de interesse público para a sua realização?',
+    sugestoes: ['Promover difusão artística gratuita', 'Descentralizar a cultura para bairros periféricos', 'Valorizar a memória e identidade comunitária'],
+    fundamentacaoLegal: 'Art. 1º da Lei nº 8.313/1991; Art. 4º da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 6,
+    chave: 'local_cronograma',
+    nome: 'Local e Cronograma',
+    descricao: 'Localidades de execução e cronograma detalhado por fases em até 36 meses',
+    perguntaPadrao: 'Onde o projeto será realizado e qual é o cronograma previsto para as fases de pré-produção, produção e pós-produção (até 36 meses)?',
+    sugestoes: ['Execução em 12 meses (Viamão e Região)', 'Execução em 6 meses (Centros Culturais e Escolas)', 'Pré-produção (Mês 1-3) • Produção (Mês 4-8) • Pós (Mês 9-12)'],
+    fundamentacaoLegal: 'Art. 4º, § 2º e Art. 17 da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 7,
+    chave: 'plano_distribuicao_democratizacao',
+    nome: 'Distribuição e Democratização',
+    descricao: 'Cotas: mín. 10% gratuidade social, máx. 10% patrocinador, mín. 20% ingressos populares até R$ 50',
+    perguntaPadrao: 'Como será o plano de distribuição de ingressos ou produtos culturais (considerando a cota mínima de 10% gratuita para fins sociais e 20% populares de até R$ 50,00)?',
+    sugestoes: ['100% de acesso gratuito à comunidade', '10% gratuito social + 20% popular até R$ 50 + restante até R$ 250', 'Distribuição gratuita integral em escolas e praças'],
+    fundamentacaoLegal: 'Art. 41 da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 8,
+    chave: 'medidas_acessibilidade',
+    nome: 'Acessibilidade (IN 29/2026)',
+    descricao: 'Acessibilidade física, comunicacional (Libras, audiodescrição) e atitudinal (limite orçamentário 20%)',
+    perguntaPadrao: 'Quais medidas de acessibilidade arquitetônica e comunicacional (como Libras e audiodescrição) serão adotadas para garantir o acesso de pessoas com deficiência ou mobilidade reduzida?',
+    sugestoes: ['Intérprete de Libras em todas as apresentações', 'Audiodescrição ao vivo e visitas guiadas táteis', 'Espaço térreo com rampas, sanitários adaptados e gratuidade para acompanhante de PcD'],
+    fundamentacaoLegal: 'Arts. 20, 38 a 40 e Anexo III da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 9,
+    chave: 'divulgacao_marcas',
+    nome: 'Divulgação e Marcas Pronac',
+    descricao: 'Marcas obrigatórias Pronac/MinC/Governo Federal e submissão prévia em 5 dias úteis',
+    perguntaPadrao: 'Como será feita a divulgação do projeto e a inserção das marcas oficiais obrigatórias do Pronac, Lei Rouanet, Ministério da Cultura e Governo Federal?',
+    sugestoes: ['Redes sociais, cartazes impressos e spots de rádio', 'Aplicação das marcas conforme Manual do Pronac com envio prévio de 5 dias úteis ao MinC', 'Assessoria de imprensa e divulgação acessível'],
+    fundamentacaoLegal: 'Art. 21 da IN MinC nº 29/2026 e Manual do Uso das Marcas do Pronac',
+  },
+  {
+    etapa: 10,
+    chave: 'ficha_tecnica',
+    nome: 'Ficha Técnica e Direitos',
+    descricao: 'Composição da equipe artística e técnica, currículos/portfólios e direitos autorais (limite 10%)',
+    perguntaPadrao: 'Quem são os principais profissionais da ficha técnica (artistas e produtores) e qual a qualificação ou histórico de atuação de cada um?',
+    sugestoes: ['Diretor Artístico, Produtor Executivo e Artistas Locais', 'Equipe técnica de som, luz, acessibilidade e comunicação', 'Profissionais com portfólio comprovado e termo de anuência'],
+    fundamentacaoLegal: 'Art. 27 e Anexo II da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 11,
+    chave: 'planilha_orcamentaria',
+    nome: 'Planilha Orçamentária e Limites',
+    descricao: 'Orçamento analítico: admin máx. 15%, captação máx. 10%/R$ 150 mil, cachê máx. R$ 25 mil/R$ 50 mil',
+    perguntaPadrao: 'Quais são os itens e valores estimados do seu orçamento analítico (incluindo custos de produção, custos administrativos e remunerações)?',
+    sugestoes: ['Custos de produção e apresentações', 'Custos administrativos (respeitando o teto de 15%)', 'Remuneração para captação de recursos (respeitando 10% / teto R$ 150 mil)'],
+    fundamentacaoLegal: 'Arts. 11, 16, 19, 20, 22, 23, 24, 26 e 27 da IN MinC nº 29/2026',
+  },
+  {
+    etapa: 12,
+    chave: 'conferencia_regras_revisao',
+    nome: 'Conferência e Salic',
+    descricao: 'Conferência de regras por código e orientações para cadastramento da proposta no Salic',
+    perguntaPadrao: 'Deseja revisar algum ponto da sua proposta antes de gerar o documento consolidado com o relatório de conferência das regras da Lei Rouanet?',
+    sugestoes: ['Tudo conferido, quero baixar o documento .docx da Lei Rouanet', 'Quero revisar as cotas de democratização e gratuidade', 'Quero revisar os itens da planilha orçamentária'],
+    fundamentacaoLegal: 'Arts. 4º, 5º, 45, 47, 48 e 69 da IN MinC nº 29/2026',
+  },
+];
+
 export interface ExemploTema {
   titulo: string;
   editalSugerido: string;
@@ -127,11 +245,13 @@ export interface ExemploTema {
   ideiaInicial: string;
 }
 
-/**
- * Exemplos temáticos de propostas sem valores fixos arbitrários,
- * em total conformidade com o princípio de que o orçamento é definido pelo proponente.
- */
 export const PROJETOS_EXEMPLO: ExemploTema[] = [
+  {
+    titulo: 'Circulação Musical pela Lei Rouanet (Pronac)',
+    editalSugerido: 'Lei Rouanet (IN MinC nº 29/2026)',
+    segmento: 'Música Instrumental / Circulação',
+    ideiaInicial: 'Projeto de circulação de concerto de música instrumental brasileira com entrada gratuita, acessibilidade completa em Libras e audiodescrição, e oficinas pedagógicas em escolas públicas.',
+  },
   {
     titulo: 'Oficinas de Hip-Hop e Rima Periférica',
     editalSugerido: 'PNAB Viamão',
@@ -164,6 +284,8 @@ export interface AssistantTurnResult {
   secoesAtualizadas: Record<string, string>;
   fontesCitadas: Array<{ documento: string; trecho: string }>;
   pendencias: string[];
+  conferenciaRegras?: any;
+  politica?: string;
   isError?: boolean;
 }
 
@@ -239,6 +361,8 @@ export async function sendMessageToAssistant(
           secoesAtualizadas: d.secoes_atualizadas || {},
           fontesCitadas: d.fontes_citadas || [],
           pendencias: d.pendencias || [],
+          conferenciaRegras: d.conferencia_regras,
+          politica: d.politica,
           isError: false,
         };
       }

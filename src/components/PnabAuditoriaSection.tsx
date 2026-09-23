@@ -85,7 +85,7 @@ export const PnabAuditoriaSection: React.FC = () => {
             </div>
 
             {/* Título Principal */}
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-normal tracking-tight text-white leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
               Política Nacional Aldir Blanc (PNAB) · Viamão
             </h1>
 
@@ -113,7 +113,7 @@ export const PnabAuditoriaSection: React.FC = () => {
                 Painel Interativo MinC
               </span>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+            <h3 className="text-lg sm:text-xl font-normal text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
               Painel Oficial PNAB (Ministério da Cultura)
             </h3>
             <p className="text-xs sm:text-sm text-[#2D0652]/75 mt-0.5 font-medium">
@@ -156,7 +156,7 @@ export const PnabAuditoriaSection: React.FC = () => {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
+                  <h4 className="text-sm font-normal text-[#2D0652]" style={{ fontFamily: 'var(--font-display)' }}>
                     Passo a Passo: Como Consultar a Verba de Viamão no Painel
                   </h4>
                   <p className="text-xs text-[#2D0652]/70">
@@ -180,7 +180,7 @@ export const PnabAuditoriaSection: React.FC = () => {
                     </span>
                     <Filter className="w-4 h-4 text-[#FF4500]" />
                   </div>
-                  <h5 className="text-xs font-bold text-[#2D0652]">Escolha o Estado (UF)</h5>
+                  <h5 className="text-xs font-normal text-[#2D0652]">Escolha o Estado (UF)</h5>
                   <p className="text-xs text-[#2D0652]/80 leading-relaxed">
                     No topo ou na aba de filtros do painel abaixo, clique na caixa de <strong>UF</strong> e selecione <strong>RS</strong> (Rio Grande do Sul).
                   </p>
@@ -199,7 +199,7 @@ export const PnabAuditoriaSection: React.FC = () => {
                     </span>
                     <Search className="w-4 h-4 text-[#FF4500]" />
                   </div>
-                  <h5 className="text-xs font-bold text-[#2D0652]">Selecione Viamão</h5>
+                  <h5 className="text-xs font-normal text-[#2D0652]">Selecione Viamão</h5>
                   <p className="text-xs text-[#2D0652]/80 leading-relaxed">
                     No campo <strong>Município</strong>, role a lista ou digite <strong>Viamão</strong> e marque a caixa de seleção.
                   </p>
@@ -218,7 +218,7 @@ export const PnabAuditoriaSection: React.FC = () => {
                     </span>
                     <Coins className="w-4 h-4 text-[#FF4500]" />
                   </div>
-                  <h5 className="text-xs font-bold text-[#2D0652]">Veja o Valor Transferido</h5>
+                  <h5 className="text-xs font-normal text-[#2D0652]">Veja o Valor Transferido</h5>
                   <p className="text-xs text-[#2D0652]/80 leading-relaxed">
                     Observe os cartões centrais: você verá o valor exato repassado pelo Governo Federal ao <strong>Fundo Municipal de Cultura</strong>.
                   </p>
@@ -237,7 +237,7 @@ export const PnabAuditoriaSection: React.FC = () => {
                     </span>
                     <FileText className="w-4 h-4 text-[#FF4500]" />
                   </div>
-                  <h5 className="text-xs font-bold text-[#2D0652]">Navegue pelas Abas</h5>
+                  <h5 className="text-xs font-normal text-[#2D0652]">Navegue pelas Abas</h5>
                   <p className="text-xs text-[#2D0652]/80 leading-relaxed">
                     Na barra inferior do Power BI (setas de páginas), navegue para conferir o <strong>Plano de Ação</strong>, <strong>Metas</strong> e <strong>Editais</strong>.
                   </p>
@@ -277,7 +277,7 @@ export const PnabAuditoriaSection: React.FC = () => {
       <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2D2BC]">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#2D0652] flex items-center gap-2.5" style={{ fontFamily: 'var(--font-display)' }}>
+            <h2 className="text-xl sm:text-2xl font-normal text-[#2D0652] flex items-center gap-2.5" style={{ fontFamily: 'var(--font-display)' }}>
               <Scale className="w-6 h-6 text-[#FF4500]" />
               Transparência Pública e Regramento de Custódia Financeira
             </h2>
@@ -335,7 +335,7 @@ export const PnabAuditoriaSection: React.FC = () => {
 
       {/* 4. LINHA DO TEMPO DA TRAMITAÇÃO */}
       <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs space-y-4">
-        <h3 className="text-base sm:text-lg font-bold text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
+        <h3 className="text-base sm:text-lg font-normal text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
           <Clock className="w-5 h-5 text-[#FF4500]" />
           Linha do Tempo da Tramitação da PNAB em Viamão
         </h3>

@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-8 sm:py-10 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[#3D0B6D]">
           <div className="space-y-2 max-w-lg">
-            <div className="flex items-center gap-2 text-white font-bold text-base" style={{ fontFamily: 'var(--font-display)' }}>
+            <div className="flex items-center gap-2 text-white text-base" style={{ fontFamily: 'var(--font-display)' }}>
               <span>Cult Circuito Viamão</span>
               <span className="text-[11px] text-white bg-[#6A0DAD] px-2.5 py-0.5 rounded-full border border-purple-400/30">
                 Cultura Transparente

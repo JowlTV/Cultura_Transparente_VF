@@ -1,11 +1,10 @@
-# DOCUMENTO OFICIAL: Lei nº 14.399, de 8 de julho de 2022 (Política Nacional Aldir Blanc de Fomento à Cultura - PNAB)
-# TIPO: lei
+# DOCUMENTO OFICIAL: Lei nº 14.399, de 8 de julho de 2022 (Institui a Política Nacional Aldir Blanc de Fomento à Cultura - PNAB)
 # POLÍTICA: PNAB
-# DATA DA NORMA: 2022-07-08
 # URL OFICIAL DE ORIGEM: https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14399.htm
-# DATA DE COLETA: 2026-09-21
+# DATA DE COLETA: 2026-09-23
 # STATUS: disponivel
 ================================================================================
+
 L14399
 Presidência da República
 Secretaria-Geral
@@ -13,14 +12,14 @@ Subchefia para
 Assuntos Jurídicos
 LEI Nº
 14.399,
-DE 8 DE JULHO DE 2022
+DE 8 DE JULHO DE 2022
 Vide Mensagem de Veto Total nº 212, de 2022
 Vigência
 (Vide ADI nº
 7232)
 Institui a Política Nacional Aldir Blanc de
 Fomento à Cultura.
-O PRESIDENTE DA REPÚBLICA
+O PRESIDENTE DA REPÚBLICA
 Faço
 saber que o Congresso Nacional decreta e eu promulgo, nos termos do
 parágrafo 5º do art. 66 da Constituição Federal, a seguinte Lei:
@@ -86,16 +85,6 @@ IX -
 direito de qualquer pessoa física ou jurídica de candidatar-se a receber
 benefício oriundo de recursos de que trata esta Lei oferecido por Estados,
 por Municípios ou pelo Distrito Federal.
-Parágrafo único. O princípio estabelecido no inciso V do caput deste
-artigo deve ser implementado por meio de Plano Anual de Aplicação dos
-Recursos (PAAR), ouvida a sociedade civil, preferencialmente, por intermédio
-de seus representantes nos Conselhos de Cultura.
-Parágrafo único.  O princípio estabelecido no inciso V
-do caput deve ser implementado por meio de Plano de Aplicação dos
-Recursos (PAAR), de caráter anual ou plurianual, ouvida a sociedade civil,
-preferencialmente, por intermédio de seus representantes nos Conselhos de
-Cultura.
-(Redação dada pela Medida Provisória nº 1.274, de 2024)
 Parágrafo único. O princípio estabelecido no inciso V
 do caput deste artigo deve ser implementado por meio de Plano de
 Aplicação dos Recursos (PAR), de caráter anual ou plurianual, ouvida a
@@ -194,62 +183,18 @@ para a execução das ações finalísticas previstas neste artigo, entre as
 quais, atividades de consultoria, de emissão de pareceres e de participação
 em comissões julgadoras de projetos, de ações, de iniciativas e de
 candidatos a prêmios e a bolsas em editais e congêneres.
-Art. 6º A União entregará aos Estados, ao Distrito
-Federal e aos Municípios, a cada ano, em parcela única, o valor
-correspondente a R$ 3.000.000.000,00 (três bilhões de reais), no primeiro
-exercício subsequente ao da entrada em vigor desta Lei e nos 4 (quatro) anos
-seguintes.
-Vigência
-Art. 6º  Fica a União autorizada a destinar aos
-Estados, ao Distrito Federal e aos Municípios, a cada ano, os seguintes
-valores máximos, para a consecução das ações elencadas no art. 7º, observada
-a disponibilidade orçamentária e financeira de cada exercício:
-(Redação
-dada pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
-I -
-em 2024, até R$ 3.000.000.000,00 (três bilhões de reais);
-(Incluído
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
-II -
-em 2025, até R$ 3.000.000.000,00 (três bilhões de reais);
-(Incluído
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
-III
-- em 2026, até R$ 3.000.000.000,00 (três bilhões de reais);
-(Incluído
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
-IV -
-em 2027, até R$ 3.000.000.000,00 (três bilhões de reais); e
-(Incluído
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
-V -
-em 2028, até R$ 3.000.000.000,00 (três bilhões de reais).
-(Incluído
-pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
-Art. 6º A União entregará aos Estados, ao Distrito
-Federal e aos Municípios, a cada ano, em parcela única, o valor
-correspondente a R$ 3.000.000.000,00 (três bilhões de reais), no primeiro
-exercício subsequente ao da entrada em vigor desta Lei e nos 4 (quatro) anos
-seguintes.
-Vigência
-Art. 6º A partir de 2023, a União entregará aos
-Estados, ao Distrito Federal e aos Municípios o valor total de R$
-15.000.000.000,00 (quinze bilhões de reais).
-(Redação dada
-pela Medida Provisória nº 1.274, de 2024)
-Vigência
 Art. 6º A partir de 2023, a União entregará aos
 Estados, ao Distrito Federal e aos Municípios o valor de R$
 15.000.000.000,00 (quinze bilhões de reais), constituindo-se como diretriz o
@@ -257,14 +202,6 @@ saldo nas contas específicas dos Estados, do Distrito Federal e dos
 Municípios na data de aferição dos recursos, na forma de regulamento.
 (Redação dada pela
 Lei nº 15.132, de 2025)
-§ 1º
-Os Estados, o Distrito Federal e os Municípios apresentarão à União, em
-prazo estabelecido na forma do regulamento, plano de ação para o exercício,
-juntamente com a solicitação dos recursos.
-§ 1º Os Estados, o Distrito Federal e os Municípios
-apresentarão à União plano de ação na forma estabelecida em regulamento.
-(Redação dada
-pela Medida Provisória nº 1.274, de 2024)
 § 1º Os Estados, o Distrito Federal e os Municípios
 apresentarão à União plano de ação na forma estabelecida em regulamento.
 (Redação dada pela
@@ -279,37 +216,6 @@ integram, em prazo estabelecido na forma do regulamento.
 Os recursos deverão ser transferidos pela União aos Estados, ao Distrito
 Federal e aos Municípios para conta bancária específica, aberta em
 instituição financeira federal.
-§ 4º
-Para receber os recursos de que trata esta Lei, anualmente, os Estados, os
-Municípios e o Distrito Federal deverão comprovar a destinação, para a
-cultura, de recursos orçamentários próprios em montante não inferior à média
-dos valores consignados nos últimos 3 (três) exercícios.
-§ 4º Para receber os recursos de que trata esta Lei,
-anualmente, os Estados, os Municípios e o Distrito Federal deverão comprovar
-a destinação, para a cultura, de recursos orçamentários próprios, conforme
-ato do Poder Executivo federal.
-(Redação dada
-pela Medida Provisória nº 1.274, de 2024)
-§ 5º A cada ano, a programação orçamentária será de até R$ 3.000.000.000,00
-(três bilhões de reais), constituindo-se como diretriz o saldo total
-remanescente nas contas específicas dos Estados, do Distrito Federal e dos
-Municípios.
-(Incluído pela Medida Provisória nº 1.274, de 2024)
-§ 6º A execução de que trata o caput , ao longo dos exercícios
-financeiros, assegurará o repasse do valor integral devido aos entes
-federativos, nos termos do disposto no art. 8º, conforme regulamento.
-(Incluído pela
-Medida Provisória nº 1.274, de 2024)
-§ 7º Até 2026, no caso de inexistência de fundos de cultura estaduais e
-municipais aptos a receber os recursos federais de que trata esta Lei, o
-repasse será direcionado para estrutura definida pela autoridade competente
-de cada ente federativo recebedor.
-(Incluído pela
-Medida Provisória nº 1.274, de 2024)
-§ 8º A partir de 2027, somente receberão os recursos previstos nesta Lei os
-entes federativos que dispuserem de fundo de cultura, conforme regulamento.
-(Incluído pela
-Medida Provisória nº 1.274, de 2024)
 § 4º Para receber os recursos de que trata este
 artigo, anualmente, os Estados, o Distrito Federal e os Municípios deverão
 comprovar a destinação, para a cultura, de recursos orçamentários próprios e
@@ -378,35 +284,12 @@ I -
 (vinte por cento) de acordo com os critérios de rateio do Fundo de
 Participação dos Estados e do Distrito Federal (FPE) e 80% (oitenta por
 cento) proporcionalmente à população;
-II -
-50% (cinquenta por cento) aos Municípios, dos quais 20% (vinte por cento) de
-acordo com os critérios de rateio do Fundo de Participação dos Municípios (FPM)
-e 80% (oitenta por cento) proporcionalmente à população.
-II - 50% (cinquenta por cento) aos Municípios e ao
-Distrito Federal, dos quais 20% (vinte por cento) de acordo com os critérios
-de rateio do Fundo de Participação dos Municípios (FPM) e 80% (oitenta por
-cento) proporcionalmente à população.
-(Redação dada
-pela Medida Provisória nº 1.274, de 2024)
 II  50% (cinquenta por cento) aos Municípios e ao
 Distrito Federal, dos quais 20% (vinte por cento) de acordo com os critérios
 de rateio do Fundo de Participação dos Municípios (FPM) e 80% (oitenta por
 cento) proporcionalmente à população.
 (Redação dada pela
 Lei nº 15.132, de 2025)
-§ 1º
-Os recursos recebidos que não tenham sido objeto de programação publicada
-pelos Municípios em até 180 (cento e oitenta) dias deverão ser
-automaticamente revertidos ao fundo estadual de cultura do Estado onde o
-Município se localiza ou ao órgão ou entidade estadual responsável pela
-gestão desses recursos.
-§ 1 º
-Para os repasses realizados a partir de 2025, o cálculo a que se
-referem os incisos do caput será realizado considerando o quociente
-de participação no respectivo Fundo de Participação e a proporção
-populacional existente ao final do exercício de 2024.
-(Redação dada
-pela Medida Provisória nº 1.274, de 2024)
 § 1º
 (Revogado).
 (Redação dada pela
@@ -418,22 +301,6 @@ considerando o quociente de participação no respectivo Fundo de Participação
 e a proporção populacional existente ao final do exercício de 2024.
 (Incluído pela Lei
 nº 15.132, de 2025)
-§ 2º
-Eventuais recursos da União referentes às ações previstas nesta Lei que não
-forem destinados aos demais entes federativos em razão do não cumprimento de
-procedimentos e de prazos exigidos a Estados, ao Distrito Federal e a
-Municípios, inclusive o previsto no § 1º do art. 6º desta Lei, serão
-imediatamente redistribuídos pela União aos demais entes, segundo os mesmos
-critérios de partilha estabelecidos no caput deste artigo.
-§ 2º Eventuais recursos da União referentes às ações previstas nesta Lei que
-não forem destinados aos demais entes federativos em razão do não
-cumprimento de procedimentos e de prazos exigidos a Estados, ao Distrito
-Federal e a Municípios serão imediatamente redistribuídos pela União aos
-demais entes federativos, observados os mesmos critérios de partilha
-estabelecidos no caput e os prazos e as condições estabelecidos em
-regulamento.
-(Redação dada
-pela Medida Provisória nº 1.274, de 2024)
 § 2º Eventuais recursos da União referentes às ações
 previstas nesta Lei que não forem destinados aos demais entes federativos em
 razão do não cumprimento de procedimentos e de prazos exigidos dos Estados,
@@ -624,7 +491,7 @@ VII
 - reembolso das operações de empréstimo realizadas por meio do FNC, a título
 de financiamento reembolsável, observados critérios de remuneração que, no
 mínimo, lhes preservem o valor real e que contribuam para gerar o superávit
-referido no inciso II do caput ;
+referido no inciso II do caput;
 VIII
 - retorno dos resultados econômicos provenientes dos investimentos em
 empresas e em projetos culturais feitos com recursos do FNC;
@@ -638,13 +505,6 @@ outras receitas que lhes vierem a ser destinadas.
 Art. 14. A Política Nacional Aldir Blanc de Fomento à
 Cultura é de responsabilidade das autoridades competentes nas esferas
 federal, estadual, distrital e municipal.
-§ 1º
-No caso de inexistência de fundos de cultura estaduais e municipais aptos a
-receber os recursos federais de que trata esta Lei, o repasse será
-direcionado para estrutura definida pela autoridade competente de cada ente
-federativo recebedor.
-(Revogado pela
-Medida Provisória nº 1.274, de 2024)
 (Revogado pela Lei
 nº 15.132, de 2025)
 § 2º
@@ -693,46 +553,19 @@ descaso em relação à análise de prestação de contas de projeto cultural ou
 audiovisual isenta os proponentes de vedações, de inabilitações ou de
 quaisquer outras sanções decorrentes da prestação de contas desses projetos
 específicos.
-Art. 16. A autoridade federal responsável pelo setor da
-cultura definirá as diretrizes gerais para a aplicação dos recursos oriundos
-desta Lei.
-Art. 16.  O Ministério da Cultura estabelecerá as
-diretrizes para a aplicação dos recursos oriundos desta Lei, conforme o
-disposto no
-art. 18 da
-Lei nº 14.719, de 1º de novembro de 2023 .
-(Redação dada
-pela Medida Provisória nº 1.274, de 2024)
 Art. 16. Regulamento estabelecerá as diretrizes para a
 aplicação dos recursos oriundos desta Lei, conforme o disposto no
 art. 18 da Lei nº
-14.719, de 1º de novembro de 2023 .
+14.719, de 1º de novembro de 2023.
 (Redação dada pela
 Lei nº 15.132, de 2025)
-Art. 17. Esta Lei entra em vigor na data de sua
-publicação, e, nos termos do art.
-134 da Lei nº 14.194, de 20 de agosto de 2021 , o disposto nos
-arts. 6º ,
-7º e 13 desta Lei terá vigência por 5 (cinco) anos.
-Art. 17.  Esta Lei entra em vigor na data de sua
-publicação e, nos termos do  art.
-134 da Lei nº 14.194, de 20 de agosto de 2021 , o disposto nos  art.
-6º ,  art. 7º  e  art. 13 desta Lei  terá
-vigência até 31 de dezembro de 2028.
-(Redação
-dada pela Medida Provisória nº 1.135, de 2022)
 (Vigência
 encerrada)
-Art. 17. Esta Lei entra em vigor na data de sua
-publicação, e, nos termos do art.
-134 da Lei nº 14.194, de 20 de agosto de 2021 , o disposto nos
-arts. 6º ,
-7º e 13 desta Lei terá vigência por 5 (cinco) anos.
 Art. 17. Esta Lei entra em vigor na data de sua
 publicação.
 (Redação dada pela
 Lei nº 15.132, de 2025)
-Brasília, 8 de  julho de 2022; 201º da Independência e 134º da República.
+Brasília, 8 de julho de 2022; 201º da Independência e 134º da República.
 JAIR
 MESSIAS BOLSONARO
 Este texto não substitui o publicado no DOU de
