@@ -123,13 +123,13 @@
   {
     "id": "edital_pnab_viamao_vigente",
     "arquivo": "edital_pnab_viamao_vigente.txt",
-    "titulo": "Edital(is) PNAB Viamão/RS em vigência",
+    "titulo": "Editais PNAB Viamão/RS 2026 (Quadro Geral - 16 Editais)",
     "tipo": "edital",
     "politica": "PNAB",
-    "data": "2024-01-01",
-    "url_oficial": "https://www.viamao.rs.gov.br/pagina/editais-de-cultura",
-    "data_coleta": "2026-09-21",
-    "status": "pendente_adicao_manual"
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/portal/noticias/0/3/9656/prorrogados-prazos-de-inscricao-dos-editais-pnab-2026---literatura-e-artesanato-com-nova-redacao",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
   },
   {
     "id": "editais_municipais_viamao_vigentes",
@@ -141,5 +141,181 @@
     "url_oficial": "https://www.viamao.rs.gov.br/noticias?categoria=cultura",
     "data_coleta": "2026-09-21",
     "status": "pendente_adicao_manual"
+  },
+  {
+    "id": "edital_pnab_viamao_01_pareceristas",
+    "arquivo": "edital_pnab_viamao_01_pareceristas.txt",
+    "titulo": "Edital PNAB Viamão nº 01/2026 - PARECERISTAS",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_1_pareceristas_retificaCAo_28034612.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_02_cultura_viva_fomento",
+    "arquivo": "edital_pnab_viamao_02_cultura_viva_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 02/2026 - CULTURA VIVA – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_2_cultura_viva_fomento_retificado_28034613.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_03_cultura_viva_premiacao",
+    "arquivo": "edital_pnab_viamao_03_cultura_viva_premiacao.txt",
+    "titulo": "Edital PNAB Viamão nº 03/2026 - CULTURA VIVA – PREMIAÇÃO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_3_cultura_viva_premiaCAo__retificado_28034612.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_04_musica_fomento",
+    "arquivo": "edital_pnab_viamao_04_musica_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 04/2026 - MÚSICA – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_4_mUsica_retificado_28034612.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_05_carnaval_e_tradicionalismo_premiacao",
+    "arquivo": "edital_pnab_viamao_05_carnaval_e_tradicionalismo_premiacao.txt",
+    "titulo": "Edital PNAB Viamão nº 05/2026 - CARNAVAL E TRADICIONALISMO – PREMIAÇÃO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_5_carnaval_e_tradicionalismo_retificado_28034612.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_06_artesanato_nova_redacao_fomento",
+    "arquivo": "edital_pnab_viamao_06_artesanato_nova_redacao_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 06/2026 - ARTESANATO – NOVA REDAÇÃO – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_6_artesanato_retificado_28034613.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_07_audiovisual_fomento",
+    "arquivo": "edital_pnab_viamao_07_audiovisual_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 07/2026 - AUDIOVISUAL – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_7_audiovisual_retificado_28034613.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_08_danca_fomento",
+    "arquivo": "edital_pnab_viamao_08_danca_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 08/2026 - DANÇA – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_8_danCa_retificado_28034613.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_09_hip_hop_fomento",
+    "arquivo": "edital_pnab_viamao_09_hip_hop_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 09/2026 - HIP-HOP - FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_9_hip_hop_retificado_28034614.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_10_matrizes_tradicionais_fomento",
+    "arquivo": "edital_pnab_viamao_10_matrizes_tradicionais_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 10/2026 - MATRIZES TRADICIONAIS - FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_10_matrizes_retificado_28034614.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_11_literatura_nova_redacao_fomento",
+    "arquivo": "edital_pnab_viamao_11_literatura_nova_redacao_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 11/2026 - LITERATURA – NOVA REDAÇÃO – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_11_literatura_retificado_28034615.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_12_capoeira_fomento",
+    "arquivo": "edital_pnab_viamao_12_capoeira_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 12/2026 - CAPOEIRA – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_12_capoeira_retificado_28034619.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_13_artes_cenicas_fomento",
+    "arquivo": "edital_pnab_viamao_13_artes_cenicas_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 13/2026 - ARTES CÊNICAS – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_13_artes_cEnicas_retificado_28034620.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_14_artes_visuais_fomento",
+    "arquivo": "edital_pnab_viamao_14_artes_visuais_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 14/2026 - ARTES VISUAIS – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_14_artes_visuais_retificado_28034623.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_15_radiodifusao_fomento",
+    "arquivo": "edital_pnab_viamao_15_radiodifusao_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 15/2026 - RADIODIFUSÃO – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_15__radiodifusAo_28034625.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
+  },
+  {
+    "id": "edital_pnab_viamao_16_patrimonio_fomento",
+    "arquivo": "edital_pnab_viamao_16_patrimonio_fomento.txt",
+    "titulo": "Edital PNAB Viamão nº 16/2026 - PATRIMÔNIO – FOMENTO",
+    "tipo": "edital",
+    "politica": "PNAB",
+    "data": "2026-08-28",
+    "url_oficial": "https://www.viamao.rs.gov.br/arquivos/edital_16_patrimOnio_retificado_28034628.pdf",
+    "data_coleta": "2026-09-23",
+    "status": "inscrições encerradas"
   }
 ]

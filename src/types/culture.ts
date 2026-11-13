@@ -5,14 +5,14 @@ export interface Emenda {
   partido?: string;
   partido_sigla?: string;
   foto_parlamentar?: string;
-  esfera: 'Federal (API CGU)' | 'Estadual (ALRS)';
+  esfera: 'Federal (API CGU)' | 'Federal (cadastro manual)' | 'Estadual (ALRS)';
   orgao: string;
   secretaria: string;
   projeto: string;
   subprojeto: string;
   valor: number; // valor alocado
   valor_gasto: number; // gasto realizado / liquidado
-  status: 'Execução não iniciada' | 'Em Execução / Vigente' | 'Parceria' | 'Concluída';
+  status: 'Execução não iniciada' | 'Em Execução / Vigente' | 'Parceria' | 'Concluída' | 'Indicada';
   is_cultura: boolean;
   area_atuacao: string;
   tipo_projeto_cultural?: 'Hip-Hop & Cultura Urbana' | 'Patrimônio & Restauro' | 'Audiovisual & Cinema' | 'Tradição & Folclore' | 'Literatura & Leitura' | 'Música & Artes Cênicas' | 'Outras Áreas';

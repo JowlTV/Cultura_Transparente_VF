@@ -102,8 +102,35 @@ Todos os 18 testes validam:
 | **Portal da Transparência RS (CAGE)** | `transparencia.rs.gov.br/` | Dados Abertos Governamentais | Single-Flight Backend + Cache TTL 24h (`s-maxage=86400`) |
 | **Transferegov / SICONV** | `api.convenios.gov.br/siconv/v1/` | ~60 req/min | Single-Flight Backend + Cache TTL 1h (`s-maxage=3600`) |
 | **Google News RSS Viamão** | `news.google.com/rss/search` | ~30 req/min | Cache TTL 1h (`s-maxage=3600`) |
+| **RSS Oficial da Prefeitura de Viamão** | `viamao.rs.gov.br/portal/rss` | Feed XML Público | Parsing Nativo + Filtro Temático Cultural + Cache TTL 1h |
 
-### 🛡️ Janela Móvel e Proteção por Coalescência de Requisições
+### 📌 Emendas Parlamentares Candidatas a Inclusão (Aguardando Confirmação)
+
+Conforme a política estrita de integridade contra desinformação, emendas sem identificação de número de empenho ou valor oficial não são incluídas com valores estimados no painel principal:
+- **Deputada Estadual Bruna Rodrigues (PCdoB/RS)**: 1ª Semana do Hip Hop de Viamão (10 a 16/11/2025), realizada pela Associação da Cultura Hip Hop de Viamão. Fontes jornalísticas (*Brasil de Fato RS*, *Rap Dab*) citam destinação via emenda parlamentar, pendente de confirmação do número do empenho e processo no Sistema SAE da ALRS / Portal Transparência RS.
+
+---
+
+## 📚 Base de Conhecimento e Editais PNAB 2026 de Viamão
+
+O assistente de elaboração de projetos culturais baseia-se exclusivamente em normativas oficiais arquivadas no diretório `backend/conhecimento/`, incluindo os **16 editais da PNAB 2026 de Viamão** (com status "inscrições encerradas" em 07/09/2026):
+1. Audiovisual (`edital_pnab_viamao_audiovisual.txt`)
+2. Literatura (`edital_pnab_viamao_literatura.txt`)
+3. Artesanato (`edital_pnab_viamao_artesanato.txt`)
+4. Música (`edital_pnab_viamao_musica.txt`)
+5. Dança (`edital_pnab_viamao_danca.txt`)
+6. Hip-Hop (`edital_pnab_viamao_hip_hop.txt`)
+7. Artes Cênicas (`edital_pnab_viamao_artes_cenicas.txt`)
+8. Artes Visuais (`edital_pnab_viamao_artes_visuais.txt`)
+9. Carnaval e Tradicionalismo (`edital_pnab_viamao_carnaval_tradicionalismo.txt`)
+10. Capoeira (`edital_pnab_viamao_capoeira.txt`)
+11. Matrizes Tradicionais (`edital_pnab_viamao_matrizes_tradicionais.txt`)
+12. Radiodifusão Comunitária (`edital_pnab_viamao_radiodifusao.txt`)
+13. Patrimônio e Memória (`edital_pnab_viamao_patrimonio.txt`)
+14. Cultura Viva Fomento (`edital_pnab_viamao_cultura_viva_fomento.txt`)
+15. Cultura Viva Premiação (`edital_pnab_viamao_cultura_viva_premiacao.txt`)
+16. Pareceristas (`edital_pnab_viamao_pareceristas.txt`)
+
 1. **Janela Móvel Multi-Ano de Emendas:** O endpoint `/api/emendas` e a classe `CguTransparenciaApi` consultam os últimos 3 exercícios orçamentários (ex: 2024, 2025 e 2026). Isso resulta em até 3 requisições à CGU por sincronização com cache frio — cada ano possui sua própria chave de cache de 24h e proteção *Single-Flight* independente. Emendas com mesmo identificador são automaticamente deduplicadas e consolidadas com o maior valor pago/liquidado.
 2. **Frontend (`inFlightRequests` em `src/services/apiClient.ts`):** Deduplica chamadas disparadas no mesmo navegador / aba enquanto uma requisição está em trânsito.
 3. **Backend Serverless (`SingleFlightCache` em `backend/utils.py`):** Utiliza locks granulados por chave para que, caso múltiplos usuários cheguem simultaneamente com o cache frio (*cold cache*), apenas **uma única requisição real** seja disparada para cada ano à API da CGU ou do Estado do RS. Todas as demais threads aguardam e compartilham o mesmo resultado consolidado, mitigando tempestades de requisições (*thundering herd problem*).

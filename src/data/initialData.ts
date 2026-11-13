@@ -172,23 +172,22 @@ const rawEmendas = [
     parlamentar: 'Deputada Denise Pessôa (PT/RS)',
     partido: 'PT/RS',
     partido_sigla: 'PT',
-    foto_parlamentar: 'https://www.camara.leg.br/internet/deputado/bandep/220559.jpg',
-    esfera: 'Federal (API CGU)' as const,
+    foto_parlamentar: 'https://www.camara.leg.br/internet/deputado/bandep/220553.jpg',
+    esfera: 'Federal (cadastro manual)' as const,
     orgao: 'Ministério da Cultura (MinC)',
     secretaria: 'Ministério da Cultura (MinC)',
     projeto: 'Fomento a Ações Culturais e Cidadania - OGU',
     subprojeto: 'Fortalecimento e Circulação Cultural - Associação da Cultura Hip Hop de Viamão',
     numeroEmenda: 'Emenda OGU 2026',
-    beneficiario: 'Associação da Cultura Hip-Hop de Viamão (CNPJ: 14.892.411/0001-38)',
+    beneficiario: 'Associação da Cultura Hip-Hop de Viamão',
     tipo_projeto_cultural: 'Hip-Hop & Cultura Urbana' as const,
     valor: 200000.0,
     valor_gasto: 0.0,
-    status: 'Em Execução / Vigente' as const,
+    status: 'Indicada' as const,
     fonte: 'Gabinete Parlamentar / Diário de Viamão / OGU',
     fontes_cruzadas: [
-      'Orçamento Geral da União (OGU 2026 / MinC)',
-      'Gabinete Oficial Dep. Denise Pessôa (Publicação Oficial de Destinação)',
-      'Diário de Viamão (Notícia Institucional de Repasse Municipal)',
+      'https://denisepessoa.com.br/noticias/deputada-federal-denise-pessoa-destina-mais-de-r-11-milhao-para-saude-cultura-e-protecao-das-mulheres-em-viamao-e-participa-da-entrega-da-sede-propria-do-ifrs-campus-viamao/',
+      'https://diariodeviamao.com.br',
     ],
   },
   // Demais áreas para controle comparativo de transparência
@@ -756,21 +755,44 @@ export const API_DOCUMENTATION: ApiEndpointDoc[] = [
           id: "noticia-viamao-pnab-prorrogada",
           titulo: "Prefeitura de Viamão prorroga Editais da PNAB (Literatura, Artesanato e Pareceristas)",
           resumo: "Inscrições prorrogadas para fazedores de cultura locais através da Secretaria Municipal de Cultura com recursos federais descentralizados.",
-          link: "https://www.viamao.rs.gov.br/noticia/detalhe/80942",
+          link: "https://www.viamao.rs.gov.br/portal/noticias/0/3/9656/prorrogados-prazos-de-inscricao-dos-editais-pnab-2026---literatura-e-artesanato-com-nova-redacao",
           origem: "Municipal (Viamão)",
           veiculo_imprensa: "Secretaria Municipal da Cultura de Viamão",
           categoria_filtro: "editais",
           etiqueta: "Editais PNAB Viamão",
-          data: "08/09/2026",
-          imagem: "https://www.viamao.rs.gov.br/favicon.ico",
+          data: "28/08/2026",
+          imagem: "https://www.viamao.rs.gov.br/fotos/cc34e6a8eb6cbf1b106f93ec70fc206b.jpg",
           jurisdicao: "Municipal (Viamão)",
           fonte_confiavel: true
         }
       ],
       politica_integridade: "Zero fake news. Fontes estritamente limitadas a órgãos oficiais de Viamão, IFRS, SEDAC-RS e imprensa regional verificada.",
-      data_consulta: "14/09/2026"
+      data_consulta: "28/08/2026"
     }, null, 2)
   }
 ];
+
+/**
+ * Emendas candidatas a inclusão (aguardando confirmação oficial de valor e empenho no SAE/ALRS ou Portal da Transparência)
+ * Conforme diretrizes de integridade, nunca incluir com valores estimados.
+ */
+export const EMENDAS_A_CONFIRMAR = [
+  {
+    id: 'cand-est-2025-01',
+    ano: 2025,
+    parlamentar: 'Deputada Estadual Bruna Rodrigues (PCdoB/RS)',
+    partido: 'PCdoB/RS',
+    esfera: 'Estadual (a confirmar)',
+    evento: '1ª Semana do Hip Hop de Viamão (10 a 16 de novembro de 2025)',
+    beneficiario: 'Associação da Cultura Hip Hop de Viamão',
+    status: 'Candidata (aguardando número de emenda e empenho no SAE/ALRS)',
+    fontes_noticiosas: [
+      'https://www.brasildefators.com.br/2025/11/10/viamao-recebe-a-1-semana-do-hip-hop-com-oficinas-batalhas-e-shows-gratuitos',
+      'https://rapdab.com.br/1-semana-do-hip-hop-de-viamao-celebra-a-cultura-urbana-e-cidadania/'
+    ],
+    observacao: 'Matérias jornalísticas citam apoio via emenda parlamentar, mas sem informar número do processo ou valor exato repassado.'
+  }
+];
+
 
 

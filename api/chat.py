@@ -35,6 +35,14 @@ from backend.regras_rouanet import (
     identificar_pendencias_salic,
     tratar_casos_especiais_rouanet
 )
+from backend.roteiros_loader import (
+    obter_modelo_politica,
+    obter_campos_politica,
+    obter_ids_campos_politica,
+    obter_campo_def,
+    obter_primeiro_campo_obrigatorio,
+    filtrar_e_validar_outros_campos
+)
 from backend.utils import setup_logger
 
 logger = setup_logger("VercelApiChat")
@@ -496,7 +504,12 @@ def obter_contexto_factual_com_timeout(user_query: str = "", timeout: float = 2.
             return ""
 
 
-def validar_e_extrair_resposta_estruturada(raw_text: str, is_rouanet: bool = False) -> Optional[Dict[str, Any]]:
+def validar_e_extrair_resposta_estruturada(
+    raw_text: str,
+    is_rouanet: bool = False,
+    politica: str = "ROUANET",
+    campo_esperado: str = ""
+) -> Optional[Dict[str, Any]]:
     """Valida se o texto retornado pelo modelo é um JSON compatível com o schema do assistente."""
     if not raw_text or not raw_text.strip():
         return None
@@ -525,26 +538,41 @@ def validar_e_extrair_resposta_estruturada(raw_text: str, is_rouanet: bool = Fal
     if "mensagem" not in data or not isinstance(data["mensagem"], str):
         return None
 
-    max_etapas = 12 if is_rouanet else 11
-    etapa = data.get("etapa_atual", 1)
-    try:
-        etapa_int = int(etapa)
-        if etapa_int < 1:
-            etapa_int = 1
-        elif etapa_int > max_etapas:
-            etapa_int = max_etapas
-        data["etapa_atual"] = etapa_int
-    except (ValueError, TypeError):
-        data["etapa_atual"] = 1
+    # Normalização dos campos estruturados do roteiro
+    campo = data.get("campo") or campo_esperado or ""
+    data["campo"] = str(campo).strip()
 
-    if "secoes_atualizadas" not in data or not isinstance(data["secoes_atualizadas"], dict):
-        data["secoes_atualizadas"] = {}
+    conteudo = data.get("conteudo")
+    if conteudo is None:
+        conteudo = ""
+    data["conteudo"] = str(conteudo).strip()
+
+    completo = data.get("completo")
+    if completo is None:
+        completo = bool(data["conteudo"]) and not bool(data.get("falta"))
+    data["completo"] = bool(completo)
+
+    falta = data.get("falta") or ""
+    data["falta"] = str(falta).strip()
+
+    outros_campos = data.get("outros_campos")
+    if not isinstance(outros_campos, dict):
+        outros_campos = {}
+    data["outros_campos"] = filtrar_e_validar_outros_campos(politica, outros_campos)
 
     if "fontes_citadas" not in data or not isinstance(data["fontes_citadas"], list):
         data["fontes_citadas"] = []
 
     if "pendencias" not in data or not isinstance(data["pendencias"], list):
         data["pendencias"] = []
+
+    # Compatibilidade retroativa com secoes_atualizadas
+    if "secoes_atualizadas" not in data or not isinstance(data["secoes_atualizadas"], dict):
+        data["secoes_atualizadas"] = {}
+    if data["campo"] and data["conteudo"]:
+        data["secoes_atualizadas"][data["campo"]] = data["conteudo"]
+    for k, v in data["outros_campos"].items():
+        data["secoes_atualizadas"][k] = v
 
     data["mensagem"] = normalizar_uma_pergunta(data["mensagem"])
     return data
@@ -601,6 +629,11 @@ class handler(BaseHTTPRequestHandler):
             body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
             parsed_data = json.loads(body)
             messages = parsed_data.get("messages", [])
+            politica_param = parsed_data.get("politica")
+            campo_atual = parsed_data.get("campo_atual", "").strip()
+            campos_estado = parsed_data.get("campos", {})
+            if not isinstance(campos_estado, dict):
+                campos_estado = {}
 
             if not isinstance(messages, list) or len(messages) == 0:
                 self.send_error_response(400, "Campo 'messages' inválido ou vazio.")
@@ -618,39 +651,113 @@ class handler(BaseHTTPRequestHandler):
 
             user_texts = [m.get("content", "") for m in messages if m.get("role") == "user"]
             combined_user_text = " ".join(user_texts)
+            ultimo_texto_usuario = user_texts[-1].strip() if user_texts else ""
+
+            # Determina a política: prioriza escolha explícita enviada pelo frontend
+            if politica_param and obter_modelo_politica(politica_param):
+                politica_identificada = politica_param.upper()
+            else:
+                pol_cand = identificar_politica(combined_user_text)
+                politica_identificada = pol_cand if obter_modelo_politica(pol_cand) else "ROUANET"
+
+            is_rouanet = (politica_identificada == "ROUANET")
+            ids_validos = obter_ids_campos_politica(politica_identificada)
+
+            # Valida campo_atual; se vazio ou inexistente na política, busca o primeiro obrigatório
+            if not campo_atual or campo_atual not in ids_validos:
+                primeiro_obr = obter_primeiro_campo_obrigatorio(politica_identificada, campos_estado)
+                campo_atual = primeiro_obr["id"] if primeiro_obr else (ids_validos[0] if ids_validos else "ideia_projeto")
+
+            campo_def = obter_campo_def(politica_identificada, campo_atual) or {
+                "id": campo_atual,
+                "rotulo": campo_atual,
+                "pergunta_base": "Descreva este campo para a sua proposta cultural.",
+                "tipo": "texto",
+                "obrigatorio": True
+            }
 
             # Interceptação determinística para casos legais específicos da Lei 8.313/1991
-            ultimo_texto_usuario = user_texts[-1] if user_texts else ""
-            caso_especial = tratar_casos_especiais_rouanet(ultimo_texto_usuario)
-            if caso_especial:
+            if is_rouanet:
+                caso_especial = tratar_casos_especiais_rouanet(ultimo_texto_usuario)
+                if caso_especial:
+                    self.send_json_response(200, {
+                        "success": True,
+                        "data": {
+                            "mensagem": caso_especial.get("mensagem"),
+                            "campo": campo_atual,
+                            "conteudo": "",
+                            "completo": False,
+                            "falta": "",
+                            "proximo_campo": campo_atual,
+                            "status_campo": "em andamento",
+                            "campos_atualizados": campos_estado,
+                            "outros_campos": {},
+                            "etapa_atual": caso_especial.get("etapa_atual", 1),
+                            "secoes_atualizadas": {},
+                            "fontes_citadas": caso_especial.get("fontes_citadas", []),
+                            "pendencias": []
+                        },
+                        "metadata": {
+                            "politica": "ROUANET",
+                            "campo_atual": campo_atual,
+                            "caso_especial": caso_especial.get("caso")
+                        }
+                    })
+                    return
+
+            # Interceptação determinística para comando "PULAR"
+            cmd_lower = ultimo_texto_usuario.lower().strip()
+            pular_padroes = ["pular", "pula", "pule", "pular este campo", "pular campo", "quero pular", "passar", "ignorar"]
+            if cmd_lower in pular_padroes or cmd_lower == "pular":
+                campos_estado[campo_atual] = {
+                    "valor": "[a preencher]",
+                    "status": "pendente"
+                }
+                proximo_def = obter_primeiro_campo_obrigatorio(politica_identificada, campos_estado)
+                rotulo_atual = campo_def.get("rotulo", campo_atual)
+
+                if proximo_def and proximo_def["id"] != campo_atual:
+                    proximo_id = proximo_def["id"]
+                    msg = (
+                        f"Tudo bem! O campo **{rotulo_atual}** foi registrado como pendente (`[a preencher]`) para você preencher depois. "
+                        f"Vamos para o próximo item: **{proximo_def['rotulo']}**.\n\n{proximo_def['pergunta_base']}"
+                    )
+                else:
+                    proximo_id = campo_atual
+                    msg = (
+                        f"O campo **{rotulo_atual}** foi marcado como pendente (`[a preencher]`). "
+                        "Todos os campos obrigatórios da proposta já foram respondidos ou indicados para preenchimento posterior! "
+                        "Deseja revisar algum item antes de gerar o documento final?"
+                    )
+
                 self.send_json_response(200, {
                     "success": True,
                     "data": {
-                        "mensagem": caso_especial.get("mensagem"),
-                        "etapa_atual": caso_especial.get("etapa_atual", 1),
-                        "secoes_atualizadas": {},
-                        "fontes_citadas": caso_especial.get("fontes_citadas", []),
-                        "pendencias": []
+                        "mensagem": normalizar_uma_pergunta(msg),
+                        "campo": campo_atual,
+                        "conteudo": "[a preencher]",
+                        "completo": False,
+                        "falta": "Campo pulado pelo usuário",
+                        "proximo_campo": proximo_id,
+                        "status_campo": "pendente",
+                        "campos_atualizados": campos_estado,
+                        "outros_campos": {},
+                        "fontes_citadas": [],
+                        "pendencias": [f"Campo '{rotulo_atual}' marcado para preenchimento posterior"]
                     },
                     "metadata": {
-                        "politica": "ROUANET",
-                        "caso_especial": caso_especial.get("caso")
+                        "politica": politica_identificada,
+                        "campo_atual": proximo_id
                     }
                 })
                 return
 
-            politica_identificada = identificar_politica(combined_user_text)
-            is_rouanet = (politica_identificada == "ROUANET")
-
-            max_etapas = 12 if is_rouanet else 11
-            etapa_estimada = 1
-            if len(user_texts) >= 1:
-                etapa_estimada = min(max_etapas, len(user_texts) + 1)
-
+            # Condução baseada nos campos: recupera contexto normativo específico do campo em foco
+            termo_busca = f"{campo_def.get('rotulo', '')} {campo_def.get('pergunta_base', '')} {ultimo_texto_usuario}"
             contexto_conhecimento = extrair_contexto_conhecimento(
                 politica=politica_identificada,
-                etapa_atual=etapa_estimada,
-                user_query=combined_user_text,
+                etapa_atual=1,
+                user_query=termo_busca,
                 limite_total_caracteres=18000
             )
 
@@ -663,10 +770,39 @@ class handler(BaseHTTPRequestHandler):
                 if dados_orc.get("valor_total"):
                     conferencia_orcamento_rouanet = validar_orcamento_rouanet(dados_orc)
 
+            # Resumo dos campos já preenchidos para manter contexto sem inflar tokens
+            campos_resumo_list = []
+            for cid, cval in campos_estado.items():
+                if isinstance(cval, dict) and cval.get("valor") and cval.get("status") == "preenchido":
+                    rot = (obter_campo_def(politica_identificada, cid) or {}).get("rotulo", cid)
+                    campos_resumo_list.append(f"- {rot}: {cval['valor'][:200]}")
+            resumo_campos_texto = "\n".join(campos_resumo_list) if campos_resumo_list else "Nenhum campo preenchido ainda."
+
+            instrucao_campo_atual = (
+                f"\n\n=== CONDUÇÃO ESTRUTURADA PELO ESTADO DO PROJETO ===\n"
+                f"POLÍTICA ESCOLHIDA: {politica_identificada}\n"
+                f"CAMPO ATUAL EM FOCO NO ROTEIRO:\n"
+                f"- ID: {campo_atual}\n"
+                f"- Rótulo: {campo_def.get('rotulo', campo_atual)}\n"
+                f"- Pergunta Base: {campo_def.get('pergunta_base', '')}\n"
+                f"- Tipo do Campo: {campo_def.get('tipo', 'texto')}\n"
+                f"- Obrigatório: {'Sim' if campo_def.get('obrigatorio') else 'Não'}\n"
+                f"- Fonte Normativa: {campo_def.get('fonte', 'Legislação e editais vigentes')}\n"
+                f"- IDs Válidos da Política (outros campos permitidos): {json.dumps(ids_validos)}\n\n"
+                f"CAMPOS JÁ PREENCHIDOS:\n{resumo_campos_texto}\n\n"
+                f"DIRETRIZES DE PROCESSAMENTO:\n"
+                f"1. Se a mensagem do usuário for uma DÚVIDA ou pergunta (ex: 'o que é...', 'como faço...'): responda de forma clara e objetiva com base estrita nas normas oficiais da base, defina 'completo': false, e no final retome a pergunta do campo atual em 'mensagem' com no máximo UMA interrogação.\n"
+                f"2. Se o usuário respondeu mas a resposta estiver INCOMPLETA ou vaga: sintetize o que ele já disse em 'conteudo', defina 'completo': false, indique brevemente em 'falta' o que resta para concluir, e em 'mensagem' faça apenas a pergunta direcionada ao que falta (máximo uma interrogação).\n"
+                f"3. Se o usuário respondeu de forma SUFICIENTE: organize a redação formal e técnica para o campo em 'conteudo' a partir do que ele informou (NUNCA invente dados), defina 'completo': true e 'falta': ''. Em 'mensagem', faça um breve reconhecimento positivo do que foi registrado.\n"
+                f"4. Se o usuário tiver antecipado informações de outros campos na mesma mensagem, adicione-as em 'outros_campos' usando APENAS chaves da lista de IDs válidos.\n"
+                f"5. NUNCA invente dados de orçamento, equipe ou público que a pessoa não informou.\n"
+            )
+
             system_instruction_completa = (
                 CULTURAL_SYSTEM_PROMPT
                 + contexto_conhecimento
                 + contexto_factual
+                + instrucao_campo_atual
             )
 
             if conferencia_orcamento_rouanet:
@@ -762,7 +898,12 @@ class handler(BaseHTTPRequestHandler):
                                 parts = candidates[0].get("content", {}).get("parts", [])
                                 if parts and len(parts) > 0:
                                     raw_response_text = parts[0].get("text", "")
-                                    valid_structured_data = validar_e_extrair_resposta_estruturada(raw_response_text, is_rouanet=is_rouanet)
+                                    valid_structured_data = validar_e_extrair_resposta_estruturada(
+                                        raw_response_text,
+                                        is_rouanet=is_rouanet,
+                                        politica=politica_identificada,
+                                        campo_esperado=campo_atual
+                                    )
                                     if valid_structured_data:
                                         break
                                     else:
@@ -829,15 +970,58 @@ class handler(BaseHTTPRequestHandler):
                 })
                 return
 
-            # Anexa metadados da política e eventual conferência matemática de regras
-            valid_structured_data["politica"] = "ROUANET" if is_rouanet else (politica_identificada or "PADRAO")
+            # Decisão de avanço do projeto decidida pelo CÓDIGO
+            completo = valid_structured_data.get("completo", False)
+            conteudo = valid_structured_data.get("conteudo", "").strip()
+            outros = valid_structured_data.get("outros_campos", {})
+
+            if completo:
+                status_campo = "preenchido"
+                campos_estado[campo_atual] = {
+                    "valor": conteudo or campos_estado.get(campo_atual, {}).get("valor", ""),
+                    "status": "preenchido"
+                }
+                for ok, ov in outros.items():
+                    campos_estado[ok] = {
+                        "valor": ov,
+                        "status": "preenchido"
+                    }
+                proximo_def = obter_primeiro_campo_obrigatorio(politica_identificada, campos_estado)
+                if proximo_def and proximo_def["id"] != campo_atual:
+                    proximo_campo = proximo_def["id"]
+                    if "?" not in valid_structured_data["mensagem"]:
+                        valid_structured_data["mensagem"] += (
+                            f"\n\nPerfeito! Vamos agora para o próximo item: **{proximo_def['rotulo']}**.\n{proximo_def['pergunta_base']}"
+                        )
+                else:
+                    proximo_campo = campo_atual
+            else:
+                status_campo = "em andamento"
+                proximo_campo = campo_atual
+                if conteudo and not campos_estado.get(campo_atual, {}).get("valor"):
+                    campos_estado[campo_atual] = {
+                        "valor": conteudo,
+                        "status": "em andamento"
+                    }
+
+            valid_structured_data["campo"] = campo_atual
+            valid_structured_data["proximo_campo"] = proximo_campo
+            valid_structured_data["status_campo"] = status_campo
+            valid_structured_data["campos_atualizados"] = campos_estado
+            valid_structured_data["politica"] = politica_identificada
+            valid_structured_data["mensagem"] = normalizar_uma_pergunta(valid_structured_data["mensagem"])
+
             if conferencia_orcamento_rouanet:
                 valid_structured_data["conferencia_regras"] = conferencia_orcamento_rouanet
 
             self.send_json_response(200, {
                 "success": True,
                 "data": valid_structured_data,
-                "text": valid_structured_data.get("mensagem", "")
+                "text": valid_structured_data.get("mensagem", ""),
+                "metadata": {
+                    "politica": politica_identificada,
+                    "campo_atual": proximo_campo
+                }
             })
 
         except Exception as e:

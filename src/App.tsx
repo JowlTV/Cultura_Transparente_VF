@@ -36,6 +36,7 @@ export default function App() {
   const [syncLatency, setSyncLatency] = useState<number>(38);
   const [isQuickSearchOpen, setIsQuickSearchOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [statusFontesEmendas, setStatusFontesEmendas] = useState<Record<string, any> | undefined>();
 
   // Sempre rolar para o topo ao alternar de aba na aplicação
   useEffect(() => {
@@ -63,6 +64,9 @@ export default function App() {
         }
         if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data) && emendasRes.value.data.length > 0) {
           setEmendas(emendasRes.value.data);
+          if (emendasRes.value.statusFontes) {
+            setStatusFontesEmendas(emendasRes.value.statusFontes);
+          }
         }
 
         const avgLat = lpgRes.status === 'fulfilled' ? lpgRes.value.report.latencyMs : 35;
@@ -200,6 +204,7 @@ export default function App() {
                 emendas={emendas}
                 onSimulateApiFetch={handleRefreshData}
                 isFetchingApi={isRefreshing}
+                statusFontes={statusFontesEmendas}
               />
             )}
 

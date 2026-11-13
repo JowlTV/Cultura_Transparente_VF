@@ -1,12 +1,30 @@
-# DOCUMENTO OFICIAL: Edital(is) PNAB Viamão/RS em vigência
-# TIPO: edital
-# POLÍTICA: PNAB
-# DATA DA NORMA: 2024-01-01
-# URL OFICIAL DE ORIGEM: https://www.viamao.rs.gov.br/pagina/editais-de-cultura
-# DATA DE COLETA: 2026-09-21
-# STATUS: pendente_adicao_manual
-================================================================================
-[CONTEÚDO PENDENTE DE INCLUSÃO MANUAL]
-Este documento oficial deve ser inserido pelo responsável do projeto quando publicado oficialmente pelo ente federativo.
-URL Oficial para acompanhamento: https://www.viamao.rs.gov.br/pagina/editais-de-cultura
-Orientações: Copie o texto integral do edital oficial publicado e substitua este aviso.
+=============================================================================
+CULTURA TRANSPARENTE - BASE OFICIAL DE CONHECIMENTO CULTURAL
+EDITAIS PNAB 2026 VIAMÃO/RS - QUADRO GERAL E NORMAS MUNICIPAIS
+=============================================================================
+URL Oficial da Publicação: https://www.viamao.rs.gov.br/portal/noticias/0/3/9656/prorrogados-prazos-de-inscricao-dos-editais-pnab-2026---literatura-e-artesanato-com-nova-redacao
+Data de Coleta: 2026-09-23
+Data da Notícia no RSS Oficial: 2026-08-28
+Status Geral: inscrições encerradas
+Prazos Originais/Prorrogados: Encerrados em 07/09/2026 (Pareceristas em 31/08/2026)
+Órgão: Secretaria Municipal de Cultura de Viamão
+Política: Política Nacional Aldir Blanc (PNAB - Lei nº 14.399/2022)
+
+RELAÇÃO DOS 16 EDITAIS DA PNAB 2026 EM VIAMÃO (REFERÊNCIA NORMATIVA MUNICIPAL):
+1. Edital 01/2026 - Pareceristas (Credenciamento de avaliadores técnicos)
+2. Edital 02/2026 - Cultura Viva – Fomento (4 projetos de R$ 100.000,00)
+3. Edital 03/2026 - Cultura Viva – Premiação (28 agentes contemplados)
+4. Edital 04/2026 - Música – Fomento (Oficinas, workshops e cursos musicais)
+5. Edital 05/2026 - Carnaval e Tradicionalismo – Premiação
+6. Edital 06/2026 - Artesanato – Nova Redação – Fomento (25 peças autorais + 5 equipamentos/pesquisa)
+7. Edital 07/2026 - Audiovisual – Fomento (Curta-metragem, finalização e mostras/cineclubes)
+8. Edital 08/2026 - Dança – Fomento (9 mostras/festivais locais e 1 oficinas/cursos)
+9. Edital 09/2026 - Hip-Hop – Fomento (Festivais/batalhas e fomento à produção)
+10. Edital 10/2026 - Matrizes Tradicionais – Fomento (Quilombola, Indígena, Povo de Terreiro e Cigano)
+11. Edital 11/2026 - Literatura – Nova Redação – Fomento (11 circulação/publicação e 1 oficina)
+12. Edital 12/2026 - Capoeira – Fomento (Formação/transmissão, eventos/circulação e oficinas)
+13. Edital 13/2026 - Artes Cênicas – Fomento (Montagem/circulação e oficinas de teatro)
+14. Edital 14/2026 - Artes Visuais – Fomento (Produção/catálogo, exposições e oficinas)
+15. Edital 15/2026 - Radiodifusão – Fomento (Manutenção comunitária, conteúdo e capacitação)
+16. Edital 16/2026 - Patrimônio – Fomento (Material/Museu, inventário afro-indígena e educação patrimonial)
+=============================================================================

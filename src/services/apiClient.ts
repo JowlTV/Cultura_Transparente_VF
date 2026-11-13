@@ -182,6 +182,8 @@ class CulturalApiClient {
     report: ApiStatusReport;
     total: number;
     queryUsed: string;
+    statusFontes?: Record<string, any>;
+    isFallback?: boolean;
   }> {
     const rawQuery = (query || 'cultura').trim().toLowerCase();
     const cacheKey = `news_${rawQuery}_${filtro || 'all'}`;
@@ -249,6 +251,8 @@ class CulturalApiClient {
               },
               total: filtradas.length,
               queryUsed: query,
+              statusFontes: payload.status_fontes,
+              isFallback: false
             };
             this.setCached(cacheKey, result);
             return result;
@@ -276,11 +280,20 @@ class CulturalApiClient {
           status: 'cached' as const,
           latencyMs: Math.max(latencyMs, 5),
           lastChecked: new Date().toLocaleTimeString('pt-BR'),
-          rateLimitInfo: 'Acervo Auditado Oficial',
+          rateLimitInfo: 'Acervo de Reserva',
           totalRecords: fallbackData.length,
         },
         total: fallbackData.length,
         queryUsed: query,
+        statusFontes: {
+          prefeitura_viamao: {
+            fonte: 'Prefeitura Municipal de Viamão',
+            consultada: true,
+            sucesso: false,
+            mensagem: 'Não foi possível consultar a fonte agora'
+          }
+        },
+        isFallback: true
       };
       this.setCached(cacheKey, result);
       return result;

@@ -72,18 +72,18 @@ export const SECTION_METADATA_PADRAO = [
 ];
 
 export const SECTION_METADATA_ROUANET = [
-  { key: 'identificacao_proposta_proponente', fallbackKeys: ['perfil_proponente', 'edital_politica'], num: '1', title: 'Identificação da Proposta e do Proponente' },
-  { key: 'objetivo_justificativa_enquadramento', fallbackKeys: ['objetivos_justificativa', 'enquadramento_artigo'], num: '2', title: 'Objetivo, Justificativa e Enquadramento Legal' },
-  { key: 'produtos', fallbackKeys: ['sintese_produto'], num: '3', title: 'Produtos' },
-  { key: 'responsabilidade_social', fallbackKeys: ['medidas_acessibilidade', 'plano_distribuicao_democratizacao'], num: '4', title: 'Responsabilidade Social: Acessibilidade (Física e de Conteúdo) e Democratização de Acesso' },
-  { key: 'etapas_trabalho', fallbackKeys: ['local_cronograma', 'cronograma'], num: '5', title: 'Etapas de Trabalho' },
+  { key: 'identificacao_proposta_proponente', fallbackKeys: ['perfil_proponente', 'identificacao_proponente', 'edital_politica', 'pendencias_minc'], num: '1', title: 'Identificação da Proposta e do Proponente' },
+  { key: 'objetivo_justificativa_enquadramento', fallbackKeys: ['objetivo_pronac', 'objetivos_justificativa', 'segmento_enquadramento', 'enquadramento_artigo'], num: '2', title: 'Objetivo, Justificativa e Enquadramento Legal' },
+  { key: 'produtos', fallbackKeys: ['produtos_cadastro', 'sintese_produto'], num: '3', title: 'Produtos' },
+  { key: 'responsabilidade_social', fallbackKeys: ['acessibilidade_fisica', 'acessibilidade_conteudo', 'democratizacao_acesso', 'medidas_acessibilidade', 'plano_distribuicao_democratizacao'], num: '4', title: 'Responsabilidade Social: Acessibilidade (Física e de Conteúdo) e Democratização de Acesso' },
+  { key: 'etapas_trabalho', fallbackKeys: ['etapas_trabalho', 'local_cronograma', 'cronograma'], num: '5', title: 'Etapas de Trabalho' },
   { key: 'ficha_tecnica', fallbackKeys: ['ficha_tecnica'], num: '6', title: 'Ficha Técnica' },
-  { key: 'por_produto', fallbackKeys: ['por_produto', 'sintese_produto'], num: '7', title: 'Por Produto: Sinopse da Obra, Especificação Técnica e Descrição da Atividade' },
+  { key: 'por_produto', fallbackKeys: ['sinopse_especificacao_atividades', 'por_produto', 'sintese_produto'], num: '7', title: 'Por Produto: Sinopse da Obra, Especificação Técnica e Descrição da Atividade' },
   { key: 'plano_distribuicao', fallbackKeys: ['plano_distribuicao', 'plano_distribuicao_democratizacao'], num: '8', title: 'Plano de Distribuição' },
-  { key: 'planilha_orcamentaria', fallbackKeys: ['planilha_orcamentaria', 'orcamento'], num: '9', title: 'Planilha Orçamentária por Produto e Etapa, com Custos Vinculados e Totais' },
-  { key: 'conferencia_regras_revisao', fallbackKeys: ['conferencia_regras_revisao', 'conferencia_regras'], num: '10', title: 'Conferência de Regras' },
+  { key: 'planilha_orcamentaria', fallbackKeys: ['planilha_orcamentaria_vinculados', 'planilha_orcamentaria', 'orcamento'], num: '9', title: 'Planilha Orçamentária por Produto e Etapa, com Custos Vinculados e Totais' },
+  { key: 'conferencia_regras_revisao', fallbackKeys: ['revisao_final_salic', 'conferencia_regras_revisao', 'conferencia_regras'], num: '10', title: 'Conferência de Regras' },
   { key: 'pendencias_salic', fallbackKeys: ['pendencias_salic', 'pendencias'], num: '11', title: 'Pendências ([a preencher])' },
-  { key: 'avisos_legais', fallbackKeys: ['avisos_legais', 'divulgacao_marcas'], num: '12', title: 'Avisos e Responsabilidades Legais do Proponente' },
+  { key: 'avisos_legais', fallbackKeys: ['plano_captacao', 'avisos_legais', 'divulgacao_marcas'], num: '12', title: 'Avisos e Responsabilidades Legais do Proponente' },
 ];
 
 export function isRouanetPolicy(sections: ProjectDraftSections, explicitPolitica?: string): boolean {

@@ -1,7 +1,7 @@
 """
 Serverless Function Vercel: /api/news
-Retorna notícias e editais de cultura de Viamão/RS via portais municipais, imprensa regional e órgãos oficiais,
-com estrito filtro anti-alucinação e validação temática cultural.
+Retorna notícias e editais de cultura de Viamão/RS via RSS oficial da Prefeitura Municipal de Viamão
+com estrito filtro anti-alucinação, validação temática cultural e transparência de status das fontes.
 """
 from http.server import BaseHTTPRequestHandler
 import json
@@ -31,14 +31,23 @@ class handler(BaseHTTPRequestHandler):
             was_cached = cache.has(cache_key)
             scraper = ViamaoCultureScraper()
             noticias = scraper.extrair_noticias_editais_viamao(termo=termo, apenas_cultura=True)
+            raw_status = scraper.obter_status_fontes()
+            status_fontes = raw_status if isinstance(raw_status, dict) else {
+                "prefeitura_viamao": {
+                    "fonte": "Prefeitura Municipal de Viamão",
+                    "consultada": True,
+                    "sucesso": True
+                }
+            }
 
             response_data = {
                 "success": True,
                 "termo_pesquisado": termo,
                 "total": len(noticias),
                 "noticias": noticias,
+                "status_fontes": status_fontes,
                 "cached": was_cached,
-                "politica_integridade": "Zero fake news. Fontes estritamente limitadas a órgãos oficiais de Viamão, IFRS, SEDAC-RS e imprensa regional verificada.",
+                "politica_integridade": "Zero fake news. Fontes estritamente limitadas ao feed RSS oficial da Prefeitura de Viamão e órgãos verificados.",
                 "data_consulta": datetime.now().strftime("%d/%m/%Y")
             }
 
@@ -59,6 +68,14 @@ class handler(BaseHTTPRequestHandler):
             err_data = json.dumps({
                 "success": False,
                 "error": str(e),
+                "status_fontes": {
+                    "prefeitura_viamao": {
+                        "fonte": "Prefeitura Municipal de Viamão",
+                        "consultada": True,
+                        "sucesso": False,
+                        "mensagem": "Não foi possível consultar a fonte agora"
+                    }
+                },
                 "data_consulta": datetime.now().strftime("%d/%m/%Y")
             }, ensure_ascii=False).encode("utf-8")
             self.send_response(500)

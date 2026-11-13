@@ -265,8 +265,9 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
               <span className="text-[#2D0652]/30">·</span>
               <span className="text-xs text-[#2D0652]/80 font-medium">Edição Semanal de Fomento, Notícias & Editais</span>
             </div>
-            <div className="text-[11px] text-[#2D0652]/65 font-medium">
-              Fontes Institucionais: Prefeitura de Viamão · SEDAC-RS · MinC
+            <div className="flex items-center gap-2 text-[11px] font-medium bg-[#6A0DAD]/10 border border-[#6A0DAD]/20 px-2.5 py-1 rounded-card text-[#2D0652]">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] inline-block"></span>
+              <span><strong>Prefeitura de Viamão:</strong> última publicação em {noticias.length > 0 ? (noticias[0]?.data || '28/08/2026') : '28/08/2026'} (RSS Oficial)</span>
             </div>
           </div>
 

@@ -39,6 +39,7 @@ interface EmendasSectionProps {
   emendas: Emenda[];
   onSimulateApiFetch: () => void;
   isFetchingApi: boolean;
+  statusFontes?: Record<string, any>;
 }
 
 type SortField = 'valor' | 'valor_gasto' | 'ano' | 'parlamentar';
@@ -48,6 +49,7 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
   emendas,
   onSimulateApiFetch,
   isFetchingApi,
+  statusFontes,
 }) => {
   const [showBudgetSummary, setShowBudgetSummary] = useState<boolean>(false);
   const [filtroAno, setFiltroAno] = useState<string>('todos');
@@ -330,6 +332,32 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
               <Download className="w-3.5 h-3.5 text-white" />
               <span>Exportar (CSV)</span>
             </button>
+          </div>
+        </div>
+
+        {/* Source Status Transparency Strip */}
+        <div className="mt-3 p-3 bg-white/70 border border-[#2D0652]/10 rounded-card grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-[#2D0652]/80">
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full shrink-0 ${statusFontes?.federal_cgu?.status === 'online' ? 'bg-[#10B981]' : (statusFontes?.federal_cgu?.status === 'missing_api_key' ? 'bg-[#F59E0B]' : 'bg-[#6A0DAD]')}`}></span>
+            <div>
+              <strong>Federal (CGU):</strong>{' '}
+              {statusFontes?.federal_cgu?.status === 'online'
+                ? `consultada ao vivo (${statusFontes.federal_cgu.total_capturado ?? 0} registros)`
+                : (statusFontes?.federal_cgu?.status === 'missing_api_key'
+                  ? 'chave de API em modo passivo; exibindo registros catalogados e auditados'
+                  : 'acervo catalogado de Viamão ativo')}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full shrink-0 ${statusFontes?.estadual_rs?.status === 'error' ? 'bg-[#EF4444]' : 'bg-[#10B981]'}`}></span>
+            <div>
+              <strong>Estadual (CAGE / RS):</strong>{' '}
+              {statusFontes?.estadual_rs?.status === 'online'
+                ? `consultada com sucesso (${statusFontes.estadual_rs.total_capturado ?? 0} registros)`
+                : (statusFontes?.estadual_rs?.status === 'error'
+                  ? 'não foi possível consultar agora; base auditada ativa'
+                  : 'dados abertos ALRS / CAGE ativos')}
+            </div>
           </div>
         </div>
 

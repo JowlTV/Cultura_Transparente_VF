@@ -1,0 +1,545 @@
+{
+  "PNAB": {
+    "nome": "Política Nacional Aldir Blanc (PNAB)",
+    "descricao": "Fomento contínuo à cultura via Lei nº 14.399/2022 e Decreto nº 11.740/2023",
+    "campos": [
+      {
+        "id": "politica_edital",
+        "rotulo": "Modalidade e Linha da PNAB",
+        "pergunta_base": "Qual é a linha ou modalidade de fomento da PNAB para a qual você deseja estruturar sua proposta?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Lei nº 14.399/2022; Decreto nº 11.740/2023",
+        "por_produto": false
+      },
+      {
+        "id": "ideia_projeto",
+        "rotulo": "Ideia Central e Síntese",
+        "pergunta_base": "Qual é a ideia central do seu projeto cultural e o que será realizado?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Decreto nº 11.740/2023",
+        "por_produto": false
+      },
+      {
+        "id": "perfil_proponente",
+        "rotulo": "Identificação do Proponente",
+        "pergunta_base": "Você apresentará como pessoa física, MEI, coletivo ou pessoa jurídica, e qual sua trajetória cultural?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Lei nº 14.399/2022, art. 6º",
+        "por_produto": false
+      },
+      {
+        "id": "objetivo_principal",
+        "rotulo": "Objetivo Principal e Justificativa",
+        "pergunta_base": "Quais os principais objetivos do projeto e sua justificativa cultural e social?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Lei nº 14.399/2022, art. 2º",
+        "por_produto": false
+      },
+      {
+        "id": "publico_territorio",
+        "rotulo": "Público-Alvo e Território",
+        "pergunta_base": "Onde o projeto será realizado e qual público ele pretende alcançar prioritariamente?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Decreto nº 11.740/2023",
+        "por_produto": false
+      },
+      {
+        "id": "atividades_metodologia",
+        "rotulo": "Atividades e Metodologia",
+        "pergunta_base": "Quais etapas e atividades práticas serão executadas para realizar o projeto?",
+        "obrigatorio": true,
+        "tipo": "lista de itens",
+        "fonte": "Decreto nº 11.740/2023",
+        "por_produto": false
+      },
+      {
+        "id": "acessibilidade",
+        "rotulo": "Plano de Acessibilidade",
+        "pergunta_base": "Quais medidas de acessibilidade física, comunicacional e atitudinal serão adotadas?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Lei nº 14.399/2022; Decreto nº 11.740/2023",
+        "por_produto": false
+      },
+      {
+        "id": "contrapartida_social",
+        "rotulo": "Contrapartida Social",
+        "pergunta_base": "Qual contrapartida gratuita será oferecida à comunidade ou rede pública de ensino?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Lei nº 14.399/2022, art. 8º",
+        "por_produto": false
+      },
+      {
+        "id": "cronograma",
+        "rotulo": "Cronograma de Execução",
+        "pergunta_base": "Qual o período e prazo estimado para a realização das atividades?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Decreto nº 11.740/2023",
+        "por_produto": false
+      },
+      {
+        "id": "orcamento",
+        "rotulo": "Planilha Orçamentária",
+        "pergunta_base": "Quais são os principais itens de custo previstos e os valores estimados?",
+        "obrigatorio": true,
+        "tipo": "valor",
+        "fonte": "Decreto nº 11.740/2023",
+        "por_produto": false
+      },
+      {
+        "id": "revisao_final",
+        "rotulo": "Revisão e Documentos",
+        "pergunta_base": "Deseja fazer algum ajuste antes de emitir a proposta consolidada?",
+        "obrigatorio": false,
+        "tipo": "texto",
+        "fonte": "Decreto nº 11.740/2023",
+        "por_produto": false
+      }
+    ]
+  },
+  "LPG": {
+    "nome": "Lei Paulo Gustavo (LPG)",
+    "descricao": "Apoio emergencial ao setor cultural via Lei Complementar nº 195/2022",
+    "campos": [
+      {
+        "id": "politica_edital",
+        "rotulo": "Categoria do Edital LPG",
+        "pergunta_base": "O seu projeto concorre na categoria Audiovisual (art. 6º) ou Demais Áreas Culturais (art. 8º)?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "LC nº 195/2022, arts. 6º e 8º",
+        "por_produto": false
+      },
+      {
+        "id": "ideia_projeto",
+        "rotulo": "Ideia Central e Objeto",
+        "pergunta_base": "Qual é a ideia central e o produto cultural que será criado ou executado?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "LC nº 195/2022; Decreto nº 11.525/2023",
+        "por_produto": false
+      },
+      {
+        "id": "perfil_proponente",
+        "rotulo": "Perfil do Proponente",
+        "pergunta_base": "Qual a sua atuação cultural comprovada e forma de inscrição (Pessoa Física, Coletivo ou PJ)?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Decreto nº 11.525/2023",
+        "por_produto": false
+      },
+      {
+        "id": "objetivo_principal",
+        "rotulo": "Objetivos e Justificativa",
+        "pergunta_base": "Quais são os objetivos do projeto e por que ele é relevante para a comunidade?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "LC nº 195/2022",
+        "por_produto": false
+      },
+      {
+        "id": "publico_territorio",
+        "rotulo": "Território e Comunidade",
+        "pergunta_base": "Onde o projeto será realizado e quem participará das atividades?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Decreto nº 11.525/2023",
+        "por_produto": false
+      },
+      {
+        "id": "atividades_metodologia",
+        "rotulo": "Atividades e Execução",
+        "pergunta_base": "Como será a produção e quais ações serão desenvolvidas do início ao fim?",
+        "obrigatorio": true,
+        "tipo": "lista de itens",
+        "fonte": "Decreto nº 11.525/2023",
+        "por_produto": false
+      },
+      {
+        "id": "acessibilidade",
+        "rotulo": "Acessibilidade",
+        "pergunta_base": "Quais medidas de acessibilidade física e comunicacional serão asseguradas?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Decreto nº 11.525/2023, art. 13",
+        "por_produto": false
+      },
+      {
+        "id": "contrapartida_social",
+        "rotulo": "Contrapartida Social",
+        "pergunta_base": "Qual contrapartida com exibição ou oficina gratuita será oferecida?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "LC nº 195/2022, art. 12",
+        "por_produto": false
+      },
+      {
+        "id": "cronograma",
+        "rotulo": "Cronograma",
+        "pergunta_base": "Qual o prazo estimado de realização das etapas do projeto?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Decreto nº 11.525/2023",
+        "por_produto": false
+      },
+      {
+        "id": "orcamento",
+        "rotulo": "Orçamento do Projeto",
+        "pergunta_base": "Quais são os itens de despesa e os valores planejados para execução?",
+        "obrigatorio": true,
+        "tipo": "valor",
+        "fonte": "Decreto nº 11.525/2023",
+        "por_produto": false
+      },
+      {
+        "id": "revisao_final",
+        "rotulo": "Revisão Geral",
+        "pergunta_base": "Deseja ajustar algum dado antes de finalizar a proposta da LPG?",
+        "obrigatorio": false,
+        "tipo": "texto",
+        "fonte": "Decreto nº 11.525/2023",
+        "por_produto": false
+      }
+    ]
+  },
+  "ROUANET": {
+    "nome": "Lei Rouanet (Pronac / Salic)",
+    "descricao": "Incentivo a Projetos Culturais via Lei nº 8.313/1991 e IN MinC nº 29/2026",
+    "campos": [
+      {
+        "id": "perfil_proponente",
+        "rotulo": "Perfil do Proponente",
+        "pergunta_base": "Você vai apresentar a proposta no Salic como Pessoa Física, MEI ou Pessoa Jurídica, e qual é a sua área de atuação cultural comprovada?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Arts. 4º e 10 da IN MinC nº 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "pendencias_minc",
+        "rotulo": "Declaração de Pendências com o MinC",
+        "pergunta_base": "O proponente ou seus dirigentes possuem alguma pendência cadastral, prestação de contas reprovada ou sanção perante o Ministério da Cultura ou órgãos federais?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Art. 18, 25 e 30, § 2º da Lei nº 8.313/1991; Art. 4º da IN 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "objetivo_pronac",
+        "rotulo": "Objetivo do Pronac e Justificativa",
+        "pergunta_base": "Qual é o objetivo da sua proposta cultural e a justificativa de impacto e interesse público, atendendo às finalidades do Pronac?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Art. 1º e Art. 3º da Lei nº 8.313/1991",
+        "por_produto": false
+      },
+      {
+        "id": "segmento_enquadramento",
+        "rotulo": "Segmento Cultural e Enquadramento Legal",
+        "pergunta_base": "Em qual área ou segmento cultural a ação se enquadra para definição do Artigo 18 (100% de dedução) ou Artigo 26 da Lei nº 8.313/1991?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Arts. 18 e 26 da Lei nº 8.313/1991; Anexo IV da IN 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "produtos_cadastro",
+        "rotulo": "Cadastro de Produtos",
+        "pergunta_base": "Quais serão os produtos culturais gerados pelo projeto, indicando qual deles é o Produto Principal (apenas um) e se haverá transmissão em canal aberto?",
+        "obrigatorio": true,
+        "tipo": "tabela",
+        "fonte": "Art. 4º, § 1º e Anexo I da IN MinC nº 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "acessibilidade_fisica",
+        "rotulo": "Responsabilidade Social: Acessibilidade Física",
+        "pergunta_base": "Quais medidas de acessibilidade física (como rampas, banheiros acessíveis, rotas acessíveis, pisos táteis) serão disponibilizadas nos locais das atividades presenciais?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Art. 2º, § 3º da Lei nº 8.313/1991; Arts. 20 e 38 da IN MinC nº 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "acessibilidade_conteudo",
+        "rotulo": "Responsabilidade Social: Acessibilidade de Conteúdo",
+        "pergunta_base": "Quais medidas de acessibilidade de conteúdo (como Libras, audiodescrição, Braille, legendagem descritiva) serão disponibilizadas para compreensão do projeto?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Art. 20 e Arts. 38 a 40 da IN MinC nº 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "democratizacao_acesso",
+        "rotulo": "Responsabilidade Social: Democratização de Acesso",
+        "pergunta_base": "Quais ações concretas de democratização de acesso serão adotadas (ex: distribuição gratuita, ensaios abertos, oficinas em escolas públicas, gratuidade para comunidades vulneráveis)?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Art. 41 da IN MinC nº 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "etapas_trabalho",
+        "rotulo": "Etapas de Trabalho",
+        "pergunta_base": "Quais são as atividades e a duração estimada de cada fase: Pré-produção, Execução e Pós-produção (prazo total até 36 meses)?",
+        "obrigatorio": true,
+        "tipo": "lista de itens",
+        "fonte": "Art. 4º, § 2º e Art. 17 da IN MinC nº 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "ficha_tecnica",
+        "rotulo": "Ficha Técnica",
+        "pergunta_base": "Qual a atividade detalhada do dirigente/proponente no projeto e quem são os principais profissionais e artistas da equipe com seus históricos resumidos?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Art. 27 e Anexo II da IN MinC nº 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "sinopse_especificacao_atividades",
+        "rotulo": "Por Produto: Sinopse, Especificação Técnica e Descrição da Atividade",
+        "pergunta_base": "Para cada produto, informe: a Sinopse da obra (com classificação indicativa), a Especificação Técnica (duração, tiragem, carga horária) e a Descrição da Atividade.",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Art. 4º, § 1º e Anexo I da IN MinC nº 29/2026",
+        "por_produto": true
+      },
+      {
+        "id": "plano_distribuicao",
+        "rotulo": "Plano de Distribuição",
+        "pergunta_base": "Qual o quantitativo de público e produtos/ingressos, incluindo cota gratuita social (mín. 10%) e ingressos populares até R$ 50,00 (mín. 20%)?",
+        "obrigatorio": true,
+        "tipo": "tabela",
+        "fonte": "Art. 41 da IN MinC nº 29/2026",
+        "por_produto": true
+      },
+      {
+        "id": "planilha_orcamentaria_vinculados",
+        "rotulo": "Planilha Orçamentária e Custos Vinculados",
+        "pergunta_base": "Quais são os itens de custo estimados e como deseja aplicar os custos vinculados (Acessibilidade até 20%, Administração até 15%, Captação até 10%/R$ 150 mil)?",
+        "obrigatorio": true,
+        "tipo": "valor",
+        "fonte": "Arts. 19, 20, 22 e 26 da IN MinC nº 29/2026",
+        "por_produto": false
+      },
+      {
+        "id": "plano_captacao",
+        "rotulo": "Captação de Recursos",
+        "pergunta_base": "Como o proponente planeja a estratégia de captação de recursos junto a incentivadores fiscais (empresas tributadas com base no Lucro Real ou pessoas físicas)?",
+        "obrigatorio": false,
+        "tipo": "texto",
+        "fonte": "Arts. 18, 23 e 28 da Lei nº 8.313/1991",
+        "por_produto": false
+      },
+      {
+        "id": "revisao_final_salic",
+        "rotulo": "Revisão Final e Orientações Salic",
+        "pergunta_base": "Deseja revisar algum item do seu projeto antes da emissão do documento formatado com as pendências e orientações para o Salic?",
+        "obrigatorio": false,
+        "tipo": "texto",
+        "fonte": "Arts. 4º e 45 da IN MinC nº 29/2026",
+        "por_produto": false
+      }
+    ]
+  },
+  "EMENDAS": {
+    "nome": "Emendas Parlamentares",
+    "descricao": "Recursos indicados por parlamentares para projetos culturais via MROSC (Lei nº 13.019/2014)",
+    "campos": [
+      {
+        "id": "esfera_emenda",
+        "rotulo": "Esfera da Emenda (Federal ou Estadual)",
+        "pergunta_base": "A emenda parlamentar pleiteada é de esfera federal (Orçamento Geral da União) ou estadual (ALRS)?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Lei nº 13.019/2014; Constituição Federal, art. 166",
+        "por_produto": false
+      },
+      {
+        "id": "objeto_parceria",
+        "rotulo": "Objeto do Termo de Fomento",
+        "pergunta_base": "Qual é a ação ou festival cultural que comporá o Plano de Trabalho da parceria?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Lei nº 13.019/2014, art. 22",
+        "por_produto": false
+      },
+      {
+        "id": "organizacao_proponente",
+        "rotulo": "Organização da Sociedade Civil (OSC)",
+        "pergunta_base": "Qual é a Organização da Sociedade Civil (OSC) sem fins lucrativos apta a formalizar a parceria?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Lei nº 13.019/2014, arts. 33 e 34",
+        "por_produto": false
+      },
+      {
+        "id": "justificativa_interesse_publico",
+        "rotulo": "Justificativa de Interesse Público",
+        "pergunta_base": "Qual é o interesse público e impacto cultural da iniciativa no município de Viamão?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Lei nº 13.019/2014, art. 22",
+        "por_produto": false
+      },
+      {
+        "id": "publico_beneficiario",
+        "rotulo": "Público Beneficiário em Viamão",
+        "pergunta_base": "Quais comunidades e bairros de Viamão serão diretamente beneficiados pela ação?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Lei nº 13.019/2014",
+        "por_produto": false
+      },
+      {
+        "id": "metodologia_acoes",
+        "rotulo": "Metodologia e Metas",
+        "pergunta_base": "Quais são as metas quantitativas e as etapas de execução da ação cultural?",
+        "obrigatorio": true,
+        "tipo": "lista de itens",
+        "fonte": "Lei nº 13.019/2014, art. 22",
+        "por_produto": false
+      },
+      {
+        "id": "cronograma_desembolso",
+        "rotulo": "Cronograma de Execução e Desembolso",
+        "pergunta_base": "Qual o período previsto de execução e o cronograma estimado das fases?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Lei nº 13.019/2014",
+        "por_produto": false
+      },
+      {
+        "id": "plano_aplicacao_recursos",
+        "rotulo": "Plano de Aplicação dos Recursos",
+        "pergunta_base": "Como os recursos da emenda serão distribuídos entre as despesas da parceria?",
+        "obrigatorio": true,
+        "tipo": "valor",
+        "fonte": "Lei nº 13.019/2014, art. 22",
+        "por_produto": false
+      },
+      {
+        "id": "revisao_emenda",
+        "rotulo": "Revisão e Prestação de Contas",
+        "pergunta_base": "Deseja fazer alguma complementação no Plano de Trabalho antes de gerar a minuta?",
+        "obrigatorio": false,
+        "tipo": "texto",
+        "fonte": "Lei nº 13.019/2014, arts. 63 a 68",
+        "por_produto": false
+      }
+    ]
+  },
+  "MUNICIPAL": {
+    "nome": "Edital Municipal de Viamão",
+    "descricao": "Chamamentos e editais públicos da Secretaria Municipal de Cultura de Viamão / RS",
+    "campos": [
+      {
+        "id": "edital_numero",
+        "rotulo": "Edital de Viamão e Linha de Fomento",
+        "pergunta_base": "Qual é o número ou linha do edital municipal de Viamão ao qual o projeto concorre?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Publicações da Secretaria de Cultura de Viamão / DOM",
+        "por_produto": false
+      },
+      {
+        "id": "ideia_projeto",
+        "rotulo": "Ideia Central da Proposta",
+        "pergunta_base": "Qual é a ideia central e o produto artístico ou cultural a ser entregue em Viamão?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Edital Municipal",
+        "por_produto": false
+      },
+      {
+        "id": "perfil_proponente",
+        "rotulo": "Identificação e Residência em Viamão",
+        "pergunta_base": "Como você se inscreve (Pessoa Física ou Coletivo/PJ) e como comprova atuação cultural em Viamão?",
+        "obrigatorio": true,
+        "tipo": "escolha",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      },
+      {
+        "id": "objetivo_justificativa",
+        "rotulo": "Objetivo e Justificativa Local",
+        "pergunta_base": "Quais são os objetivos do projeto e sua relevância para o patrimônio ou vida cultural de Viamão?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      },
+      {
+        "id": "bairros_comunidades",
+        "rotulo": "Bairros e Locais em Viamão",
+        "pergunta_base": "Em quais bairros ou espaços de Viamão (ex: Centro, Santa Isabel, Itapuã, Águas Claras) as ações ocorrerão?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      },
+      {
+        "id": "etapas_execucao",
+        "rotulo": "Etapas de Execução",
+        "pergunta_base": "Quais são as fases de realização e o que será feito em cada uma?",
+        "obrigatorio": true,
+        "tipo": "lista de itens",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      },
+      {
+        "id": "acessibilidade_local",
+        "rotulo": "Acessibilidade e Inclusão",
+        "pergunta_base": "Quais medidas de inclusão e acessibilidade serão garantidas para a população viamonense?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      },
+      {
+        "id": "contrapartida_comunidade",
+        "rotulo": "Contrapartida Gratuita para a Comunidade",
+        "pergunta_base": "Qual atividade inteiramente gratuita será oferecida para os cidadãos de Viamão?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      },
+      {
+        "id": "cronograma_local",
+        "rotulo": "Cronograma",
+        "pergunta_base": "Qual o período previsto para início, realização e encerramento das ações?",
+        "obrigatorio": true,
+        "tipo": "texto",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      },
+      {
+        "id": "orcamento_detalhado",
+        "rotulo": "Orçamento Estimado",
+        "pergunta_base": "Quais são os itens de despesa e os valores planejados dentro do teto do edital?",
+        "obrigatorio": true,
+        "tipo": "valor",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      },
+      {
+        "id": "revisao_municipal",
+        "rotulo": "Revisão e Finalização",
+        "pergunta_base": "Deseja revisar algum dado antes de gerar a proposta do edital municipal?",
+        "obrigatorio": false,
+        "tipo": "texto",
+        "fonte": "Edital Municipal de Viamão",
+        "por_produto": false
+      }
+    ]
+  }
+}
