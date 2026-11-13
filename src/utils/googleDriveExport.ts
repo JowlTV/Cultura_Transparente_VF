@@ -17,6 +17,17 @@ import {
   isRouanetPolicy,
   ConferenciaRegrasResult,
 } from './docxExport';
+import { REGRAS_GERAIS_ROUANET } from './regrasRouanet';
+
+/** Escapa texto antes de inseri-lo no HTML convertido em Google Doc. */
+function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 declare global {
   interface Window {
@@ -69,21 +80,21 @@ export function convertProjectToHtml(
       <p style="margin: 4px 0 0; color: #6A0DAD; font-weight: bold; font-size: 13px;">
         ${isRouanet ? 'PROGRAMA NACIONAL DE APOIO À CULTURA (PRONAC) · LEI ROUANET (IN MINC Nº 29/2026)' : 'Plataforma Cultura Transparente · Apoio ao Fomento Cultural'}
       </p>
-      <h1 style="margin: 15px 0 5px; color: #2D0652; font-size: 24px;">${title}</h1>
+      <h1 style="margin: 15px 0 5px; color: #2D0652; font-size: 24px;">${escapeHtml(title)}</h1>
     </div>
 
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13px;">
       <tr>
         <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; width: 30%; background-color: #f9f6fd; color: #2D0652;">Mecanismo / Edital</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">${edital}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(edital)}</td>
       </tr>
       <tr>
         <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; background-color: #f9f6fd; color: #2D0652;">Proponente</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">${proponente}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(proponente)}</td>
       </tr>
       <tr>
         <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; background-color: #f9f6fd; color: #2D0652;">Território de Realização</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">${territorio}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(territorio)}</td>
       </tr>
       <tr>
         <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold; background-color: #f9f6fd; color: #2D0652;">Data de Elaboração</td>
@@ -104,12 +115,12 @@ export function convertProjectToHtml(
     }
 
     const val = rawVal || (isRouanet ? '<p style="color: #666; font-style: italic;">[a preencher]</p>' : '<p style="color: #888; font-style: italic;">[Seção pendente de preenchimento]</p>');
-    const formattedVal = val.includes('<p>') ? val : val.split('\n\n').map(p => `<p style="margin: 6px 0;">${p.replace(/\n/g, '<br/>')}</p>`).join('');
+    const formattedVal = val.split('\n\n').map(p => `<p style="margin: 6px 0;">${escapeHtml(p).replace(/\n/g, '<br/>')}</p>`).join('');
 
     bodyHtml += `
       <div style="margin-bottom: 22px;">
         <h2 style="font-size: 17px; color: #2D0652; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 8px;">
-          ${sec.num}. ${sec.title}
+          ${sec.num}. ${escapeHtml(sec.title)}
         </h2>
         <div style="font-size: 14px; color: #333;">
           ${formattedVal}
@@ -131,29 +142,32 @@ export function convertProjectToHtml(
       if (conferenciaRegras.aprovacoes && conferenciaRegras.aprovacoes.length > 0) {
         bodyHtml += `<h4 style="color: #166534; margin: 10px 0 5px;">✔ Itens Conformes:</h4><ul style="margin: 0; padding-left: 20px; font-size: 13px;">`;
         conferenciaRegras.aprovacoes.forEach(ap => {
-          bodyHtml += `<li><strong>${ap.descricao}:</strong> ${ap.referencia} - <em>"${ap.citacao}"</em></li>`;
+          bodyHtml += `<li><strong>${escapeHtml(ap.descricao)}:</strong> ${escapeHtml(ap.referencia)} - <em>"${escapeHtml(ap.citacao)}"</em></li>`;
         });
         bodyHtml += `</ul>`;
       }
       if (conferenciaRegras.infracoes && conferenciaRegras.infracoes.length > 0) {
         bodyHtml += `<h4 style="color: #B91C1C; margin: 10px 0 5px;">⚠ Limites Excedidos:</h4><ul style="margin: 0; padding-left: 20px; font-size: 13px;">`;
         conferenciaRegras.infracoes.forEach(inf => {
-          bodyHtml += `<li><strong>${inf.descricao}:</strong> ${inf.referencia} - <em>"${inf.citacao}"</em></li>`;
+          bodyHtml += `<li><strong>${escapeHtml(inf.descricao)}:</strong> ${escapeHtml(inf.referencia)} - <em>"${escapeHtml(inf.citacao)}"</em></li>`;
         });
         bodyHtml += `</ul>`;
       }
       if (conferenciaRegras.pendencias && conferenciaRegras.pendencias.length > 0) {
         bodyHtml += `<h4 style="color: #D97706; margin: 10px 0 5px;">ℹ Informações Pendentes:</h4><ul style="margin: 0; padding-left: 20px; font-size: 13px;">`;
         conferenciaRegras.pendencias.forEach(pen => {
-          bodyHtml += `<li><strong>${pen.descricao}:</strong> ${pen.pendencia} (${pen.referencia})</li>`;
+          bodyHtml += `<li><strong>${escapeHtml(pen.descricao)}:</strong> ${escapeHtml(pen.pendencia)} (${escapeHtml(pen.referencia)})</li>`;
         });
         bodyHtml += `</ul>`;
       }
     } else {
       bodyHtml += `
         <p style="font-size: 13px; color: #475569;">
-          Esta proposta foi estruturada respeitando os limites da IN MinC nº 29/2026: custos administrativos até 15% (Art. 19), captação de recursos até 10% ou R$ 150 mil (Art. 23), cachê individual até R$ 25 mil (Art. 26) e cota de gratuidade social de no mínimo 10% com ingressos populares de no mínimo 20% (Art. 41).
+          Limites objetivos da IN MinC nº 29/2026 a conferir nesta proposta (citações literais):
         </p>
+        <ul style="font-size: 13px; color: #475569;">
+          ${REGRAS_GERAIS_ROUANET.map(r => `<li><strong>${escapeHtml(r.desc)} (${escapeHtml(r.ref)}):</strong> <em>"${escapeHtml(r.cit)}"</em></li>`).join('')}
+        </ul>
       `;
     }
 

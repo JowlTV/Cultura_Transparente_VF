@@ -26,28 +26,25 @@ export const ApiDocumentationSection: React.FC = () => {
     setSimulatedStatus(null);
     const start = performance.now();
 
-    if (selectedApi.url.startsWith('/api/')) {
+    try {
+      const res = await fetch(selectedApi.url, { headers: { Accept: 'application/json' } });
+      const latency = Math.round(performance.now() - start);
+      const texto = await res.text();
+      let corpo = texto;
       try {
-        const res = await fetch(selectedApi.url, { headers: { Accept: 'application/json' } });
-        const latency = Math.round(performance.now() - start);
-        if (res.ok) {
-          const data = await res.json();
-          setSimulationResult(JSON.stringify(data, null, 2));
-          setSimulatedStatus(`HTTP ${res.status} OK • Execução em Tempo Real • Latência ${latency}ms`);
-          setIsSimulating(false);
-          return;
-        }
-      } catch (_) {
-        // Fallback
+        corpo = JSON.stringify(JSON.parse(texto), null, 2);
+      } catch {
+        // resposta não-JSON: exibe como veio
       }
-    }
-
-    setTimeout(() => {
-      const latency = Math.round(performance.now() - start + 40);
-      setIsSimulating(false);
+      setSimulationResult(corpo);
+      setSimulatedStatus(`HTTP ${res.status}${res.ok ? ' OK' : ''} • Resposta real do servidor • Latência ${latency}ms`);
+    } catch (_) {
+      // Sem resposta do servidor: mostra o exemplo da documentação, identificado como exemplo
       setSimulationResult(selectedApi.exemploResposta);
-      setSimulatedStatus(`HTTP 200 OK • Estrutura Validada • Latência ${latency}ms`);
-    }, 350);
+      setSimulatedStatus('Sem resposta do servidor • Exibindo o EXEMPLO da documentação (não é dado real)');
+    } finally {
+      setIsSimulating(false);
+    }
   };
 
   const handleCopyCode = (code: string) => {

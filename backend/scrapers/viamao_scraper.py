@@ -14,6 +14,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+from email.utils import parsedate_to_datetime
 
 from backend.utils import setup_logger
 
@@ -74,20 +75,34 @@ def obter_imagem_referencia(link: str, imagem_artigo: Optional[str] = None) -> O
     return None
 
 
-def formatar_data_iso_para_br(data_str: str) -> str:
-    """Converte 'AAAA-MM-DD' ou string de data em 'DD/MM/AAAA' sem inventar horário."""
+def _parse_data(data_str: str) -> Optional[datetime]:
+    """Interpreta datas ISO (AAAA-MM-DD), BR (DD/MM/AAAA) ou RFC 822 (padrão RSS)."""
     if not data_str:
-        return ""
-    data_limpa = data_str.strip()[:10]
-    try:
-        dt = datetime.strptime(data_limpa, "%Y-%m-%d")
-        return dt.strftime("%d/%m/%Y")
-    except Exception:
+        return None
+    bruto = data_str.strip()
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
         try:
-            dt = datetime.strptime(data_limpa, "%d/%m/%Y")
-            return dt.strftime("%d/%m/%Y")
+            return datetime.strptime(bruto[:10], fmt)
         except Exception:
-            return data_limpa
+            pass
+    try:
+        return parsedate_to_datetime(bruto)
+    except Exception:
+        return None
+
+
+def formatar_data_iso_para_br(data_str: str) -> str:
+    """Converte a data de publicação em 'DD/MM/AAAA' sem inventar horário nem data."""
+    dt = _parse_data(data_str)
+    if dt:
+        return dt.strftime("%d/%m/%Y")
+    return (data_str or "").strip()[:10]
+
+
+def chave_ordenacao_data(data_str: str) -> str:
+    """Chave ordenável AAAAMMDD; itens sem data reconhecível vão para o fim."""
+    dt = _parse_data(data_str)
+    return dt.strftime("%Y%m%d") if dt else ""
 
 
 class ViamaoCultureScraper:
@@ -180,7 +195,7 @@ class ViamaoCultureScraper:
 
         # Ordenar por data decrescente
         def _chave_ordenacao(item: Dict[str, Any]) -> str:
-            return item.get("pub_date_iso") or item.get("data") or ""
+            return chave_ordenacao_data(item.get("pub_date_iso") or item.get("data") or "")
 
         noticias.sort(key=_chave_ordenacao, reverse=True)
         return noticias
@@ -236,7 +251,7 @@ class ViamaoCultureScraper:
                 "url_pesquisa_google": f"https://www.google.com/search?q={urllib.parse.quote(f'{titulo} Viamao')}"
             })
 
-        items.sort(key=lambda x: x.get("pub_date_iso") or "", reverse=True)
+        items.sort(key=lambda x: chave_ordenacao_data(x.get("pub_date_iso") or ""), reverse=True)
         return items
 
     def _fetch_url_text(self, url: str) -> Optional[str]:
@@ -270,7 +285,7 @@ class ViamaoCultureScraper:
         if rss_text:
             try:
                 noticias = self.parse_rss_xml(rss_text, apenas_cultura=apenas_cultura)
-                ultima_pub = noticias[0]["data"] if noticias else "28/08/2026"
+                ultima_pub = (noticias[0].get("data") or None) if noticias else None
                 self.status_fontes["prefeitura_viamao"] = {
                     "fonte": "Prefeitura Municipal de Viamão",
                     "tipo": "RSS Oficial",
@@ -278,7 +293,7 @@ class ViamaoCultureScraper:
                     "sucesso": True,
                     "total_itens": len(noticias),
                     "ultima_publicacao": ultima_pub,
-                    "mensagem": f"Prefeitura de Viamão: última publicação em {ultima_pub}"
+                    "mensagem": f"Prefeitura de Viamão: última publicação em {ultima_pub}" if ultima_pub else "Prefeitura de Viamão: nenhuma publicação cultural no feed atual"
                 }
             except Exception as e:
                 logger.error(f"Erro ao processar RSS da Prefeitura: {e}")
@@ -290,7 +305,7 @@ class ViamaoCultureScraper:
             if html_text:
                 noticias = self._parse_noticias_html(html_text, base_url=self.PORTAL_NOTICIAS_URL)
                 if noticias:
-                    ultima_pub = noticias[0]["data"] if noticias else "28/08/2026"
+                    ultima_pub = (noticias[0].get("data") or None) if noticias else None
                     self.status_fontes["prefeitura_viamao"] = {
                         "fonte": "Prefeitura Municipal de Viamão",
                         "tipo": "Portal HTML (Alternativo)",
@@ -298,7 +313,7 @@ class ViamaoCultureScraper:
                         "sucesso": True,
                         "total_itens": len(noticias),
                         "ultima_publicacao": ultima_pub,
-                        "mensagem": f"Prefeitura de Viamão: última publicação em {ultima_pub}"
+                        "mensagem": f"Prefeitura de Viamão: última publicação em {ultima_pub}" if ultima_pub else "Prefeitura de Viamão: nenhuma publicação cultural no feed atual"
                     }
 
         # 3. Se todas as consultas ao vivo falharem, registrar falha transparente
@@ -344,7 +359,7 @@ class ViamaoCultureScraper:
                             "id": f"viamao-html-{idx}",
                             "titulo": clean_title,
                             "resumo": clean_title,
-                            "data": "28/08/2026",
+                            "data": "",  # a listagem HTML não informa data; não inventar
                             "origem": "Municipal (Viamão)",
                             "categoria_filtro": "editais" if "edital" in clean_title.lower() or "pnab" in clean_title.lower() else "viamao",
                             "link": full_link,

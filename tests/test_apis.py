@@ -329,7 +329,7 @@ class TestApis(unittest.TestCase):
         self.assertEqual(len(emendas), 1)
         self.assertEqual(emendas[0].numero_emenda, "2024004")
         self.assertEqual(emendas[0].municipio, "Viamão")
-        self.assertEqual(emendas[0].beneficiario, "Município de Viamão / RS")
+        self.assertTrue(emendas[0].beneficiario.startswith("Localidade do gasto:"))
 
     def test_portal_transparencia_rs_descarte_vazio_e_outros_municipios(self):
         """

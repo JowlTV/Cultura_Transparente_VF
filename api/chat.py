@@ -23,7 +23,7 @@ from typing import Dict, List, Any, Optional
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from backend.apis import TransferegovApi
+from backend.apis import TransferegovApi, CguTransparenciaApi
 from backend.conhecimento_retriever import (
     extrair_contexto_conhecimento,
     identificar_politica
@@ -325,6 +325,26 @@ Sua resposta DEVE ser EXCLUSIVAMENTE um objeto JSON válido, sem texto fora do J
 """
 
 
+MAX_MENSAGENS_HISTORICO = 40
+MAX_CHARS_POR_MENSAGEM = 8000
+
+# Ordem de failover. Pode ser sobrescrita pela variável de ambiente GEMINI_MODELS
+# (lista separada por vírgulas) quando o Google publicar ou descontinuar modelos.
+MODELOS_GEMINI_PADRAO = [
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite"
+]
+
+
+def obter_modelos_gemini() -> List[str]:
+    """Lista de modelos para failover, configurável via GEMINI_MODELS sem alterar código."""
+    raw = os.environ.get("GEMINI_MODELS", "")
+    modelos = [m.strip() for m in raw.split(",") if m.strip() and re.fullmatch(r"[a-z0-9.\-]+", m.strip())]
+    return modelos or list(MODELOS_GEMINI_PADRAO)
+
+
 def extrair_valores_orcamento_texto(texto: str) -> Dict[str, Any]:
     """
     Extrai números e itens de custo mencionados pelo usuário para alimentar
@@ -336,7 +356,7 @@ def extrair_valores_orcamento_texto(texto: str) -> Dict[str, Any]:
     # Detecta tipo de proponente se mencionado
     if "pessoa física" in txt or "pessoa fisica" in txt or re.search(r'\bpf\b', txt):
         dados["tipo_proponente"] = "pf"
-    elif "mei" in txt or "microempreendedor" in txt:
+    elif re.search(r'\bmei\b', txt) or "microempreendedor" in txt:
         dados["tipo_proponente"] = "mei"
     elif "pessoa jurídica" in txt or "pessoa juridica" in txt or re.search(r'\bpj\b', txt) or "associação" in txt or "empresa" in txt:
         dados["tipo_proponente"] = "pj"
@@ -463,18 +483,24 @@ def obter_contexto_factual_viamao(user_query: str = "") -> str:
     # Contexto Emendas Parlamentares
     if any(k in user_query_lower for k in ["emenda", "parlamentar", "deputad", "verba", "recurso", "orçamento"]):
         try:
-            from backend.apis import CguEmendasApi
-            cgu = CguEmendasApi()
-            emendas = cgu.buscar_emendas_municipio(codigo_ibge="4323002", funcao="13")
-            if emendas and len(emendas) > 0:
-                total_emendas = sum(e.get("valor_pago", 0) or e.get("valor_empenhado", 0) for e in emendas)
+            cgu = CguTransparenciaApi()
+            if not cgu.api_key:
                 context_parts.append(
-                    f"- Emendas Parlamentares para Cultura em Viamão/RS: {len(emendas)} emenda(s) monitorada(s) pela CGU para o território de Viamão na Função Cultura, somando R$ {total_emendas:,.2f}."
+                    "- Emendas Parlamentares para Cultura em Viamão/RS: consulta federal indisponível neste ambiente (chave da API da CGU não configurada). Não informe valores de emendas."
                 )
             else:
-                context_parts.append(
-                    "- Emendas Parlamentares para Cultura em Viamão/RS: Nenhuma emenda específica para Cultura localizada no momento para o município no Portal da Transparência."
-                )
+                emendas = cgu.buscar_emendas(codigo_ibge="4323002", codigo_funcao="13")
+                if emendas:
+                    total_empenhado = sum(e.valor or 0.0 for e in emendas)
+                    total_pago = sum(e.pago or 0.0 for e in emendas)
+                    context_parts.append(
+                        f"- Emendas Parlamentares Federais para Cultura em Viamão/RS (Portal da Transparência/CGU): {len(emendas)} emenda(s), "
+                        f"R$ {total_empenhado:,.2f} empenhados e R$ {total_pago:,.2f} pagos."
+                    )
+                else:
+                    context_parts.append(
+                        "- Emendas Parlamentares Federais para Cultura em Viamão/RS: nenhuma emenda localizada no Portal da Transparência (CGU) para os exercícios consultados."
+                    )
         except Exception as e:
             logger.warning(f"Consulta de emendas da CGU falhou: {e}")
 
@@ -638,6 +664,13 @@ class handler(BaseHTTPRequestHandler):
             if not isinstance(messages, list) or len(messages) == 0:
                 self.send_error_response(400, "Campo 'messages' inválido ou vazio.")
                 return
+
+            # Limita histórico e tamanho de cada mensagem para conter custo de tokens e abuso do endpoint
+            messages = [
+                {"role": m.get("role"), "content": str(m.get("content", ""))[:MAX_CHARS_POR_MENSAGEM]}
+                for m in messages[-MAX_MENSAGENS_HISTORICO:]
+                if isinstance(m, dict)
+            ]
 
             api_key = os.environ.get("GEMINI_API_KEY", "").strip()
             if not api_key:
@@ -843,12 +876,7 @@ class handler(BaseHTTPRequestHandler):
                 }
             }
 
-            candidate_models = [
-                "gemini-3.6-flash",
-                "gemini-3.5-flash",
-                "gemini-3.5-flash-lite",
-                "gemini-3.1-flash-lite"
-            ]
+            candidate_models = obter_modelos_gemini()
             models_to_try = list(candidate_models)
             tried_models = set()
 
@@ -1029,7 +1057,7 @@ class handler(BaseHTTPRequestHandler):
             logger.error(f"Exceção fatal no endpoint /api/chat: {sanitized_e}")
             self.send_json_response(500, {
                 "success": False,
-                "error": f"Erro interno ao processar requisição: {sanitized_e}",
+                "error": "Erro interno ao processar a requisição.",
                 "code": "INTERNAL_SERVER_ERROR"
             })
 

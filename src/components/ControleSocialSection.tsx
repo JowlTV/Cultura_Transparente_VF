@@ -91,7 +91,7 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
     {
       nome: 'Ouvidoria & e-SIC da Prefeitura de Viamão',
       esfera: 'Municipal',
-      papel: 'Protocolo oficial online de pedidos de informação (e-SIC), denúncias e reclamações na Central 1Doc / Tel: 156.',
+      papel: 'Protocolo oficial online de pedidos de informação (e-SIC), denúncias e reclamações na Central de Atendimento 1Doc.',
       link: 'https://viamao.1doc.com.br/atendimento',
       portalSecundario: 'https://www.viamao.rs.gov.br/',
       prazo: 'Até 20 dias',
@@ -99,7 +99,7 @@ Viamão / RS, ${new Date().toLocaleDateString('pt-BR')}.`;
     {
       nome: 'Tribunal de Contas do Estado do RS (TCE-RS)',
       esfera: 'Estadual',
-      papel: 'Ouvidoria e fiscalização da conformidade contábil, financeira e orçamentária do município de Viamão. Canal direto: 0800-541 9800 / E-mail: ouvidoria@tce.rs.gov.br.',
+      papel: 'Ouvidoria e fiscalização da conformidade contábil, financeira e orçamentária do município de Viamão. Contatos atualizados no portal da Ouvidoria do TCE-RS.',
       link: 'https://portalnovo.tce.rs.gov.br/ouvidoria',
       portalSecundario: 'https://portalnovo.tce.rs.gov.br/',
       prazo: 'Ouvidoria TCE-RS',

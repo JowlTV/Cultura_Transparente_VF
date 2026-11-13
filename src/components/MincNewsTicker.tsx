@@ -4,67 +4,58 @@ import { ChevronLeft, ChevronRight, Pause, Play, ExternalLink } from './Icon';
 export interface MincNewsItem {
   id: string;
   categoria: string;
-  data: string;
   titulo: string;
   resumo: string;
   link: string;
   orgao: string;
 }
 
+/**
+ * Atalhos para páginas oficiais (sem manchetes nem datas).
+ * Auditoria v13: a versão anterior exibia "informativos" datados de set/2026 que não
+ * correspondiam a publicações localizáveis — os links levavam apenas às páginas gerais do MinC.
+ * Para notícias reais, use o feed de /api/news (RSS oficial da Prefeitura de Viamão).
+ */
 export const MINC_NOTICIAS_OFICIAIS: MincNewsItem[] = [
   {
-    id: 'minc-01',
-    categoria: 'Política Nacional Aldir Blanc (PNAB)',
-    data: '09/09/2026',
+    id: 'minc-pnab',
+    categoria: 'PNAB',
     orgao: 'Ministério da Cultura',
-    titulo: 'MinC orienta municípios sobre acompanhamento de recursos da PNAB e prestação de contas no Transferegov',
-    resumo: 'Diretrizes nacionais reforçam a obrigatoriedade de ampla publicidade aos editais municipais, cotas para agentes periféricos e fomento direto a Pontos de Cultura.',
+    titulo: 'Política Nacional Aldir Blanc (PNAB) — página oficial do MinC',
+    resumo: 'Normas, orientações aos entes federativos e materiais oficiais da Política Nacional Aldir Blanc de Fomento à Cultura (Lei nº 14.399/2022).',
     link: 'https://www.gov.br/cultura/pt-br/assuntos/politica-nacional-aldir-blanc',
   },
   {
-    id: 'minc-02',
-    categoria: 'Cultura Viva & Pontos de Cultura',
-    data: '08/09/2026',
-    orgao: 'Secretaria de Cidadania e Diversidade Cultural / MinC',
-    titulo: 'Rede Cultura Viva abre novo ciclo de certificação simplificada para coletivos comunitários e entidades',
-    resumo: 'Iniciativas culturais comunitárias em periferias e zonas rurais podem obter a chancela oficial de Ponto de Cultura para habilitação em editais de premiação.',
+    id: 'minc-cultura-viva',
+    categoria: 'Cultura Viva',
+    orgao: 'Ministério da Cultura',
+    titulo: 'Política Nacional de Cultura Viva — página oficial do MinC',
+    resumo: 'Informações oficiais sobre Pontos e Pontões de Cultura e a certificação da Rede Cultura Viva.',
     link: 'https://www.gov.br/cultura/pt-br/assuntos/cultura-viva',
   },
   {
-    id: 'minc-03',
-    categoria: 'Transparência & Controle Social',
-    data: '06/09/2026',
-    orgao: 'MinC & Controladoria-Geral da União (CGU)',
-    titulo: 'Painel da Transparência Cultural Federal integra dados de emendas e transferências fundo a fundo',
-    resumo: 'Cidadãos e conselheiros municipais de cultura agora contam com cruzamento automatizado de emendas parlamentares e dotações do Fundo Nacional de Cultura.',
-    link: 'https://portaldatransparencia.gov.br/',
+    id: 'cgu-transparencia',
+    categoria: 'Transparência',
+    orgao: 'Controladoria-Geral da União (CGU)',
+    titulo: 'Portal da Transparência — consulta de emendas parlamentares',
+    resumo: 'Consulta pública oficial de emendas parlamentares federais por autor, localidade e função orçamentária.',
+    link: 'https://portaldatransparencia.gov.br/emendas',
   },
   {
-    id: 'minc-04',
-    categoria: 'Transparência Municipal & PNAB',
-    data: '04/09/2026',
-    orgao: 'Secretaria de Gestão e Fomento Cultural',
-    titulo: 'Orientações aos municípios para aplicação dos rendimentos financeiros da conta PNAB',
-    resumo: 'Recursos em conta fiduciária do Fundo Municipal de Cultura devem ter rendimentos reinvestidos integralmente nas metas do Plano Anual de Aplicação dos Recursos (PAAR).',
-    link: 'https://www.gov.br/cultura/pt-br/assuntos/politica-nacional-aldir-blanc',
-  },
-  {
-    id: 'minc-05',
-    categoria: 'Sistema Nacional de Cultura (SNC)',
-    data: '02/09/2026',
-    orgao: 'Conselho Nacional de Política Cultural (CNPC)',
-    titulo: 'Fortalecimento dos Conselhos Municipais de Cultura: MinC promove capacitação para controle social',
-    resumo: 'Encontros virtuais e guias práticos capacitam conselheiros e agentes culturais locais na fiscalização e aprovação de planos de aplicação de recursos.',
+    id: 'minc-snc',
+    categoria: 'Sistema Nacional de Cultura',
+    orgao: 'Ministério da Cultura',
+    titulo: 'Sistema Nacional de Cultura (SNC) — página oficial do MinC',
+    resumo: 'Informações oficiais sobre conselhos, planos e fundos de cultura dos entes federativos.',
     link: 'https://www.gov.br/cultura/pt-br/assuntos/sistema-nacional-de-cultura',
   },
   {
-    id: 'minc-06',
-    categoria: 'Hip-Hop & Cultura Urbana',
-    data: '28/08/2026',
+    id: 'minc-noticias',
+    categoria: 'Notícias',
     orgao: 'Ministério da Cultura',
-    titulo: 'Decreto Federal de Valorização da Cultura Hip-Hop impulsiona ações formativas e mostras urbanas',
-    resumo: 'Fomento a festivais, batalhas de rima, breaking e artes visuais como vetores prioritários de inclusão social e cidadania para as juventudes periféricas.',
-    link: 'https://www.gov.br/cultura/pt-br',
+    titulo: 'Notícias oficiais do Ministério da Cultura',
+    resumo: 'Canal oficial de notícias e comunicados do Ministério da Cultura.',
+    link: 'https://www.gov.br/cultura/pt-br/assuntos/noticias',
   },
 ];
 
@@ -118,7 +109,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
         {/* Left Badge: Informativos Oficiais */}
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center gap-1.5 bg-[#FF4500] text-white px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wide uppercase shadow-xs">
-            <span>Informativos MinC</span>
+            <span>Links oficiais</span>
           </div>
         </div>
 
@@ -126,7 +117,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
         <div
           onClick={() => handleOpenDetail(currentNews)}
           className="flex-1 min-w-0 flex items-center gap-2 cursor-pointer group py-0.5"
-          title="Clique para ler o informativo completo do Ministério da Cultura"
+          title="Clique para ver a descrição e abrir a página oficial"
         >
           <span className="hidden lg:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#3D0B6D] text-purple-200 border border-purple-400/30 shrink-0">
             {currentNews.categoria}
@@ -134,10 +125,6 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
 
           <span className="font-medium text-purple-100 group-hover:text-[#FF4500] transition-colors truncate text-xs">
             {currentNews.titulo}
-          </span>
-
-          <span className="hidden xl:inline-block text-[10px] text-white/70 shrink-0">
-            ({currentNews.data})
           </span>
 
           <ExternalLink className="w-3 h-3 text-white/70 group-hover:text-[#FF4500] shrink-0 opacity-80" />
@@ -151,7 +138,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
 
           <button
             onClick={handlePrev}
-            aria-label="Notícia anterior do MinC"
+            aria-label="Link anterior"
             className="p-1 hover:bg-white/10 hover:text-white rounded transition-colors text-purple-200"
             title="Anterior"
           >
@@ -169,7 +156,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
 
           <button
             onClick={handleNext}
-            aria-label="Próxima notícia do MinC"
+            aria-label="Próximo link"
             className="p-1 hover:bg-white/10 hover:text-white rounded transition-colors text-purple-200"
             title="Próxima"
           >
@@ -194,9 +181,6 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB]">
                     {selectedModalNews.categoria}
                   </span>
-                  <span className="text-xs text-[#2D0652]/70 font-semibold">
-                    {selectedModalNews.data}
-                  </span>
                 </div>
                 <h3 className="text-base sm:text-lg text-[#2D0652] leading-snug" style={{ fontFamily: 'var(--font-display)' }}>
                   {selectedModalNews.titulo}
@@ -215,9 +199,6 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
                 Órgão Emissor: <strong>{selectedModalNews.orgao}</strong>
               </div>
               <p>{selectedModalNews.resumo}</p>
-              <p className="text-xs text-[#2D0652]/70">
-                Esta publicação integra o monitoramento de transparência pública ativa do município de Viamão para acompanhamento de diretrizes federais de investimento e repasses orçamentários culturais.
-              </p>
             </div>
 
             <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#E2D2BC]">
@@ -234,7 +215,7 @@ export const MincNewsTicker: React.FC<MincNewsTickerProps> = ({ onSelectNews }) 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#6A0DAD] hover:bg-[#580B91] text-white text-xs font-bold rounded-full transition-colors shadow-xs"
               >
-                <span>Acessar no Portal do MinC</span>
+                <span>Abrir página oficial</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>

@@ -11,6 +11,7 @@ import {
   BorderStyle,
   Packer,
 } from 'docx';
+import { REGRAS_GERAIS_ROUANET } from './regrasRouanet';
 
 export interface ProjectDraftSections {
   edital_politica?: string;
@@ -331,14 +332,8 @@ export async function generateProjectDocxBlob(options: DocxExportOptions): Promi
         });
       }
     } else {
-      // Regras gerais de conferência da IN 29/2026
-      const regrasGerais = [
-        { desc: 'Custos Administrativos', ref: 'Art. 19', cit: 'Os custos administrativos ficam limitados a 15% (quinze por cento) do valor total do projeto.' },
-        { desc: 'Remuneração para Captação de Recursos', ref: 'Art. 23', cit: 'A remuneração para captação de recursos fica limitada a 10% (dez por cento) do valor total aprovado para captação, até o valor máximo de R$ 150.000,00 (cento e cinquenta mil reais).' },
-        { desc: 'Cachê Artístico Individual', ref: 'Art. 26', cit: 'O valor máximo para pagamento de cachê artístico com recursos incentivados é de R$ 25.000,00 (vinte e cinco mil reais) por artista.' },
-        { desc: 'Cotas Gratuitas de Democratização', ref: 'Art. 41', cit: 'A distribuição gratuita de ingressos ou produtos culturais deve destinar no mínimo 10% (dez por cento) para ações socioeducativas ou comunitárias e no mínimo 20% (vinte por cento) com preços populares de até R$ 50,00.' },
-        { desc: 'Submissão e Responsabilidade no Salic', ref: 'Art. 4º e Art. 48', cit: 'A proposta deve ser apresentada pelo próprio proponente no Salic. A aprovação da proposta no Pronac autoriza a captação de recursos junto a patrocinadores e não garante a captação nem o recebimento de verba direta.' },
-      ];
+      // Regras gerais de conferência da IN 29/2026 (citações literais do catálogo verificado)
+      const regrasGerais = REGRAS_GERAIS_ROUANET;
 
       regrasGerais.forEach(r => {
         children.push(
@@ -352,6 +347,19 @@ export async function generateProjectDocxBlob(options: DocxExportOptions): Promi
           })
         );
       });
+      children.push(
+        new Paragraph({
+          bullet: { level: 0 },
+          children: [
+            new TextRun({ text: 'Submissão no Salic (Art. 4º e Arts. 47 e 48 da IN MinC nº 29/2026): ', bold: true, size: 20 }),
+            new TextRun({
+              text: 'a proposta é apresentada pelo próprio proponente no Salic; a aprovação autoriza a captação de recursos e não garante a captação.',
+              size: 20,
+            }),
+          ],
+          spacing: { after: 60 },
+        })
+      );
     }
   }
 

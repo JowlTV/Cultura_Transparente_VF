@@ -67,7 +67,7 @@ class handler(BaseHTTPRequestHandler):
             logger.error(f"Erro no endpoint /api/news: {e}")
             err_data = json.dumps({
                 "success": False,
-                "error": str(e),
+                "error": "Falha ao consultar as fontes de notícias.",
                 "status_fontes": {
                     "prefeitura_viamao": {
                         "fonte": "Prefeitura Municipal de Viamão",

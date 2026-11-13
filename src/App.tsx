@@ -13,11 +13,7 @@ const LpgSection = lazy(() => import('./components/LpgSection').then(m => ({ def
 const ApiDocumentationSection = lazy(() => import('./components/ApiDocumentationSection').then(m => ({ default: m.ApiDocumentationSection })));
 const QuickSearchModal = lazy(() => import('./components/QuickSearchModal').then(m => ({ default: m.QuickSearchModal })));
 
-import {
-  INITIAL_EMENDAS,
-  INITIAL_NEWS,
-  INITIAL_LPG_DATA,
-} from './data/initialData';
+import { INITIAL_LPG_DATA } from './data/initialData';
 import { Emenda, NewsItem, LpgPlanoAcao } from './types/culture';
 import { apiClient } from './services/apiClient';
 import { sortNewsByDateDesc } from './utils/formatters';
@@ -26,14 +22,15 @@ import { CheckCircle2 } from './components/Icon';
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('visao-geral');
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const [emendas, setEmendas] = useState<Emenda[]>(INITIAL_EMENDAS);
-  const [noticias, setNoticias] = useState<NewsItem[]>(() => sortNewsByDateDesc(INITIAL_NEWS));
+  const [emendas, setEmendas] = useState<Emenda[]>([]);
+  const [noticias, setNoticias] = useState<NewsItem[]>([]);
   const [lpgData, setLpgData] = useState<LpgPlanoAcao>(INITIAL_LPG_DATA);
-  const [isFetchingLpg, setIsFetchingLpg] = useState<boolean>(false);
-  const [lastUpdated, setLastUpdated] = useState<string>('11/09/2026 11:25');
+  const [isFetchingLpg, setIsFetchingLpg] = useState<boolean>(true);
+  const [lastUpdated, setLastUpdated] = useState<string>('—');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-  const [syncStatusText, setSyncStatusText] = useState<string>('Bases Oficiais Auditadas');
-  const [syncLatency, setSyncLatency] = useState<number>(38);
+  const [syncStatusText, setSyncStatusText] = useState<string>('Consultando bases públicas…');
+  const [syncLatency, setSyncLatency] = useState<number | undefined>(undefined);
+  const [syncDegraded, setSyncDegraded] = useState<boolean>(false);
   const [isQuickSearchOpen, setIsQuickSearchOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [statusFontesEmendas, setStatusFontesEmendas] = useState<Record<string, any> | undefined>();
@@ -43,46 +40,57 @@ export default function App() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [activeTab]);
 
-  // Carga inicial automatizada via Serverless APIs com fallback auditado
+  const formatNow = () => {
+    const now = new Date();
+    return `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+  };
+
+  // Consulta as APIs públicas. Não há dados substitutos para emendas e notícias:
+  // se a fonte falhar, a lista fica vazia e o status informa a indisponibilidade.
+  const loadData = async (): Promise<{ degradadas: string[]; latencyMs?: number }> => {
+    const [lpgRes, newsRes, emendasRes] = await Promise.allSettled([
+      apiClient.fetchLpg(),
+      apiClient.fetchNews('cultura'),
+      apiClient.fetchEmendas(),
+    ]);
+
+    const degradadas: string[] = [];
+
+    if (lpgRes.status === 'fulfilled') {
+      setLpgData(lpgRes.value.data);
+      if (lpgRes.value.data.fonte_dado !== 'api_real') degradadas.push('LPG');
+    } else {
+      degradadas.push('LPG');
+    }
+
+    if (newsRes.status === 'fulfilled') {
+      setNoticias(sortNewsByDateDesc(newsRes.value.data));
+      if (newsRes.value.isFallback) degradadas.push('Notícias');
+    } else {
+      degradadas.push('Notícias');
+    }
+
+    if (emendasRes.status === 'fulfilled') {
+      setEmendas(emendasRes.value.data);
+      setStatusFontesEmendas(emendasRes.value.statusFontes);
+      if (emendasRes.value.isFallback) degradadas.push('Emendas');
+    } else {
+      degradadas.push('Emendas');
+    }
+
+    const latencyMs = lpgRes.status === 'fulfilled' ? lpgRes.value.report.latencyMs : undefined;
+    setSyncLatency(latencyMs);
+    setLastUpdated(formatNow());
+    setSyncDegraded(degradadas.length > 0);
+    setSyncStatusText(
+      degradadas.length === 0 ? 'Bases públicas consultadas' : `Fonte indisponível: ${degradadas.join(', ')}`
+    );
+    return { degradadas, latencyMs };
+  };
+
   useEffect(() => {
-    let isMounted = true;
-    const loadInitialData = async () => {
-      try {
-        const [lpgRes, newsRes, emendasRes] = await Promise.allSettled([
-          apiClient.fetchLpg(),
-          apiClient.fetchNews('cultura'),
-          apiClient.fetchEmendas(),
-        ]);
-
-        if (!isMounted) return;
-
-        if (lpgRes.status === 'fulfilled' && lpgRes.value.data) {
-          setLpgData(lpgRes.value.data);
-        }
-        if (newsRes.status === 'fulfilled' && newsRes.value.data && newsRes.value.data.length > 0) {
-          setNoticias(sortNewsByDateDesc(newsRes.value.data));
-        }
-        if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data) && emendasRes.value.data.length > 0) {
-          setEmendas(emendasRes.value.data);
-          if (emendasRes.value.statusFontes) {
-            setStatusFontesEmendas(emendasRes.value.statusFontes);
-          }
-        }
-
-        const avgLat = lpgRes.status === 'fulfilled' ? lpgRes.value.report.latencyMs : 35;
-        setSyncLatency(avgLat);
-        const now = new Date();
-        setLastUpdated(`${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`);
-        setSyncStatusText(`Bases Públicas Viamão (${avgLat}ms)`);
-      } catch (err) {
-        // Mantém estado com base auditada
-      }
-    };
-
-    loadInitialData();
-    return () => {
-      isMounted = false;
-    };
+    loadData().finally(() => setIsFetchingLpg(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const showToast = (msg: string) => {
@@ -92,42 +100,17 @@ export default function App() {
     }, 4000);
   };
 
-  // Sincronização resiliente com /api serverless e fallback auditado
   const handleRefreshData = async () => {
     setIsRefreshing(true);
     setIsFetchingLpg(true);
+    apiClient.clearCache();
     try {
-      const syncRes = await apiClient.syncAll();
-      const [lpgRes, newsRes, emendasRes] = await Promise.allSettled([
-        apiClient.fetchLpg(),
-        apiClient.fetchNews('cultura'),
-        apiClient.fetchEmendas(),
-      ]);
-
-      if (lpgRes.status === 'fulfilled' && lpgRes.value.data) {
-        setLpgData(lpgRes.value.data);
-      }
-      if (newsRes.status === 'fulfilled' && newsRes.value.data && newsRes.value.data.length > 0) {
-        setNoticias(sortNewsByDateDesc(newsRes.value.data));
-      }
-      if (emendasRes.status === 'fulfilled' && Array.isArray(emendasRes.value.data) && emendasRes.value.data.length > 0) {
-        setEmendas(emendasRes.value.data);
-      }
-
-      const lpgLat = lpgRes.status === 'fulfilled' ? lpgRes.value.report.latencyMs : 40;
-      setSyncLatency(lpgLat);
-      setLastUpdated(syncRes.timestamp);
-      setSyncStatusText(`CGU / Transparência RS / MinC (${lpgLat}ms)`);
-      showToast(`Bases públicas sincronizadas! LPG, Notícias e Emendas atualizadas em ${lpgLat}ms.`);
-    } catch (err) {
-      const now = new Date();
-      const timeStr = `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`;
-      setLastUpdated(timeStr);
-      setSyncStatusText('Bases Locais Auditadas');
-      showToast('Sincronização concluída com base em cache auditado.');
+      const { degradadas } = await loadData();
+      showToast(
+        degradadas.length === 0
+          ? 'Bases públicas consultadas novamente.'
+          : `Consulta concluída. Indisponível no momento: ${degradadas.join(', ')}.`
+      );
     } finally {
       setIsRefreshing(false);
       setIsFetchingLpg(false);
@@ -170,6 +153,7 @@ export default function App() {
           onOpenQuickSearch={() => setIsQuickSearchOpen(true)}
           syncStatusText={syncStatusText}
           latencyMs={syncLatency}
+          isDegraded={syncDegraded}
         />
 
         {/* Dynamic Main View Area */}
@@ -202,8 +186,8 @@ export default function App() {
             {(activeTab === 'emendas' || activeTab === 'painel') && (
               <EmendasSection
                 emendas={emendas}
-                onSimulateApiFetch={handleRefreshData}
-                isFetchingApi={isRefreshing}
+                onRefreshApi={handleRefreshData}
+                isFetchingApi={isRefreshing || isFetchingLpg}
                 statusFontes={statusFontesEmendas}
               />
             )}

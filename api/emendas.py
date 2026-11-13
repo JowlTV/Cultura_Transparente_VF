@@ -21,6 +21,8 @@ from backend.utils import setup_logger, cache
 
 logger = setup_logger("VercelApiEmendas")
 
+CODIGO_IBGE_VIAMAO = "4323002"  # IBGE de Viamão/RS
+
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -29,8 +31,12 @@ class handler(BaseHTTPRequestHandler):
             query_params = urllib.parse.parse_qs(parsed_url.query)
             
             esfera = query_params.get("esfera", ["all"])[0].lower()
-            municipio = query_params.get("municipio", ["Viamão"])[0]
-            codigo_ibge = query_params.get("ibge", ["4323002"])[0]
+            # Escopo territorial fixo: a plataforma cobre exclusivamente Viamão/RS.
+            # Parâmetros 'municipio'/'ibge' vindos da URL são ignorados para impedir consultas fora do escopo.
+            municipio = "Viamão"
+            codigo_ibge = CODIGO_IBGE_VIAMAO
+            if esfera not in ("all", "federal", "estadual"):
+                esfera = "all"
             apenas_cultura = query_params.get("apenas_cultura", ["false"])[0].lower() in ("1", "true", "sim")
             
             # Anos fiscais solicitados (opcional, padrão: últimos 3 anos)
@@ -46,7 +52,11 @@ class handler(BaseHTTPRequestHandler):
 
             anos_tag = ','.join(map(str, sorted(anos_list))) if anos_list else "default_3y"
             cache_key = f"api:emendas:{esfera}:{codigo_ibge}:{anos_tag}:{apenas_cultura}"
-            was_cached = cache.has(cache_key)
+            cached_response = cache.get(cache_key)
+            if cached_response is not None:
+                self._send_json(200, {**cached_response, "cached": True}, "public, s-maxage=86400, stale-while-revalidate=86400")
+                return
+            was_cached = False
 
             emendas_result: List[Dict[str, Any]] = []
             status_fontes: Dict[str, Any] = {}
@@ -75,7 +85,7 @@ class handler(BaseHTTPRequestHandler):
                         logger.warning(f"Erro ao consultar API CGU: {e_cgu}")
                         status_fontes["federal_cgu"] = {
                             "status": "error",
-                            "mensagem": f"Falha temporária ao comunicar com a API da CGU: {e_cgu}",
+                            "mensagem": "Falha temporária ao comunicar com a API da CGU.",
                             "total_capturado": 0
                         }
 
@@ -84,18 +94,29 @@ class handler(BaseHTTPRequestHandler):
                 try:
                     rs_api = PortalTransparenciaRsApi()
                     emendas_est = rs_api.buscar_emendas_estaduais(municipio=municipio, anos=anos_list)
-                    status_fontes["estadual_rs"] = {
-                        "status": "online",
-                        "mensagem": "Consulta a dados abertos do Portal da Transparência RS (CAGE) realizada com sucesso.",
-                        "total_capturado": len(emendas_est)
-                    }
+                    if rs_api.fonte_disponivel:
+                        status_fontes["estadual_rs"] = {
+                            "status": "online",
+                            "mensagem": "Consulta a dados abertos do Portal da Transparência RS (CAGE) realizada com sucesso.",
+                            "total_capturado": len(emendas_est)
+                        }
+                    else:
+                        status_fontes["estadual_rs"] = {
+                            "status": "sem_fonte_estruturada",
+                            "mensagem": (
+                                "O Portal da Transparência RS publica as emendas estaduais em relatório PowerBI, "
+                                "sem API de dados estruturados. Nenhuma emenda estadual é exibida até haver fonte verificável. "
+                                "Consulte diretamente: https://transparencia.rs.gov.br"
+                            ),
+                            "total_capturado": 0
+                        }
                     for e in emendas_est:
                         emendas_result.append(e.to_dict())
                 except Exception as e_rs:
                     logger.warning(f"Erro ao consultar Portal RS: {e_rs}")
                     status_fontes["estadual_rs"] = {
                         "status": "error",
-                        "mensagem": f"Falha temporária ao comunicar com o Portal RS: {e_rs}",
+                        "mensagem": "Falha temporária ao comunicar com o Portal RS.",
                         "total_capturado": 0
                     }
 
@@ -149,30 +170,28 @@ class handler(BaseHTTPRequestHandler):
                 "politica_auditoria": "Dados oficiais agregados do Portal da Transparência CGU e Portal RS CAGE exclusivos para Viamão/RS."
             }
 
-            payload = json.dumps(response_data, ensure_ascii=False).encode("utf-8")
+            # Só guarda em cache respostas sem falha de fonte, para não fixar um erro transitório por 24h
+            if not any(f.get("status") == "error" for f in status_fontes.values()):
+                cache.set(cache_key, response_data, ttl_seconds=86400)
 
-            # Armazena em cache TTL de 24 horas (86400 segundos)
-            cache.set(cache_key, response_data, ttl_seconds=86400)
-
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("X-Content-Type-Options", "nosniff")
-            self.send_header("X-Frame-Options", "SAMEORIGIN")
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.send_header("Cache-Control", "public, s-maxage=86400, stale-while-revalidate=86400")
-            self.send_header("Content-Length", str(len(payload)))
-            self.end_headers()
-            self.wfile.write(payload)
+            self._send_json(200, response_data, "public, s-maxage=86400, stale-while-revalidate=86400")
 
         except Exception as e:
             logger.error(f"Erro no endpoint /api/emendas: {e}")
-            err_data = json.dumps({
+            self._send_json(500, {
                 "success": False,
-                "error": str(e),
+                "error": "Erro interno ao consultar as fontes de emendas.",
                 "fonte": "CGU / Portal Transparência RS"
-            }, ensure_ascii=False).encode("utf-8")
-            self.send_response(500)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Content-Length", str(len(err_data)))
-            self.end_headers()
-            self.wfile.write(err_data)
+            }, "no-store")
+
+    def _send_json(self, status_code: int, data: Dict[str, Any], cache_control: str) -> None:
+        payload = json.dumps(data, ensure_ascii=False).encode("utf-8")
+        self.send_response(status_code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "SAMEORIGIN")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", cache_control)
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)

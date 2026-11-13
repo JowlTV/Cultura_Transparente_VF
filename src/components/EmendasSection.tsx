@@ -32,12 +32,11 @@ import {
 } from './Icon';
 import { Emenda } from '../types/culture';
 import { formatBRL, exportEmendasToCSV } from '../utils/formatters';
-import { BUDGET_CHRONOLOGY } from '../data/initialData';
 import { LottieStateAnimation } from './lottie/LottieStateAnimation';
 
 interface EmendasSectionProps {
   emendas: Emenda[];
-  onSimulateApiFetch: () => void;
+  onRefreshApi: () => void;
   isFetchingApi: boolean;
   statusFontes?: Record<string, any>;
 }
@@ -47,7 +46,7 @@ type SortOrder = 'asc' | 'desc';
 
 export const EmendasSection: React.FC<EmendasSectionProps> = ({
   emendas,
-  onSimulateApiFetch,
+  onRefreshApi,
   isFetchingApi,
   statusFontes,
 }) => {
@@ -230,12 +229,26 @@ export const EmendasSection: React.FC<EmendasSectionProps> = ({
   }, [emendasFiltradas]);
 
   // Chart 3: Chronology Chart Data
+  // Evolução por exercício calculada a partir das emendas exibidas (sem série histórica fixa)
   const areaDataResumido = useMemo(() => {
-    if (filtroAno === 'todos') {
-      return BUDGET_CHRONOLOGY;
-    }
-    return BUDGET_CHRONOLOGY.filter(p => p.ano === Number(filtroAno));
-  }, [filtroAno]);
+    const porAno: Record<number, { alocado: number; gasto: number }> = {};
+    emendasFiltradas.forEach(e => {
+      if (!e.ano) return;
+      porAno[e.ano] = porAno[e.ano] || { alocado: 0, gasto: 0 };
+      porAno[e.ano].alocado += e.valor || 0;
+      porAno[e.ano].gasto += e.valor_gasto || 0;
+    });
+    let alocadoAcum = 0;
+    let gastoAcum = 0;
+    return Object.keys(porAno)
+      .map(Number)
+      .sort((a, b) => a - b)
+      .map(ano => {
+        alocadoAcum += porAno[ano].alocado;
+        gastoAcum += porAno[ano].gasto;
+        return { mes: String(ano), ano, alocado_acumulado: alocadoAcum, gasto_acumulado: gastoAcum };
+      });
+  }, [emendasFiltradas]);
 
   const hasActiveFilters = filtroAno !== 'todos' || filtroEsfera !== 'todas' || filtroStatus !== 'todos' || filtroPartido !== 'todos' || filtroSegmento !== 'todos' || busca.trim().length > 0;
 
@@ -297,7 +310,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-[#2D0652]/75 mt-1 font-medium">
-              Painel integrado com auditoria contábil, detalhamento das notas de empenho e prestação de contas dos recursos destinados a Viamão.
+              Emendas parlamentares destinadas a Viamão conforme as fontes oficiais consultadas. Só aparecem registros devolvidos pelas APIs públicas.
             </p>
           </div>
 
@@ -316,7 +329,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
             </button>
 
             <button
-              onClick={onSimulateApiFetch}
+              onClick={onRefreshApi}
               disabled={isFetchingApi}
               className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#6A0DAD] bg-white hover:bg-[#EFE6FD] border border-[#6A0DAD] rounded-pill transition-colors disabled:opacity-50 cursor-pointer"
               title="Consultar API Federal da CGU e ALRS"
@@ -335,30 +348,29 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
           </div>
         </div>
 
-        {/* Source Status Transparency Strip */}
+        {/* Source Status Transparency Strip: mostra exatamente o que cada fonte respondeu */}
         <div className="mt-3 p-3 bg-white/70 border border-[#2D0652]/10 rounded-card grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-[#2D0652]/80">
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full shrink-0 ${statusFontes?.federal_cgu?.status === 'online' ? 'bg-[#10B981]' : (statusFontes?.federal_cgu?.status === 'missing_api_key' ? 'bg-[#F59E0B]' : 'bg-[#6A0DAD]')}`}></span>
-            <div>
-              <strong>Federal (CGU):</strong>{' '}
-              {statusFontes?.federal_cgu?.status === 'online'
-                ? `consultada ao vivo (${statusFontes.federal_cgu.total_capturado ?? 0} registros)`
-                : (statusFontes?.federal_cgu?.status === 'missing_api_key'
-                  ? 'chave de API em modo passivo; exibindo registros catalogados e auditados'
-                  : 'acervo catalogado de Viamão ativo')}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full shrink-0 ${statusFontes?.estadual_rs?.status === 'error' ? 'bg-[#EF4444]' : 'bg-[#10B981]'}`}></span>
-            <div>
-              <strong>Estadual (CAGE / RS):</strong>{' '}
-              {statusFontes?.estadual_rs?.status === 'online'
-                ? `consultada com sucesso (${statusFontes.estadual_rs.total_capturado ?? 0} registros)`
-                : (statusFontes?.estadual_rs?.status === 'error'
-                  ? 'não foi possível consultar agora; base auditada ativa'
-                  : 'dados abertos ALRS / CAGE ativos')}
-            </div>
-          </div>
+          {[
+            { key: 'federal_cgu', rotulo: 'Federal (CGU)' },
+            { key: 'estadual_rs', rotulo: 'Estadual (Portal RS)' },
+          ].map(({ key, rotulo }) => {
+            const fonte = statusFontes?.[key] ?? (statusFontes?.api ? statusFontes.api : undefined);
+            const st: string | undefined = fonte?.status;
+            const cor = st === 'online' ? 'bg-[#10B981]' : st === 'error' ? 'bg-[#EF4444]' : st ? 'bg-[#F59E0B]' : 'bg-[#C8AF8A]';
+            const texto = !fonte
+              ? (isFetchingApi ? 'consultando…' : 'aguardando consulta')
+              : st === 'online'
+              ? `consultada ao vivo (${fonte.total_capturado ?? 0} registros)`
+              : fonte.mensagem || 'indisponível no momento';
+            return (
+              <div key={key} className="flex items-start gap-2">
+                <span className={`w-2 h-2 mt-1 rounded-full shrink-0 ${cor}`}></span>
+                <div>
+                  <strong>{rotulo}:</strong> {texto}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Search & Dynamic Filter Controls */}
@@ -432,7 +444,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                   <Info className="w-3.5 h-3.5 text-[#6A0DAD] cursor-help" />
                   <div className="absolute right-0 bottom-full mb-1.5 hidden group-hover:block z-40 w-64 p-2.5 bg-[#2D0652] border border-white/20 rounded-card text-[11px] leading-relaxed text-white shadow-tint-lg">
                     <span className="font-bold text-white block mb-0.5">Base Dinâmica:</span>
-                    Esta lista reflete apenas os partidos com emendas ativas e sincronizadas no acervo auditado.
+                    Esta lista reflete apenas os partidos informados pelas fontes nas emendas exibidas.
                   </div>
                 </div>
               </div>
@@ -745,7 +757,7 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                         Consultando fontes oficiais...
                       </p>
                       <p className="text-xs text-[#2D0652]/70 mt-1">
-                        Sincronizando registros da CGU, ALRS e diários oficiais.
+                        Consultando a API da CGU e o Portal da Transparência RS.
                       </p>
                     </div>
                   </td>
@@ -760,10 +772,14 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                         size={96}
                       />
                       <p className="font-bold text-[#2D0652] text-sm mt-3" style={{ fontFamily: 'var(--font-display)' }}>
-                        Nenhuma emenda encontrada para os filtros selecionados
+                        {emendas.length === 0
+                          ? 'Nenhuma emenda disponível nas fontes oficiais consultadas'
+                          : 'Nenhuma emenda encontrada para os filtros selecionados'}
                       </p>
-                      <p className="text-xs text-[#2D0652]/70 mt-1">
-                        Altere o termo de busca ou redefina os parâmetros da planilha.
+                      <p className="text-xs text-[#2D0652]/70 mt-1 max-w-md">
+                        {emendas.length === 0
+                          ? 'Veja acima o status de cada fonte. Nenhum dado substituto é exibido quando uma fonte não responde.'
+                          : 'Altere o termo de busca ou redefina os parâmetros da planilha.'}
                       </p>
                     </div>
                   </td>
@@ -935,13 +951,13 @@ Fontes: ${emenda.fontes_cruzadas?.join(' | ') || emenda.fonte}`;
                                   <div>
                                     <span className="text-[#2D0652]/70 block text-[11px] font-bold">Nota de Empenho:</span>
                                     <span className="font-mono tabular-nums font-bold text-[#2D0652]">
-                                      {emenda.empenho_numero || 'Em tramitação contábil'}
+                                      {emenda.empenho_numero || 'Não informado pela fonte'}
                                     </span>
                                   </div>
                                   <div>
                                     <span className="text-[#2D0652]/70 block text-[11px] font-bold">Processo Administrativo:</span>
                                     <span className="font-mono tabular-nums text-[#6A0DAD] font-bold">
-                                      {emenda.processo_administrativo || 'Não informado'}
+                                      {emenda.processo_administrativo || 'Não informado pela fonte'}
                                     </span>
                                   </div>
                                   <div>

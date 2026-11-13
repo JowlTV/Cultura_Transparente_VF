@@ -14,8 +14,8 @@ class handler(BaseHTTPRequestHandler):
             "versao": "2.5.0",
             "timestamp": datetime.now().isoformat(),
             "rotas_disponiveis": {
-                "/api/lpg": "Auditoria de repasses e metas da Lei Paulo Gustavo (MinC / Transferegov Fundo a Fundo)",
-                "/api/news": "Pesquisa de notícias e editais de Viamão via Google News com filtro anti-fake-news",
+                "/api/lpg": "Plano de Ação, metas e contas da Lei Paulo Gustavo em Viamão (Transferegov Fundo a Fundo)",
+                "/api/news": "Notícias e editais de cultura do RSS oficial da Prefeitura de Viamão",
                 "/api/emendas": "Coleta e auditoria de emendas parlamentares federais (CGU) e estaduais (Portal RS / CAGE)",
                 "/api/chat": "Assistente de IA para elaboração técnica de projetos culturais (PNAB, LPG, Emendas)"
             },

@@ -11,6 +11,7 @@ interface HeaderProps {
   onOpenQuickSearch: () => void;
   syncStatusText?: string;
   latencyMs?: number;
+  isDegraded?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,8 +20,9 @@ export const Header: React.FC<HeaderProps> = ({
   onRefresh,
   isRefreshing,
   onOpenQuickSearch,
-  syncStatusText = 'Bases Oficiais Sincronizadas',
+  syncStatusText = 'Consultando bases públicas…',
   latencyMs,
+  isDegraded = false,
 }) => {
   const [justRefreshed, setJustRefreshed] = useState(false);
 
@@ -72,10 +74,16 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Status Indicator Pill */}
           <div className="flex items-center gap-1.5 text-[#2D0652]">
             <span className="relative flex h-2 w-2">
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isDegraded ? 'bg-amber-500' : 'bg-emerald-600'}`}></span>
             </span>
-            <span className="text-[11px] font-semibold text-emerald-900 bg-[#E3F7E8] px-2.5 py-0.5 rounded-pill border border-emerald-700/20 hidden md:inline">
-              {justRefreshed ? 'Auditado agora' : syncStatusText}
+            <span
+              className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-pill border hidden md:inline ${
+                isDegraded
+                  ? 'text-amber-900 bg-amber-50 border-amber-600/30'
+                  : 'text-emerald-900 bg-[#E3F7E8] border-emerald-700/20'
+              }`}
+            >
+              {syncStatusText}
             </span>
             {latencyMs !== undefined && (
               <span className="text-[10px] font-mono text-[#D33600] bg-[#FFE8E0] px-1.5 py-0.5 rounded-pill border border-[#FF4500]/25 hidden lg:inline font-semibold">
@@ -83,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             )}
             <span className="text-[11px] text-[#2D0652]/70 font-medium hidden 2xl:inline">
-              Auditado: {lastUpdated}
+              Consultado: {lastUpdated}
             </span>
           </div>
 
@@ -95,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-1.5 text-[#6A0DAD] hover:bg-[#6A0DAD]/10 bg-white px-3.5 py-1.5 rounded-pill transition-all disabled:opacity-50 border-2 border-[#6A0DAD] text-xs font-bold cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-[#6A0DAD] transition-transform ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>{isRefreshing ? 'Consultando...' : justRefreshed ? 'Auditado' : 'Atualizar'}</span>
+            <span>{isRefreshing ? 'Consultando...' : justRefreshed ? 'Atualizado' : 'Atualizar'}</span>
           </button>
 
           {/* Botão Primário de Ação: Preenchido Laranja (#FF4500) */}

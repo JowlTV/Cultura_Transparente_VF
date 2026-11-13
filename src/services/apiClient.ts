@@ -4,11 +4,13 @@
  * Módulo: src/services/apiClient.ts
  * =============================================================================
  * Fornece consumo resiliente dos endpoints Python em /api (Vercel Serverless)
- * com fallback inteligente para dados auditados consolidados e métricas de latência.
+ * e métricas de latência. Para emendas e notícias NÃO existe dado substituto: se a fonte
+ * falhar, retorna lista vazia com isFallback=true para a interface sinalizar a indisponibilidade.
+ * Apenas a LPG tem snapshot estático verificado (INITIAL_LPG_DATA), sinalizado como 'fallback_estatico'.
  */
 
 import { NewsItem, LpgPlanoAcao, Emenda } from '../types/culture';
-import { INITIAL_NEWS, INITIAL_LPG_DATA, INITIAL_EMENDAS } from '../data/initialData';
+import { INITIAL_LPG_DATA } from '../data/initialData';
 import { sanitizeUrl, sanitizeInputText } from '../utils/security';
 
 export interface ApiStatusReport {
@@ -20,19 +22,14 @@ export interface ApiStatusReport {
   totalRecords: number;
 }
 
-export interface SyncResult {
-  timestamp: string;
-  lpgStatus?: ApiStatusReport;
-  newsStatus?: ApiStatusReport;
-  emendasStatus?: ApiStatusReport;
-  success: boolean;
-  message: string;
-}
-
 interface ClientCacheEntry<T> {
   data: T;
   timestamp: number;
 }
+
+const NAO_INFORMADO = 'Não informado pela fonte';
+// Categorias que a API realmente produz; outras ('todos', 'eventos'...) são filtradas só na interface
+const FILTROS_CATEGORIA_API = new Set(['editais', 'viamao']);
 
 class CulturalApiClient {
   private static instance: CulturalApiClient;
@@ -63,6 +60,11 @@ class CulturalApiClient {
     this.cache.set(key, { data, timestamp: Date.now() });
   }
 
+  /** Limpa o cache do navegador para forçar nova consulta (botão "Atualizar"). */
+  public clearCache(): void {
+    this.cache.clear();
+  }
+
   /**
    * Consulta auditoria da Lei Paulo Gustavo em /api/lpg via Transferegov Fundo a Fundo
    */
@@ -86,7 +88,7 @@ class CulturalApiClient {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-        const response = await fetch('/api/lpg?cnpj=88000914000101', {
+        const response = await fetch('/api/lpg', {
           headers: { Accept: 'application/json' },
           signal: controller.signal
         });
@@ -218,7 +220,7 @@ class CulturalApiClient {
 
         if (response.ok) {
           const payload = await response.json();
-          if (payload.success && Array.isArray(payload.noticias) && payload.noticias.length > 0) {
+          if (payload.success && Array.isArray(payload.noticias)) {
             const sanitizedNoticias: NewsItem[] = payload.noticias.map((n: any) => ({
               id: sanitizeInputText(n.id || `news-${Date.now()}`, 60),
               titulo: sanitizeInputText(n.titulo || '', 200),
@@ -236,7 +238,7 @@ class CulturalApiClient {
               url_pesquisa_google: n.url_pesquisa_google ? sanitizeUrl(n.url_pesquisa_google) : undefined,
             }));
             let filtradas = sanitizedNoticias;
-            if (filtro && filtro !== 'todas') {
+            if (filtro && FILTROS_CATEGORIA_API.has(filtro)) {
               filtradas = filtradas.filter(n => n.categoria_filtro === filtro);
             }
             const result = {
@@ -252,7 +254,8 @@ class CulturalApiClient {
               total: filtradas.length,
               queryUsed: query,
               statusFontes: payload.status_fontes,
-              isFallback: false
+              // A API respondeu, mas a fonte oficial pode ter falhado: sinaliza para a interface
+              isFallback: Object.values(payload.status_fontes || {}).some((f: any) => f && f.sucesso === false)
             };
             this.setCached(cacheKey, result);
             return result;
@@ -263,27 +266,17 @@ class CulturalApiClient {
       }
 
       const latencyMs = Math.round(performance.now() - startTime);
-      let fallbackData = INITIAL_NEWS;
-      if (rawQuery && rawQuery !== 'cultura') {
-        fallbackData = fallbackData.filter(
-          n => n.titulo.toLowerCase().includes(rawQuery) || n.resumo.toLowerCase().includes(rawQuery) || n.etiqueta.toLowerCase().includes(rawQuery)
-        );
-      }
-      if (filtro && filtro !== 'todas') {
-        fallbackData = fallbackData.filter(n => n.categoria_filtro === filtro);
-      }
-
       const result = {
-        data: fallbackData,
+        data: [] as NewsItem[],
         report: {
           endpoint: '/api/news',
-          status: 'cached' as const,
+          status: 'degraded' as const,
           latencyMs: Math.max(latencyMs, 5),
           lastChecked: new Date().toLocaleTimeString('pt-BR'),
-          rateLimitInfo: 'Acervo de Reserva',
-          totalRecords: fallbackData.length,
+          rateLimitInfo: 'Fonte indisponível',
+          totalRecords: 0,
         },
-        total: fallbackData.length,
+        total: 0,
         queryUsed: query,
         statusFontes: {
           prefeitura_viamao: {
@@ -295,7 +288,6 @@ class CulturalApiClient {
         },
         isFallback: true
       };
-      this.setCached(cacheKey, result);
       return result;
     })();
 
@@ -353,16 +345,6 @@ class CulturalApiClient {
 
         const latencyMs = Math.round(performance.now() - startTime);
 
-        let fallbackData = INITIAL_EMENDAS;
-        if (esfera === 'federal') {
-          fallbackData = fallbackData.filter(e => e.esfera.includes('Federal'));
-        } else if (esfera === 'estadual') {
-          fallbackData = fallbackData.filter(e => e.esfera.includes('Estadual'));
-        }
-        if (apenasCultura) {
-          fallbackData = fallbackData.filter(e => e.is_cultura);
-        }
-
         if (response.ok) {
           const payload = await response.json();
           if (payload.success && Array.isArray(payload.emendas)) {
@@ -373,18 +355,18 @@ class CulturalApiClient {
               
               return {
                 id: sanitizeInputText(e.id || `emenda-${idx + 1}`, 60),
-                ano: typeof e.ano === 'number' ? e.ano : 2026,
-                parlamentar: sanitizeInputText(e.autor || e.parlamentar || 'Parlamentar', 100),
-                partido: sanitizeInputText(e.partido || 'S/P', 20),
-                partido_sigla: sanitizeInputText(e.partido || e.partido_sigla || 'S/P', 20),
+                ano: typeof e.ano === 'number' ? e.ano : Number(e.ano) || 0,
+                parlamentar: sanitizeInputText(e.autor || e.parlamentar || NAO_INFORMADO, 100),
+                partido: sanitizeInputText(e.partido || NAO_INFORMADO, 40),
+                partido_sigla: sanitizeInputText(e.partido || e.partido_sigla || NAO_INFORMADO, 40),
                 esfera: esferaNormalizada,
-                orgao: sanitizeInputText(e.orgao || 'Órgão Público', 120),
-                secretaria: sanitizeInputText(e.orgao || e.secretaria || 'Secretaria de Estado / Ministério', 120),
-                projeto: sanitizeInputText(e.objeto || e.subprojeto || 'Ações Comunitárias', 200),
-                subprojeto: sanitizeInputText(e.subprojeto || e.objeto || 'Ações Comunitárias', 200),
+                orgao: sanitizeInputText(e.orgao || NAO_INFORMADO, 120),
+                secretaria: sanitizeInputText(e.orgao || e.secretaria || NAO_INFORMADO, 120),
+                projeto: sanitizeInputText(e.objeto || e.subprojeto || NAO_INFORMADO, 200),
+                subprojeto: sanitizeInputText(e.subprojeto || e.objeto || NAO_INFORMADO, 200),
                 valor: valorAlocado,
                 valor_gasto: valorPago,
-                status: (e.status === 'Concluída' || e.status === 'Em Execução / Vigente' || e.status === 'Parceria') ? e.status : 'Em Execução / Vigente',
+                status: sanitizeInputText(e.status || NAO_INFORMADO, 40) as Emenda['status'],
                 is_cultura: Boolean(e.is_cultura),
                 area_atuacao: sanitizeInputText(e.area_atuacao || (e.is_cultura ? 'Cultura & Turismo' : 'Demais Áreas'), 60),
                 tipo_projeto_cultural: e.tipo_projeto_cultural || (e.is_cultura ? 'Outras Áreas' : undefined),
@@ -392,12 +374,15 @@ class CulturalApiClient {
                 fonte: sanitizeInputText(e.fonte || 'Portal da Transparência', 100),
                 fontes_cruzadas: Array.isArray(e.fontes_cruzadas) ? e.fontes_cruzadas : [e.fonte || 'Portal da Transparência'],
                 numeroEmenda: sanitizeInputText(e.numero_emenda || e.numeroEmenda || '', 40),
-                beneficiario: sanitizeInputText(e.beneficiario || 'Município de Viamão', 100),
+                beneficiario: sanitizeInputText(e.beneficiario || NAO_INFORMADO, 160),
               };
             });
 
-            const emendasFinais = sanitizedEmendas.length > 0 ? sanitizedEmendas : fallbackData;
-            const isFallbackResult = sanitizedEmendas.length === 0;
+            const emendasFinais = sanitizedEmendas;
+            // Lista vazia de uma API que respondeu é um resultado legítimo; só é "falha" se alguma fonte reportou erro
+            const isFallbackResult = Object.values(payload.status_fontes || {}).some(
+              (f: any) => f && (f.status === 'error' || f.status === 'missing_api_key')
+            );
 
             const result = {
               data: emendasFinais,
@@ -406,7 +391,7 @@ class CulturalApiClient {
                 status: 'online' as const,
                 latencyMs,
                 lastChecked: new Date().toLocaleTimeString('pt-BR'),
-                rateLimitInfo: 'CGU API (120 req/min) & Transparência RS',
+                rateLimitInfo: 'CGU API & Transparência RS',
                 totalRecords: emendasFinais.length,
               },
               statusFontes: payload.status_fontes,
@@ -421,36 +406,24 @@ class CulturalApiClient {
       }
 
       const latencyMs = Math.round(performance.now() - startTime);
-      let fallbackData = INITIAL_EMENDAS;
-      if (esfera === 'federal') {
-        fallbackData = fallbackData.filter(e => e.esfera.includes('Federal'));
-      } else if (esfera === 'estadual') {
-        fallbackData = fallbackData.filter(e => e.esfera.includes('Estadual'));
-      }
-      if (apenasCultura) {
-        fallbackData = fallbackData.filter(e => e.is_cultura);
-      }
-
-      const result = {
-        data: fallbackData,
+      return {
+        data: [] as Emenda[],
         report: {
           endpoint: '/api/emendas',
-          status: 'cached' as const,
+          status: 'degraded' as const,
           latencyMs: Math.max(latencyMs, 6),
           lastChecked: new Date().toLocaleTimeString('pt-BR'),
-          rateLimitInfo: 'Base Auditada Consolidada (Fallback)',
-          totalRecords: fallbackData.length,
+          rateLimitInfo: 'Fonte indisponível',
+          totalRecords: 0,
         },
         statusFontes: {
-          fallback: {
-            status: 'fallback_active',
-            mensagem: 'Exibindo acervo consolidado auditado localmente.'
+          api: {
+            status: 'error',
+            mensagem: 'Não foi possível consultar /api/emendas agora. Nenhum dado substituto é exibido.'
           }
         },
         isFallback: true
       };
-      this.setCached(cacheKey, result);
-      return result;
     })();
 
     this.inFlightRequests.set(cacheKey, promise);
@@ -461,31 +434,6 @@ class CulturalApiClient {
     }
   }
 
-  /**
-   * Executa auditoria e sincronização completa em paralelo
-   */
-  public async syncAll(): Promise<SyncResult> {
-    const [lpgRes, newsRes, emendasRes] = await Promise.all([
-      this.fetchLpg(),
-      this.fetchNews(),
-      this.fetchEmendas(),
-    ]);
-
-    const now = new Date();
-    const timestamp = `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })}`;
-
-    return {
-      timestamp,
-      lpgStatus: lpgRes.report,
-      newsStatus: newsRes.report,
-      emendasStatus: emendasRes.report,
-      success: true,
-      message: 'Sincronização concluída com êxito! Bases auditadas da LPG, Notícias Oficiais e Emendas Parlamentares atualizadas.',
-    };
-  }
 }
 
 export const apiClient = CulturalApiClient.getInstance();

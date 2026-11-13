@@ -6,11 +6,13 @@
   "functions": {
     "api/chat.py": {
       "maxDuration": 60,
-      "memory": 1024
+      "memory": 1024,
+      "includeFiles": "{backend/**,src/config/roteiros.json}"
     },
     "api/*.py": {
       "maxDuration": 10,
-      "memory": 1024
+      "memory": 1024,
+      "includeFiles": "{backend/**,src/config/roteiros.json}"
     }
   },
   "headers": [

@@ -145,12 +145,12 @@ export const LpgSection: React.FC<LpgSectionProps> = ({ lpgData, isLoading }) =>
               <span>Regras de Prestação de Contas</span>
             </div>
             <p className="text-xs text-[#2D0652]/80 leading-relaxed font-medium">
-              Em conformidade com o Decreto Federal nº 11.525/2023, o monitoramento avalia o <strong>cumprimento do objeto</strong> e contrapartidas sociais gratuitas à comunidade escolar e bairros periféricos de Viamão.
+              O Decreto Federal nº 11.525/2023 regulamenta a LPG, incluindo a prestação de contas pelo <strong>cumprimento do objeto</strong> e as contrapartidas sociais dos projetos apoiados.
             </p>
           </div>
           <div className="mt-4 pt-3 border-t border-[#E2D2BC] flex items-center gap-1.5 text-xs font-bold text-[#FF4500]">
             <Sparkles className="w-3.5 h-3.5" />
-            Acesso e Contrapartida 100% Gratuitos
+            Base: Decreto nº 11.525/2023
           </div>
         </div>
       </div>

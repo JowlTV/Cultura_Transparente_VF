@@ -23,42 +23,30 @@ import {
 export const PnabAuditoriaSection: React.FC = () => {
   const [mostrarGuiaDetalhado, setMostrarGuiaDetalhado] = useState<boolean>(false);
 
+  // Etapas genéricas do ciclo da PNAB (Lei nº 14.399/2022 e Decreto nº 11.740/2023).
+  // Auditoria v13: removidos status e datas atribuídos a Viamão ("Homologado", "Dez/2023",
+  // "Fase atual 2026") que não tinham fonte. A situação real do município deve ser lida
+  // no painel oficial do MinC abaixo.
   const etapasTramitacao = [
     {
       titulo: '1. Adesão e Plano de Ação no Transferegov',
-      status: 'Homologado',
-      data: 'Dezembro / 2023',
-      desc: 'Prefeitura Municipal de Viamão cadastrou e obteve aprovação do Plano de Ação junto ao Ministério da Cultura através da plataforma oficial Transferegov.br.',
-      isDone: true,
+      desc: 'O ente federativo cadastra e submete o Plano Anual de Aplicação dos Recursos (PAAR) na plataforma Transferegov.br.',
     },
     {
       titulo: '2. Repasse Fundo a Fundo da União',
-      status: 'Concluído / Em Conta',
-      data: 'Exercício 2024',
-      desc: 'Crédito descentralizado repassado à conta corrente fiduciária vinculada ao Fundo Municipal de Cultura de Viamão, em conformidade com as diretrizes do Transferegov.br e da Lei nº 14.399/2022.',
-      isDone: true,
+      desc: 'Após aprovação, o recurso é transferido para conta específica vinculada ao fundo de cultura do ente.',
     },
     {
-      titulo: '3. Regulamentação do PAAR e Escutas Públicas',
-      status: 'Homologado',
-      data: '2024 / 2025',
-      desc: 'Realização de escutas com o Conselho Municipal de Cultura e comunidade artística para pactuação do Plano Anual de Aplicação dos Recursos (PAAR).',
-      isDone: true,
+      titulo: '3. Escuta pública e pactuação do PAAR',
+      desc: 'Participação do conselho de cultura e da comunidade artística na definição das ações e metas.',
     },
     {
-      titulo: '4. Publicação e Execução dos Editais Municipais',
-      status: 'Fase Atual (Em Andamento)',
-      data: '2026',
-      desc: 'Elaboração das minutas, abertura do período de inscrições para a classe artística de Viamão, seleção técnica e avaliação das propostas.',
-      isDone: false,
-      isCurrent: true,
+      titulo: '4. Publicação e execução dos editais',
+      desc: 'Lançamento dos editais, inscrições, seleção, divulgação de resultados e pagamento aos contemplados.',
     },
     {
-      titulo: '5. Prestação de Contas Integrada (MinC / TCU)',
-      status: 'Aguardando Execução',
-      data: 'Até 2027',
-      desc: 'Comprovação final no Transferegov.br, fiscalizada pelos órgãos de controle social, Conselho Municipal de Cultura e Ministério da Cultura.',
-      isDone: false,
+      titulo: '5. Prestação de contas',
+      desc: 'Comprovação da execução no Transferegov.br, sujeita ao controle social e aos órgãos de controle.',
     },
   ];
 
@@ -337,23 +325,15 @@ export const PnabAuditoriaSection: React.FC = () => {
       <div className="bg-[#FAF4EB] rounded-3xl p-6 sm:p-8 border border-[#E2D2BC] shadow-xs space-y-4">
         <h3 className="text-base sm:text-lg font-normal text-[#2D0652] flex items-center gap-2" style={{ fontFamily: 'var(--font-display)' }}>
           <Clock className="w-5 h-5 text-[#FF4500]" />
-          Linha do Tempo da Tramitação da PNAB em Viamão
+          Etapas do ciclo da PNAB (referência geral)
         </h3>
 
         <div className="space-y-4 pt-2">
           {etapasTramitacao.map((etapa, idx) => (
             <div key={idx} className="flex items-start gap-3 relative">
               <div className="flex flex-col items-center">
-                <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                    etapa.isDone
-                      ? 'bg-[#6A0DAD] text-white border-2 border-[#DCC7FB]'
-                      : etapa.isCurrent
-                      ? 'bg-[#FF4500] text-white border-2 border-orange-300 animate-pulse'
-                      : 'bg-white text-[#2D0652] border-2 border-[#E2D2BC]'
-                  }`}
-                >
-                  {etapa.isDone ? '✓' : idx + 1}
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-white text-[#2D0652] border-2 border-[#E2D2BC]">
+                  {idx + 1}
                 </div>
                 {idx < etapasTramitacao.length - 1 && (
                   <div className="w-0.5 h-12 bg-[#E2D2BC] my-1"></div>
@@ -363,20 +343,6 @@ export const PnabAuditoriaSection: React.FC = () => {
               <div className="bg-white p-4 rounded-2xl border border-[#E2D2BC] text-xs w-full shadow-xs">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                   <span className="font-bold text-[#2D0652] text-sm">{etapa.titulo}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#2D0652]/70 font-semibold">{etapa.data}</span>
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
-                        etapa.isDone
-                          ? 'bg-[#EFE6FD] text-[#6A0DAD] border border-[#DCC7FB]'
-                          : etapa.isCurrent
-                          ? 'bg-[#FFE8E0] text-[#D33600] border border-[#FFC2B2]'
-                          : 'bg-[#FAF4EB] text-[#2D0652] border border-[#E2D2BC]'
-                      }`}
-                    >
-                      {etapa.status}
-                    </span>
-                  </div>
                 </div>
                 <p className="text-[#2D0652]/80 leading-relaxed font-normal">{etapa.desc}</p>
               </div>

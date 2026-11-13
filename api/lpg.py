@@ -5,7 +5,6 @@ em Viamão/RS via API pública Transferegov Fundo a Fundo (MinC).
 """
 from http.server import BaseHTTPRequestHandler
 import json
-import urllib.parse
 import sys
 import os
 
@@ -20,11 +19,11 @@ logger = setup_logger("VercelApiLPG")
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            parsed_url = urllib.parse.urlparse(self.path)
-            query_params = urllib.parse.parse_qs(parsed_url.query)
-            cnpj = query_params.get("cnpj", ["88000914000101"])[0]
+            # Escopo fixo: CNPJ da Prefeitura de Viamão. O parâmetro 'cnpj' da URL é ignorado
+            # para que o endpoint não sirva dados de outro ente rotulados como "Viamão".
+            cnpj = TransferegovApi.CNPJ_VIAMAO_DEFAULT
 
-            cache_key = f"transferegov_lpg:{cnpj}"
+            cache_key = f"transferegov:lpg:full:{cnpj}"
             was_cached = cache.has(cache_key)
 
             api = TransferegovApi()
@@ -56,10 +55,11 @@ class handler(BaseHTTPRequestHandler):
             logger.error(f"Erro no endpoint /api/lpg: {e}")
             err_data = json.dumps({
                 "success": False,
-                "error": str(e),
+                "error": "Falha ao consultar o Transferegov Fundo a Fundo.",
                 "fonte": "Transferegov Fundo a Fundo (MinC)"
-            }).encode("utf-8")
+            }, ensure_ascii=False).encode("utf-8")
             self.send_response(500)
-            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(err_data)

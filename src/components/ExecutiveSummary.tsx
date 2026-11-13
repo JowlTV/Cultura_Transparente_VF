@@ -44,7 +44,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
   const [searchFeedback, setSearchFeedback] = useState<{ tipo: 'info' | 'success' | 'alert'; msg: string } | null>(null);
   const [mostrarPesquisaAvancada, setMostrarPesquisaAvancada] = useState<boolean>(false);
 
-  // Executa pesquisa ativa no Google Notícias com filtro de integridade
+  // Pesquisa no feed oficial da Prefeitura de Viamão via /api/news
   const handlePesquisarGoogle = async (termoPersonalizado?: string) => {
     const termo = (termoPersonalizado !== undefined ? termoPersonalizado : buscaTexto).trim();
     setIsSearchingGoogle(true);
@@ -69,7 +69,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
     } catch {
       setSearchFeedback({
         tipo: 'alert',
-        msg: 'Acesso à pesquisa Google temporariamente indisponível. Exibindo acervo auditado de Viamão.'
+        msg: 'Não foi possível consultar o feed oficial agora. Tente novamente em instantes.'
       });
     } finally {
       setIsSearchingGoogle(false);
@@ -88,7 +88,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
       }
       setSearchFeedback({
         tipo: 'info',
-        msg: 'Acervo auditado oficial de Viamão e do RS restaurado.'
+        msg: 'Feed oficial da Prefeitura de Viamão recarregado.'
       });
     } finally {
       setIsSearchingGoogle(false);
@@ -241,7 +241,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
               Auxílio ao Fazedor de Cultura · Estruturador de Projetos
             </h3>
             <p className="text-xs text-purple-100/80 max-w-2xl leading-relaxed">
-              Elabore propostas técnicas para PNAB, Lei Paulo Gustavo, Emendas Parlamentares e editais municipais com auxílio inteligente passo a passo, cronograma, planilha orçamentária e exportação em PDF.
+              Elabore propostas técnicas para PNAB, Lei Paulo Gustavo, Emendas Parlamentares e editais municipais com auxílio inteligente passo a passo, cronograma, planilha orçamentária e exportação em Word (.docx).
             </p>
           </div>
         </div>
@@ -266,8 +266,13 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
               <span className="text-xs text-[#2D0652]/80 font-medium">Edição Semanal de Fomento, Notícias & Editais</span>
             </div>
             <div className="flex items-center gap-2 text-[11px] font-medium bg-[#6A0DAD]/10 border border-[#6A0DAD]/20 px-2.5 py-1 rounded-card text-[#2D0652]">
-              <span className="w-2 h-2 rounded-full bg-[#10B981] inline-block"></span>
-              <span><strong>Prefeitura de Viamão:</strong> última publicação em {noticias.length > 0 ? (noticias[0]?.data || '28/08/2026') : '28/08/2026'} (RSS Oficial)</span>
+              <span className={`w-2 h-2 rounded-full inline-block ${noticias.length > 0 ? 'bg-[#10B981]' : 'bg-[#F59E0B]'}`}></span>
+              <span>
+                <strong>Prefeitura de Viamão (RSS oficial):</strong>{' '}
+                {noticias.length > 0
+                  ? (noticias[0]?.data ? `última publicação em ${noticias[0].data}` : 'publicação sem data informada')
+                  : 'sem publicações disponíveis no momento'}
+              </span>
             </div>
           </div>
 
@@ -309,7 +314,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                   onClick={() => handlePesquisarGoogle()}
                   disabled={isSearchingGoogle}
                   className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#FF4500] hover:bg-[#E03D00] text-white text-xs font-bold rounded-pill transition-all shadow-tint-sm disabled:opacity-50 cursor-pointer"
-                  title="Pesquisar no Google Notícias"
+                  title="Pesquisar no feed oficial da Prefeitura de Viamão"
                 >
                   {isSearchingGoogle ? (
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -323,7 +328,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({
                   onClick={handleRestaurarAcervo}
                   disabled={isSearchingGoogle}
                   className="p-2 bg-white hover:bg-[#F5EAD8] text-[#2D0652] rounded-pill border border-[#2D0652]/15 transition-colors text-xs font-semibold cursor-pointer"
-                  title="Restaurar notícias auditadas iniciais"
+                  title="Recarregar o feed oficial sem filtros"
                 >
                   <RefreshCw className="w-3.5 h-3.5 text-[#6A0DAD]" />
                 </button>

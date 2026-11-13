@@ -7,17 +7,18 @@ Plataforma cidadã de transparência pública, auditoria de recursos e fomento �
 ## 📋 Arquitetura do Sistema
 
 O projeto é estruturado em uma arquitetura moderna full-stack:
-- **Frontend SPA**: React 18 + TypeScript + Vite + Tailwind CSS + Lucide Icons.
+- **Frontend SPA**: React 19 + TypeScript + Vite 6 + Tailwind CSS 4.
 - **Backend & Automação**: Python 3.10+ modularizado (`backend/models.py`, `backend/utils.py`, `backend/apis.py`).
 - **Serverless API (Vercel)**: Funções serverless leves em `/api` com resposta sub-100ms e cache no Edge.
 - **PNAB (Política Nacional Aldir Blanc)**: Consulta direta e visual via iframe oficial do painel Power BI do Ministério da Cultura (MinC), garantindo dados fidedignos e atualizados sem riscos de inconsistência por scraping.
 - **LPG (Lei Paulo Gustavo)**: Consulta e auditoria em tempo real via endpoint `/api/lpg` conectado à API Pública Transferegov Fundo a Fundo (Programa 47).
-- **Emendas Parlamentares (Federais e Estaduais)**: Coleta e auditoria via endpoint `/api/emendas` conectado à API de Dados da CGU (Governo Federal) e aos Dados Abertos do Portal da Transparência RS (CAGE / SEFAZ-RS), com fallback auditado e classificação setorial.
+- **Emendas Parlamentares (Federais e Estaduais)**: endpoint `/api/emendas` conectado à API de Dados da CGU (exige `PORTAL_TRANSPARENCIA_API_KEY`). As emendas estaduais só aparecem se o Portal da Transparência RS devolver dados estruturados — hoje ele publica em PowerBI, então a esfera estadual aparece como "sem fonte estruturada". **Não há dados substitutos**: fonte indisponível = lista vazia + aviso.
 
 ```
 ├── api/                       # Vercel Serverless Functions (Python)
 │   ├── lpg.py                 # GET /api/lpg (Transferegov Fundo a Fundo - LC 195/2022)
-│   ├── news.py                # GET /api/news (Google News RSS com filtro cultural)
+│   ├── news.py                # GET /api/news (RSS oficial da Prefeitura de Viamão)
+│   ├── chat.py                # POST /api/chat (assistente de projetos culturais, Gemini)
 │   ├── emendas.py             # GET /api/emendas (CGU Federal + Transparência RS CAGE)
 │   └── index.py               # GET /api (Índice de rotas e health check)
 ├── backend/                   # Módulos Python Reutilizáveis
@@ -33,10 +34,10 @@ O projeto é estruturado em uma arquitetura moderna full-stack:
 │   │   ├── PnabAuditoriaSection.tsx # Painel Oficial MinC Power BI via Iframe
 │   │   ├── LpgSection.tsx           # Auditoria LPG com metas orçamentárias reais
 │   │   ├── EmendasSection.tsx       # Emendas Parlamentares Federais e Estaduais
-│   │   ├── BudgetDashboard.tsx      # Dashboard Orçamentário e Cronologia
 │   │   └── ExecutiveSummary.tsx     # Sumário Executivo e KPIs
-│   ├── data/                  # Dados consolidados e auditados
+│   ├── data/                  # Snapshot verificado da LPG e exemplos da documentação de API
 │   └── types/                 # Contratos TypeScript sincronizados
+├── scripts/dev_api_runner.py  # Executa api/*.py no `npm run dev` (mesmo código da produção)
 ├── vercel.json                # Configuração para Deploy Gratuito no Vercel (Timeout 10s + Caching)
 └── requirements.txt           # Dependências Python para Vercel
 ```
@@ -79,7 +80,7 @@ Para rodar a suíte completa de testes unitários do backend Python:
 PYTHONPATH=. python3 -m unittest discover -s tests -p "test_*.py"
 ```
 
-Todos os 18 testes validam:
+Os 70 testes Python (e `node tests/test_docx_and_drive.mjs` para a exportação) validam:
 - Formatos e dígitos verificadores de CNPJ.
 - Integração e parsing da API Transferegov Fundo a Fundo (LPG).
 - API da CGU (Emendas Federais) com e sem chave configurada.
@@ -94,14 +95,21 @@ Todos os 18 testes validam:
 
 ---
 
+## 🧭 Auditoria v13 (nov/2026) — o que mudou
+
+- Removidos todos os dados fixos exibidos como "base auditada" sem fonte verificável: 17 emendas estaduais no backend, 20 emendas, série histórica de orçamento e 6 notícias no frontend, 6 "informativos MinC" datados e a linha do tempo da PNAB com status atribuídos a Viamão.
+- Emendas, notícias e LPG agora mostram o estado real de cada fonte (cabeçalho fica âmbar quando alguma fonte não respondeu).
+- Exportações .docx/Google Drive usam as citações literais de `backend/conhecimento/regras_rouanet.json` (antes trocavam os Arts. 19 e 22/23).
+- `/api/lpg` e `/api/emendas` têm escopo fixo em Viamão; erros não expõem mensagens internas.
+- `npm run dev` executa os handlers Python reais (sem respostas simuladas).
+
 ## 🔌 Documentação de Rate Limits e Coalescência de Requisições
 
 | API Governamental | Endpoint Base | Limite Oficial / Estimado | Estratégia de Cache e Proteção |
 |---|---|---|---|
 | **Portal da Transparência CGU** | `api.portaldatransparencia.gov.br/api-de-dados/` | 400 req/min (dia) / 700 req/min (madrugada) / 180 req/min (restritas) | Janela móvel de 3 anos (até 3 reqs/sync) + Single-Flight por ano + Cache TTL 24h (`s-maxage=86400`) |
 | **Portal da Transparência RS (CAGE)** | `transparencia.rs.gov.br/` | Dados Abertos Governamentais | Single-Flight Backend + Cache TTL 24h (`s-maxage=86400`) |
-| **Transferegov / SICONV** | `api.convenios.gov.br/siconv/v1/` | ~60 req/min | Single-Flight Backend + Cache TTL 1h (`s-maxage=3600`) |
-| **Google News RSS Viamão** | `news.google.com/rss/search` | ~30 req/min | Cache TTL 1h (`s-maxage=3600`) |
+| **Transferegov Fundo a Fundo** | `api.transferegov.gestao.gov.br/fundoafundo/` | ~60 req/min (estimado) | Single-Flight Backend + Cache TTL 2h (`s-maxage=7200`) |
 | **RSS Oficial da Prefeitura de Viamão** | `viamao.rs.gov.br/portal/rss` | Feed XML Público | Parsing Nativo + Filtro Temático Cultural + Cache TTL 1h |
 
 ### 📌 Emendas Parlamentares Candidatas a Inclusão (Aguardando Confirmação)
@@ -113,7 +121,9 @@ Conforme a política estrita de integridade contra desinformação, emendas sem 
 
 ## 📚 Base de Conhecimento e Editais PNAB 2026 de Viamão
 
-O assistente de elaboração de projetos culturais baseia-se exclusivamente em normativas oficiais arquivadas no diretório `backend/conhecimento/`, incluindo os **16 editais da PNAB 2026 de Viamão** (com status "inscrições encerradas" em 07/09/2026):
+O assistente de elaboração de projetos culturais baseia-se exclusivamente em normativas oficiais arquivadas no diretório `backend/conhecimento/`, incluindo os **16 editais da PNAB 2026 de Viamão** (com status "inscrições encerradas" em 07/09/2026).
+
+> ⚠️ Os editais 02, 05, 09, 10, 11, 12, 14, 15 e 16 estão só com cabeçalho e link do PDF — o texto integral ainda não foi incluído, então o assistente não tem o conteúdo deles. Os demais (01, 03, 04, 06, 07, 08, 13) têm o texto completo.
 1. Audiovisual (`edital_pnab_viamao_audiovisual.txt`)
 2. Literatura (`edital_pnab_viamao_literatura.txt`)
 3. Artesanato (`edital_pnab_viamao_artesanato.txt`)

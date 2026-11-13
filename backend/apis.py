@@ -192,48 +192,14 @@ def classificar_tipo_cultural(texto: str) -> Optional[str]:
     return "Outras Áreas"
 
 
-# =============================================================================
-# MAPEAMENTO DE PARLAMENTARES FEDERAIS DO RS E PARTIDOS
-# =============================================================================
+def status_execucao(valor: float, pago: float) -> str:
+    """Status derivado apenas dos valores informados pela fonte (sem inferências)."""
+    if not valor or valor <= 0:
+        return "Sem empenho registrado"
+    if pago >= valor:
+        return "Concluída"
+    return "Em Execução / Vigente"
 
-RS_PARLAMENTARES_PARTIDOS: Dict[str, str] = {
-    "FERNANDA MELCHIONNA": "PSOL",
-    "BOHN GASS": "PT",
-    "MARCON": "PT",
-    "REGINETE BISPO": "PT",
-    "PAULO PAIM": "PT",
-    "MARIA DO ROSARIO": "PT",
-    "MARIA DO ROSÁRIO": "PT",
-    "DENISE PESSOA": "PT",
-    "DENISE PESSÔA": "PT",
-    "ALEXANDRE LINDENMEYER": "PT",
-    "ANY ORTIZ": "CIDADANIA",
-    "HEITOR SCHUCH": "PSB",
-    "AFONSO HAMM": "PP",
-    "COVATTI FILHO": "PP",
-    "PEDRO WESTPHALEN": "PP",
-    "LUIS CARLOS HEINZE": "PP",
-    "ALCEU MOREIRA": "MDB",
-    "MARCIO BIOLCHI": "MDB",
-    "AFONSO MOTTA": "PDT",
-    "POMPEO DE MATTOS": "PDT",
-    "CARLOS GOMES": "REPUBLICANOS",
-    "FRANCIANE BAYER": "REPUBLICANOS",
-    "HAMILTON MOURÃO": "REPUBLICANOS",
-    "HAMILTON MOURAO": "REPUBLICANOS",
-    "GIOVANI CHERINI": "PL",
-    "SANDERSON": "PL",
-    "BIBO NUNES": "PL",
-    "TENENTE CORONEL ZUCCO": "PL",
-    "ZUCCO": "PL",
-    "MARCEL VAN HATTEM": "NOVO",
-    "LUCAS REDECKER": "PSDB",
-    "DANIEL TRZECIAK": "PSDB",
-    "DANRLEI DE DEUS HINTERHOLZ": "PSD",
-    "MAURICIO DZIEDRICKI": "PODEMOS",
-    "DAIANA SANTOS": "PCdoB",
-    "LUIZ CARLOS BUSATO": "UNIÃO",
-}
 
 def parse_moeda_br(valor: Any) -> float:
     """Converte valores monetários no formato brasileiro (ex: '200.000,00') para float."""
@@ -411,22 +377,16 @@ class CguTransparenciaApi:
 
                 codigo_emenda = str(r.get("codigoEmenda") or len(emendas_map) + 1)
                 autor_raw = (r.get("nomeAutor") or r.get("autor") or "Não Identificado").strip()
-                autor_norm = normalizar_texto(autor_raw).upper()
                 
-                # Resolução do Partido Político via mapeamento oficial de parlamentares do RS
-                partido = r.get("partido") or r.get("siglaPartido") or None
-                if not partido:
-                    for nome_chave, sigla in RS_PARLAMENTARES_PARTIDOS.items():
-                        if normalizar_texto(nome_chave).upper() in autor_norm or autor_norm in normalizar_texto(nome_chave).upper():
-                            partido = sigla
-                            break
-                if not partido:
-                    partido = "S/P"
+                # Partido apenas quando informado pela própria fonte (a API da CGU normalmente não informa).
+                # Mapeamentos fixos nome→partido foram removidos: parlamentares trocam de partido e o dado
+                # ficaria incorreto para exercícios anteriores.
+                partido = r.get("partido") or r.get("siglaPartido") or "Não informado pela fonte"
 
-                tipo_emenda = r.get("tipoEmenda") or "Individual - Finalidade Definida"
-                orgao_nome = r.get("orgao") or "Ministério da Cultura"
-                funcao_nome = r.get("funcao") or "Cultura"
-                subfuncao_nome = r.get("subfuncao") or "Difusão Cultural"
+                tipo_emenda = r.get("tipoEmenda") or "Não informado pela fonte"
+                orgao_nome = r.get("orgao") or "Não informado pela fonte"
+                funcao_nome = r.get("funcao") or ("Cultura" if codigo_funcao == "13" else "Não informado pela fonte")
+                subfuncao_nome = r.get("subfuncao") or "Não informado pela fonte"
                 
                 objeto = f"Emenda OGU nº {r.get('numeroEmenda', codigo_emenda)} - {funcao_nome} ({subfuncao_nome}) - {localidade}"
                 
@@ -449,8 +409,7 @@ class CguTransparenciaApi:
                     existente = emendas_map[dedup_key]
                     if pago_final > existente.pago:
                         existente.pago = pago_final
-                        if existente.pago >= existente.valor:
-                            existente.status = "Concluída"
+                        existente.status = status_execucao(existente.valor, existente.pago)
                     if f"Orçamento Geral da União {ano_exercicio}" not in existente.fontes_cruzadas:
                         existente.fontes_cruzadas.append(f"Orçamento Geral da União {ano_exercicio}")
                     continue
@@ -465,13 +424,13 @@ class CguTransparenciaApi:
                     objeto=objeto,
                     valor=valor_empenhado,
                     pago=pago_final,
-                    status="Em Execução / Vigente" if pago_final < valor_empenhado else "Concluída",
+                    status=status_execucao(valor_empenhado, pago_final),
                     is_cultura=is_cultura,
                     area_atuacao="Cultura & Turismo" if is_cultura else funcao_nome,
                     municipio="Viamão",
                     esfera="Federal (API CGU)",
                     numero_emenda=codigo_emenda,
-                    beneficiario="Município de Viamão / RS",
+                    beneficiario=f"Localidade do gasto: {localidade}" if localidade else "Não informado pela fonte",
                     fonte="Portal da Transparência do Governo Federal (CGU)",
                     fontes_cruzadas=["Portal da Transparência CGU (API de Dados)", f"Orçamento Geral da União {ano_exercicio}"],
                     subprojeto=f"{subfuncao_nome} - {localidade}",
@@ -486,235 +445,6 @@ class CguTransparenciaApi:
 # 3. API PORTAL DA TRANSPARÊNCIA RS / CAGE (EMENDAS PARLAMENTARES ESTADUAIS)
 # =============================================================================
 
-# Base auditada oficial de emendas parlamentares estaduais destinadas a Viamão/RS (ALRS / CAGE)
-# Utilizada como fonte de referência garantida dado que o portal estadual renderiza dados via PowerBI embed.
-AUDITED_EMENDAS_RS_VIAMAO: List[Dict[str, Any]] = [
-    # Exercício 2024
-    {
-        "ano": 2024,
-        "ep": "1204/2024",
-        "parlamentar": "Deputado Professor Bonatto (PSDB/RS)",
-        "partido": "PSDB",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Restauro Emergencial e Conservação do Patrimônio Cultural Histórico de Viamão",
-        "valor": 100000.0,
-        "valor_pago": 100000.0,
-        "status": "Concluída",
-        "municipio": "Viamão",
-        "beneficiario": "Prefeitura Municipal de Viamão - SMC",
-    },
-    {
-        "ano": 2024,
-        "ep": "1312/2024",
-        "parlamentar": "Deputado Elton Weber (PSB/RS)",
-        "partido": "PSB",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Feira de Artes e Tradicionalismo Regional dos Distritos de Viamão",
-        "valor": 60000.0,
-        "valor_pago": 60000.0,
-        "status": "Concluída",
-        "municipio": "Viamão",
-        "beneficiario": "Associação Cultural e Tradicionalista de Viamão",
-    },
-    {
-        "ano": 2024,
-        "ep": "1408/2024",
-        "parlamentar": "Deputado Airton Lima (PODEMOS/RS)",
-        "partido": "PODEMOS",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Modernização de Equipamentos de Áudio e Palco para Eventos Culturais Populares",
-        "valor": 50000.0,
-        "valor_pago": 50000.0,
-        "status": "Concluída",
-        "municipio": "Viamão",
-        "beneficiario": "Conselho Municipal de Cultura de Viamão",
-    },
-    {
-        "ano": 2024,
-        "ep": "1519/2024",
-        "parlamentar": "Deputada Sofia Cavedon (PT/RS)",
-        "partido": "PT",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Circuito Literário, Feira do Livro e Formação de Mediadores de Leitura em Viamão",
-        "valor": 50000.0,
-        "valor_pago": 50000.0,
-        "status": "Concluída",
-        "municipio": "Viamão",
-        "beneficiario": "Rede de Bibliotecas Comunitárias de Viamão",
-    },
-    {
-        "ano": 2024,
-        "ep": "1622/2024",
-        "parlamentar": "Deputada Patrícia Alba (MDB/RS)",
-        "partido": "MDB",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Apoio a Festivais Regionais e Centros Comunitários Culturais de Viamão",
-        "valor": 75000.0,
-        "valor_pago": 75000.0,
-        "status": "Concluída",
-        "municipio": "Viamão",
-        "beneficiario": "Município de Viamão",
-    },
-    {
-        "ano": 2024,
-        "ep": "1730/2024",
-        "parlamentar": "Deputado Sergio Peres (REPUBLICANOS/RS)",
-        "partido": "REPUBLICANOS",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Incentivo à Música Sacra, Corais Comunitários e Prática Instrumental",
-        "valor": 50000.0,
-        "valor_pago": 50000.0,
-        "status": "Concluída",
-        "municipio": "Viamão",
-        "beneficiario": "Coletivo Cultural Comunitário de Viamão",
-    },
-    # Exercício 2025
-    {
-        "ano": 2025,
-        "ep": "2055/2025",
-        "parlamentar": "Deputada Sofia Cavedon (PT/RS)",
-        "partido": "PT",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Música nas Escolas e Formação Artística Infanto-Juvenil",
-        "valor": 50000.0,
-        "valor_pago": 50000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Coletivo Educacional e Artístico de Viamão",
-    },
-    {
-        "ano": 2025,
-        "ep": "2188/2025",
-        "parlamentar": "Deputado Edivilson Brum (MDB/RS)",
-        "partido": "MDB",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Fomento a Grupos de Folclore e Centros de Tradição Gaúcha em Viamão",
-        "valor": 100000.0,
-        "valor_pago": 80000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Associação Cultural e Campeira de Viamão",
-    },
-    {
-        "ano": 2025,
-        "ep": "2240/2025",
-        "parlamentar": "Deputado Elton Weber (PSB/RS)",
-        "partido": "PSB",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Feiras Culturais Rurais e Fortalecimento do Artesanato Comunitário de Itapuã",
-        "valor": 80000.0,
-        "valor_pago": 80000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Associação de Moradores e Produtores de Itapuã",
-    },
-    {
-        "ano": 2025,
-        "ep": "2310/2025",
-        "parlamentar": "Deputado Professor Bonatto (PSDB/RS)",
-        "partido": "PSDB",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Infraestrutura de Espaços Culturais Públicos e Centros de Convivência",
-        "valor": 120000.0,
-        "valor_pago": 120000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Secretaria Municipal de Cultura de Viamão",
-    },
-    {
-        "ano": 2025,
-        "ep": "2415/2025",
-        "parlamentar": "Deputado Valdeci Oliveira (PT/RS)",
-        "partido": "PT",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Apoio a Coletivos Culturais Independentes e Oficinas de Artes Urbanas",
-        "valor": 50000.0,
-        "valor_pago": 35000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Coletivo Cultural Periferia Ativa de Viamão",
-    },
-    # Exercício 2026
-    {
-        "ano": 2026,
-        "ep": "3012/2026",
-        "parlamentar": "Deputada Sofia Cavedon (PT/RS)",
-        "partido": "PT",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Biblioteca Municipal e Feira do Livro de Viamão",
-        "valor": 100000.0,
-        "valor_pago": 100000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Secretaria Municipal de Educação e Cultura de Viamão",
-    },
-    {
-        "ano": 2026,
-        "ep": "3045/2026",
-        "parlamentar": "Deputado Professor Bonatto (PSDB/RS)",
-        "partido": "PSDB",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Preservação do Centro Histórico e Igreja Matriz de Viamão",
-        "valor": 200000.0,
-        "valor_pago": 150000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Paróquia Nossa Senhora da Conceição e Mitra Arquidiocesana",
-    },
-    {
-        "ano": 2026,
-        "ep": "3078/2026",
-        "parlamentar": "Deputado Adão Pretto Filho (PT/RS)",
-        "partido": "PT",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Pontos de Cultura Urbana e Periferias de Viamão",
-        "valor": 100000.0,
-        "valor_pago": 75000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Associação de Moradores da Santa Isabel",
-    },
-    {
-        "ano": 2026,
-        "ep": "3102/2026",
-        "parlamentar": "Deputado Leonel Radde (PT/RS)",
-        "partido": "PT",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Fomento à Cultura Hip-Hop e Juventude de Viamão",
-        "valor": 50000.0,
-        "valor_pago": 50000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Coletivo de Cultura Urbana e Juventude de Viamão",
-    },
-    {
-        "ano": 2026,
-        "ep": "3150/2026",
-        "parlamentar": "Deputado Sergio Peres (REPUBLICANOS/RS)",
-        "partido": "REPUBLICANOS",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Equipamentos para Fanfarras e Bandas Escolares de Viamão",
-        "valor": 50000.0,
-        "valor_pago": 50000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Escola Estadual de Ensino Médio Setembrina",
-    },
-    {
-        "ano": 2026,
-        "ep": "3210/2026",
-        "parlamentar": "Deputada Patrícia Alba (MDB/RS)",
-        "partido": "MDB",
-        "secretaria": "Secretaria de Estado da Cultura (SEDAC-RS)",
-        "objeto": "Revitalização de Centros Comunitários Culturais de Viamão",
-        "valor": 150000.0,
-        "valor_pago": 120000.0,
-        "status": "Em Execução / Vigente",
-        "municipio": "Viamão",
-        "beneficiario": "Associação Cultural e Beneficente de Viamão",
-    },
-]
-
 class PortalTransparenciaRsApi:
     """
     Cliente para os Dados Abertos e Portal da Transparência do Estado do Rio Grande do Sul
@@ -725,9 +455,11 @@ class PortalTransparenciaRsApi:
       estaduais através de relatórios incorporados do Microsoft PowerBI (workspace CAGE/SEFAZ-RS).
     - Não existe API REST/JSON pública direta nem endpoint CSV estático estável no portal estadual
       (as chamadas internas utilizam tokens de sessão temporários do cluster PowerBI Azure).
-    - Estratégia de Ingestão: A classe tenta consultar qualquer endpoint estruturado disponível;
-      caso não retorne JSON estruturado, utiliza o acervo auditado oficial de emendas da ALRS
-      para Viamão, garantindo cobertura completa para os exercícios de 2024, 2025 e 2026 sem quebras.
+    - Estratégia de Ingestão: A classe tenta consultar qualquer endpoint estruturado disponível.
+      Se a fonte não devolver JSON estruturado, NENHUM registro é exibido e o atributo
+      `fonte_disponivel` fica False, para que o endpoint informe a indisponibilidade com transparência.
+      (Até a v12 havia aqui uma lista fixa de emendas sem número de empenho verificável; foi removida
+      na auditoria v13 por não ser rastreável a uma fonte oficial.)
     """
     BASE_URL = "https://transparencia.rs.gov.br/emendas-parlamentares/emendas-parlamentares-estaduais/dados"
     DADOS_ABERTOS_URL = "https://transparencia.rs.gov.br/dados-abertos"
@@ -735,6 +467,8 @@ class PortalTransparenciaRsApi:
     def __init__(self, client=None, single_flight_cache: Optional[SingleFlightCache] = None):
         self.client = client or http_client
         self.single_flight = single_flight_cache or single_flight
+        # Indica se ao menos um exercício retornou dados estruturados na última consulta
+        self.fonte_disponivel: bool = False
 
     def _fetch_rs_payload_raw(self, ano: int) -> Any:
         """Executa tentativa de requisição aos dados abertos do Portal RS."""
@@ -745,7 +479,7 @@ class PortalTransparenciaRsApi:
                 cache_ttl=None
             )
         except Exception as e_req:
-            logger.info(f"Portal RS web não possui endpoint JSON direto para {ano} ({e_req}). Utilizando acervo auditado ALRS.")
+            logger.info(f"Portal RS não forneceu JSON estruturado para {ano} ({e_req}).")
             return []
 
     def buscar_emendas_estaduais(
@@ -789,9 +523,10 @@ class PortalTransparenciaRsApi:
                 elif isinstance(payload, dict) and "data" in payload and isinstance(payload["data"], list):
                     registros = payload["data"]
                 
-                # Se o endpoint externo não fornecer JSON estruturado (PowerBI embed), utiliza o acervo auditado ALRS
+                # Sem JSON estruturado (relatório PowerBI): não há dado verificável para este exercício.
                 if not registros:
-                    registros = [r for r in AUDITED_EMENDAS_RS_VIAMAO if r.get("ano") == ano]
+                    continue
+                self.fonte_disponivel = True
 
                 for r in registros:
                     raw_mun = r.get("municipio") or r.get("beneficiario") or r.get("localidade") or ""
@@ -807,10 +542,10 @@ class PortalTransparenciaRsApi:
                         continue
 
                     num_ep = str(r.get("numero_emenda") or r.get("ep") or r.get("id") or len(emendas) + 1)
-                    autor = r.get("autor") or r.get("parlamentar") or "Deputado Estadual"
-                    partido = r.get("partido") or r.get("partido_sigla") or "S/P"
-                    orgao = r.get("secretaria") or r.get("orgao") or "Secretaria de Estado da Cultura (SEDAC-RS)"
-                    subprojeto = r.get("objeto") or r.get("subprojeto") or r.get("descricao") or "Apoio Cultural Comunitário"
+                    autor = r.get("autor") or r.get("parlamentar") or "Não informado pela fonte"
+                    partido = r.get("partido") or r.get("partido_sigla") or "Não informado pela fonte"
+                    orgao = r.get("secretaria") or r.get("orgao") or "Não informado pela fonte"
+                    subprojeto = r.get("objeto") or r.get("subprojeto") or r.get("descricao") or "Não informado pela fonte"
                     
                     texto_analise = f"{orgao} {subprojeto}".upper()
                     is_cultura = any(
@@ -830,19 +565,19 @@ class PortalTransparenciaRsApi:
                             id=f"em-est-{ano}-{num_ep.replace('/', '-')}",
                             autor=autor,
                             partido=partido,
-                            tipo="Individual (Impositiva)",
+                            tipo=r.get("tipo") or r.get("tipo_emenda") or "Não informado pela fonte",
                             ano=ano,
                             orgao=orgao,
                             objeto=subprojeto,
                             valor=valor_alocado,
                             pago=valor_pago,
-                            status=r.get("status") or ("Concluída" if valor_pago >= valor_alocado else "Em Execução / Vigente"),
+                            status=r.get("status") or status_execucao(valor_alocado, valor_pago),
                             is_cultura=is_cultura,
                             area_atuacao="Cultura & Turismo" if is_cultura else "Demais Áreas",
                             municipio="Viamão",
                             esfera="Estadual (ALRS)",
                             numero_emenda=f"Ep {num_ep}" if not str(num_ep).startswith("Ep") else str(num_ep),
-                            beneficiario=r.get("beneficiario") or "Município de Viamão",
+                            beneficiario=r.get("beneficiario") or "Não informado pela fonte",
                             fonte="Assembleia Legislativa RS (ALRS) / Transparência RS",
                             fontes_cruzadas=["Portal da Transparência RS (CAGE)", f"Sistema SAE ALRS {ano}"],
                             subprojeto=subprojeto,
